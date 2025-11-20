@@ -1,23 +1,20 @@
 ## GitHub Copilot / AI Agent Instructions for 9Melody Games Studio
 
 Project summary:
-- Frontend: Vite + React + TypeScript (recommended). Backend/API: Node.js + TypeScript (monorepo style). PostgreSQL database via Prisma. This site hosts posts (devlog/blog), company info, job board and in-house forum.
+- Frontend: Next.js + React + TypeScript (recommended; app lives in `web/`). Vite+React is also supported for separate SPA apps but the default scaffolded app uses Next.js. Backend/API: Node.js + TypeScript (monorepo style) or Next.js API routes. PostgreSQL database via Prisma. This site hosts posts (devlog/blog), company info, job board and in-house forum.
 
 Target goals for the AI agent:
 - Be productive: implement features, update docs, scaffold pages & API routes, and create PRs that pass CI and follow project conventions.
 - Ask clarifying questions before making design decisions that would change architecture or cross-cutting behavior (auth, DB models, infra).
 
 Quick architecture overview (what to expect):
-- Frontend: Vite + React + TypeScript. Use `src/` (or `packages/web/` in a monorepo) and React components in `src/components`.
-- Backend/API: Node.js + TypeScript API routes under `server/` or `src/server` (or `packages/api/`). Use Express/Nest.js or a similar framework as needed.
-- Note: If SSR/SSG is required, Next.js is acceptable; otherwise the default frontend build tool is Vite.
- - Frontend: Vite + React + TypeScript, or Next.js for SSR/SSG (project uses Next.js fullstack by default in `web/`).
- - Backend/API: Next.js API routes under `web/src/pages/api/*` (serverless) or Node.js services under `server/` for non-serverless.
+- Frontend: Next.js + React + TypeScript (default; app lives in `web/`). Use `src/` and React components in `src/components`.
+- Backend/API: Next.js API routes under `web/src/pages/api/*` (serverless) or Node.js services under `server/` for non-serverless.
+- Note: If you prefer a separate SPA setup, you can use Vite + React for client-only apps, but this repo scaffolds a Next.js fullstack app by default.
 - Database: `prisma/schema.prisma`. Use Prisma Client from `lib/prisma.ts` or `server/db.ts`.
 - Auth: Expect NextAuth or JWT cookie-based auth; `lib/auth` or `pages/api/auth/*`.
 
-- Developer workflows & commands (standardized):
-- Local dev (Node.js v18+, pnpm/npm/yarn):
+ - Developer workflows & commands (standardized):
  - Local dev (Node.js v18+, pnpm/npm/yarn):
 ```
 npm install
@@ -31,27 +28,31 @@ npm run dev
 ```
 - Build & test:
 ```
-# Frontend (Vite)
-npm run build:client    # vite build
-npm run preview:client  # vite preview
-# Backend
-npm run build:server
+# Frontend (Next.js `web/`):
+# From project root
+cd web
+npm install
+npm run dev          # next dev
+npm run build        # next build
+npm run start        # next start
+
+# Backend (if you maintain a separate server package or build artifacts):
+# e.g., server build may be `npm run build:server` in that package. In this repo we use Next.js API routes under `web/src/pages/api`, so there is no separate server build step.
 npm run test
 npm run lint
 ```
 TypeScript & Linting (enforcement):
 ```
-// package.json example scripts (root or workspace)
+// package.json example scripts (Next.js web project under `web/`)
 {
 	"scripts": {
-		"dev:client": "vite",
-		"dev:server": "ts-node-dev --respawn --transpile-only server/index.ts",
-		"dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
-		"build:client": "vite build",
-		"preview:client": "vite preview",
-		"build:server": "tsc -p tsconfig.server.json && node dist/server/index.js",
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "eslint --ext .ts,.tsx src",
 		"type-check": "tsc --noEmit",
-		"lint": "eslint --ext .ts,.tsx src server",
+		"prisma:migrate": "prisma migrate dev",
+		"prisma:seed": "ts-node prisma/seed.ts",
 		"test": "vitest"
 	}
 }
@@ -77,7 +78,7 @@ ESLint config snippet (TypeScript-aware linting & rules):
 }
 ```
 
-CI steps (example):
+CI steps (example) for `web/` Next.js app:
 ```
 - name: Install Dependencies
 	run: npm ci
@@ -85,10 +86,10 @@ CI steps (example):
 	run: npm run type-check
 - name: Lint
 	run: npm run lint -- --max-warnings=0
-- name: Build Client
-	run: npm run build:client
-- name: Build Server
-	run: npm run build:server
+- name: Build
+	run: npm run build
+- name: Run Tests
+	run: npm run test
 ```
 - DB migrations: `npx prisma migrate dev --name <desc>` and `npx prisma migrate deploy` in CI for deployments.
 
@@ -110,21 +111,13 @@ Security & infra notes (must-follow):
 - File uploads: Use S3 signed URLs (`lib/s3.ts`) or remote CDNs. Do not accept raw base64 uploads in requests.
 - Rate limit public endpoints (login, register, apply job, forum creation). Add server-side checks to prevent spam.
 
-- Keep UI components small & pure; put shared hooks in `src/hooks/`.
-- Use `useSWR` or React Query for caching/fetching; avoid direct fetch in componentDidMount.
-- Use `lib/` for utility functions; `server/` for backend-only business logic.
-- For PRs, include unit tests and API test for any behavioral change.
-Patterns worth following:
-- Keep UI components small & pure; put shared hooks in `src/hooks/`.
-- Use `useSWR` or React Query for caching/fetching; avoid direct fetch in componentDidMount.
-- Use `lib/` for utility functions; `server/` for backend-only business logic.
-- For PRs, include unit tests and API test for any behavioral change.
-- TypeScript rules: All new code must be TypeScript. Add `tsconfig.json` with `"strict": true` and run `tsc --noEmit` in CI via `npm run type-check`.
-- Prefer typed helper utilities, e.g., typed translation helper generation, typed RPC/resolvers, and avoid `any` wherever possible.
-- Keep UI components small & pure; put shared hooks in `src/hooks/`.
-- Use `useSWR` or React Query for caching/fetching; avoid direct fetch in componentDidMount.
-- Use `lib/` for utility functions; `server/` for backend-only business logic.
-- For PRs, include unit tests and API test for any behavioral change.
+ - Patterns worth following:
+ - Keep UI components small & pure; put shared hooks in `src/hooks/`.
+ - Use `useSWR` or React Query for caching/fetching; avoid direct fetch in componentDidMount.
+ - Use `lib/` for utility functions; `server/` for backend-only business logic.
+ - For PRs, include unit tests and API test for any behavioral change.
+ - TypeScript rules: All new code must be TypeScript. Add `tsconfig.json` with `"strict": true` and run `tsc --noEmit` in CI via `npm run type-check`.
+ - Prefer typed helper utilities, e.g., typed translation helper generation, typed RPC/resolvers, and avoid `any` wherever possible.
 
 Styling policy (MANDATORY):
 - Tailwind CSS is mandatory for all new UI work. Use Tailwind utility classes and variants for layout, spacing, colors, and responsiveness.
@@ -303,11 +296,7 @@ Integration points and environment variables:
 - JWT/NextAuth secret: `JWT_SECRET` / `NEXTAUTH_SECRET`
 - SMTP for emails: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`
 - S3/Cloudinary keys for media: `S3_BUCKET`, `S3_KEY`, `S3_SECRET`
-- Vite-specific env: `VITE_` prefix for client-side environment variables (e.g., `VITE_API_URL`).
-- Database: `DATABASE_URL`
-- JWT/NextAuth secret: `JWT_SECRET` / `NEXTAUTH_SECRET`
-- SMTP for emails: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`
-- S3/Cloudinary keys for media: `S3_BUCKET`, `S3_KEY`, `S3_SECRET`
+- Next.js env vars: use `NEXT_PUBLIC_` prefix for public client-side environment variables (e.g., `NEXT_PUBLIC_API_URL`). If using Vite for a separate SPA, keep `VITE_` prefix for that package.
 
 What to do when making changes:
 1. Run tests & lint locally. Fix any issues before committing.
@@ -318,14 +307,14 @@ What to do when making changes:
 
 When to ask a human:
 - If a requested change affects authentication flows, DB schema, infra (e.g., storage provider), or cross-component contracts, stop and ask for confirmation.
-- If there is no clear guideline for a style or hook name, follow the nearest existing example in `src/` and mention the pattern in the PR.
+- If there is no clear guideline for a style or hook name, follow the nearest existing example in `web/src/` and mention the pattern in the PR.
 
 Files to examine for project-specific patterns:
 - `README.md` (root) for project overview & commands
-- `package.json` for scripts
-- `prisma/schema.prisma` for DB models
-- `src/pages/api/*` or `server/*` for API structure
-- `src/components/` and `styles/` for UI patterns
+ - `web/package.json` (and root `package.json`) for scripts
+ - `prisma/schema.prisma` for DB models
+ - `web/src/pages/api/*` or `server/*` for API structure
+ - `web/src/components/` and `web/styles/` for UI patterns
 - `.github/workflows/*` for CI
 
 Post-PR checklist:
