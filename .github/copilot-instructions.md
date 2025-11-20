@@ -1,15 +1,15 @@
 ## GitHub Copilot / AI Agent Instructions for 9Melody Games Studio
 
 Project summary:
-- Frontend: Next.js + React + TypeScript (recommended; app lives in `web/`). Vite+React is also supported for separate SPA apps but the default scaffolded app uses Next.js. Backend/API: Node.js + TypeScript (monorepo style) or Next.js API routes. PostgreSQL database via Prisma. This site hosts posts (devlog/blog), company info, job board and in-house forum.
+ - Frontend: Next.js + React + TypeScript (recommended; app lives in the repo root). Vite+React is also supported for separate SPA apps but the default scaffolded app uses Next.js. Backend/API: Node.js + TypeScript (monorepo style) or Next.js API routes. PostgreSQL database via Prisma. This site hosts posts (devlog/blog), company info, job board and in-house forum.
 
 Target goals for the AI agent:
 - Be productive: implement features, update docs, scaffold pages & API routes, and create PRs that pass CI and follow project conventions.
 - Ask clarifying questions before making design decisions that would change architecture or cross-cutting behavior (auth, DB models, infra).
 
 Quick architecture overview (what to expect):
-- Frontend: Next.js + React + TypeScript (default; app lives in `web/`). Use `src/` and React components in `src/components`.
-- Backend/API: Next.js API routes under `web/src/pages/api/*` (serverless) or Node.js services under `server/` for non-serverless.
+- Frontend: Next.js + React + TypeScript (default; app lives in root). Use `src/` and React components in `src/components`.
+- Backend/API: Next.js API routes under `src/pages/api/*` (serverless) or Node.js services under `server/` for non-serverless.
 - Note: If you prefer a separate SPA setup, you can use Vite + React for client-only apps, but this repo scaffolds a Next.js fullstack app by default.
 - Database: `prisma/schema.prisma`. Use Prisma Client from `lib/prisma.ts` or `server/db.ts`.
 - Auth: Expect NextAuth or JWT cookie-based auth; `lib/auth` or `pages/api/auth/*`.
@@ -21,38 +21,36 @@ npm install
 cp .env.example .env    # populate env vars
 npx prisma migrate dev --name init
 npx prisma db seed       # if seed script exists
-# In a Next.js monorepo using `web/` as app root:
-cd web
-npm install
-npm run dev
+ # Previously in a Next.js monorepo using `web/` as app root; the app now lives in the repository root.
+ npm install
+ npm run dev
 ```
  - Docker dev (optional):
  ```bash
  docker compose up --build
  ```
- This starts Postgres, the Next.js `web/` app (port 3000), and optional services (mailhog). To run migrations/seeds with docker-compose run:
+ This starts Postgres, the Next.js app (port 3000), and optional services (mailhog). To run migrations/seeds with docker-compose run:
  ```bash
  docker compose run --rm prisma npx prisma migrate dev --name init
  docker compose run --rm prisma npx prisma db seed
  ```
 - Build & test:
 ```
-# Frontend (Next.js `web/`):
-# From project root
-cd web
-npm install
-npm run dev          # next dev
-npm run build        # next build
-npm run start        # next start
+ # Frontend (Next.js):
+ # From project root
+ npm install
+ npm run dev          # next dev
+ npm run build        # next build
+ npm run start        # next start
 
 # Backend (if you maintain a separate server package or build artifacts):
-# e.g., server build may be `npm run build:server` in that package. In this repo we use Next.js API routes under `web/src/pages/api`, so there is no separate server build step.
+ # e.g., server build may be `npm run build:server` in that package. In this repo we use Next.js API routes under `src/pages/api`, so there is no separate server build step.
 npm run test
 npm run lint
 ```
 TypeScript & Linting (enforcement):
 ```
-// package.json example scripts (Next.js web project under `web/`)
+ // package.json example scripts (Next.js project in the repo root)
 {
 	"scripts": {
 		"dev": "next dev",
@@ -87,7 +85,7 @@ ESLint config snippet (TypeScript-aware linting & rules):
 }
 ```
 
-CI steps (example) for `web/` Next.js app:
+ CI steps (example) for Next.js app:
 ```
 - name: Install Dependencies
 	run: npm ci
@@ -101,14 +99,14 @@ CI steps (example) for `web/` Next.js app:
 	run: npm run test
 ```
 - DB migrations: `npx prisma migrate dev --name <desc>` and `npx prisma migrate deploy` in CI for deployments.
- - DB migrations: The `schema.prisma` file lives at the repo root in `prisma/schema.prisma`, so run migrations from the repo root or pass `--schema` if running from `web/`.
+ - DB migrations: The `schema.prisma` file lives at the repo root in `prisma/schema.prisma`, so run migrations from the repo root or pass `--schema` if running from another folder.
 	 Example:
 	 - From repo root:
 		 `npx prisma migrate dev --schema=prisma/schema.prisma --name init`
-	 - From `web/` package (we expose scripts):
-		 `npm run prisma:migrate` (the script runs `prisma migrate dev --schema=../prisma/schema.prisma`)
-	 - From repo root, there's also a `dev` script that runs migration + seed and starts `web` dev server:
-		 `npm run dev` (from repo root)
+ 	 - From repo root we expose scripts such as:
+ 		`npm run prisma:migrate`
+ 	 - From repo root, there's also a `dev` script that runs migration + seed and starts the dev server:
+ 		`npm run dev` (from repo root)
 
 Code & API conventions (project-specific):
 - Responses: API handlers should return a consistent envelope, e.g.
@@ -182,6 +180,13 @@ Testing & acceptance criteria:
 - Run color contrast checks for large and normal text (WCAG AA). Tools: Lighthouse, axe, or https://contrast-ratio.com/
 - All new components must have Tailwind tokens (not HEX literals) so theme swapping works automatically.
 - Snapshots should be taken in both themes if visual regression testing is used (Chromatic or Playwright snapshot testing in dark/light modes).
+
+Pixel-art styling guidance (optional but recommended):
+- Use the provided `font-pixel` class (Press Start 2P) for pixel UI text.
+- Use `image-rendering: pixelated` for scaled pixel art images (`.pixelated` class).
+- Use `border-4` and thicker outlines for pixel borders to match the 8-bit aesthetic.
+- Avoid complex CSS transitions; prefer sharp toggles and no smoothing to keep the retro look.
+- Add a `/pixel-theme` demo page (already created) and add it to component tests and storybook snapshots.
 
 Exceptions:
 - Very specific marketing pages with unique designs may propose a themed exception — document reasons in a PR and obtain approval from a lead.
@@ -324,14 +329,14 @@ What to do when making changes:
 
 When to ask a human:
 - If a requested change affects authentication flows, DB schema, infra (e.g., storage provider), or cross-component contracts, stop and ask for confirmation.
-- If there is no clear guideline for a style or hook name, follow the nearest existing example in `web/src/` and mention the pattern in the PR.
+ - If there is no clear guideline for a style or hook name, follow the nearest existing example in `src/` and mention the pattern in the PR.
 
 Files to examine for project-specific patterns:
 - `README.md` (root) for project overview & commands
- - `web/package.json` (and root `package.json`) for scripts
+ - `package.json` for scripts
  - `prisma/schema.prisma` for DB models
- - `web/src/pages/api/*` or `server/*` for API structure
- - `web/src/components/` and `web/styles/` for UI patterns
+ - `src/pages/api/*` or `server/*` for API structure
+ - `src/components/` and `styles/` for UI patterns
 - `.github/workflows/*` for CI
 
 Post-PR checklist:
