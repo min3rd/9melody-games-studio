@@ -16,9 +16,16 @@ This is a minimal Next.js + TypeScript + Prisma scaffold for the 9Melody Game St
 ```bash
 npm install
 cp .env.example .env
-npx prisma migrate dev --name init
-npx prisma db seed
+# Run migration from the web package; the root `schema.prisma` lives in `../prisma/schema.prisma`
+npx prisma migrate dev --schema=../prisma/schema.prisma --name init
+npx prisma db seed --schema=../prisma/schema.prisma
 npm run dev
+```
+
+Run with Docker:
+```
+# from the repo root
+docker compose up --build
 ```
 
 ## Scripts

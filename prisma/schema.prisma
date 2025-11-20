@@ -14,7 +14,9 @@ model User {
   name      String?
   role      Role     @default(USER)
   posts     Post[]
+  threads   Thread[]
   applications Application[]
+  replies   Reply[]
   createdAt DateTime @default(now())
 }
 

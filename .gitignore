@@ -1,0 +1,59 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Next.js
+.next/
+web/.next/
+
+# Prisma client build artifacts
+node_modules/@prisma/
+
+# Builds
+dist/
+build/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+web/.env
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Coverage
+coverage/
+
+# Misc
+.cache/
+tmp/
+temp/
+
+# lock files - keep in repo (do not ignore package-lock.json or pnpm-lock.yaml)
+# Bundle (if any) artifacts
+*.tgz

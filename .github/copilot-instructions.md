@@ -26,6 +26,15 @@ cd web
 npm install
 npm run dev
 ```
+ - Docker dev (optional):
+ ```bash
+ docker compose up --build
+ ```
+ This starts Postgres, the Next.js `web/` app (port 3000), and optional services (mailhog). To run migrations/seeds with docker-compose run:
+ ```bash
+ docker compose run --rm prisma npx prisma migrate dev --name init
+ docker compose run --rm prisma npx prisma db seed
+ ```
 - Build & test:
 ```
 # Frontend (Next.js `web/`):
@@ -92,6 +101,14 @@ CI steps (example) for `web/` Next.js app:
 	run: npm run test
 ```
 - DB migrations: `npx prisma migrate dev --name <desc>` and `npx prisma migrate deploy` in CI for deployments.
+ - DB migrations: The `schema.prisma` file lives at the repo root in `prisma/schema.prisma`, so run migrations from the repo root or pass `--schema` if running from `web/`.
+	 Example:
+	 - From repo root:
+		 `npx prisma migrate dev --schema=prisma/schema.prisma --name init`
+	 - From `web/` package (we expose scripts):
+		 `npm run prisma:migrate` (the script runs `prisma migrate dev --schema=../prisma/schema.prisma`)
+	 - From repo root, there's also a `dev` script that runs migration + seed and starts `web` dev server:
+		 `npm run dev` (from repo root)
 
 Code & API conventions (project-specific):
 - Responses: API handlers should return a consistent envelope, e.g.
