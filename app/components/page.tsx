@@ -7,6 +7,7 @@ import i18n from '@/lib/i18n'
 import LanguageSwitcherPreview from './language-switcher-preview.client';
 import ModalPreview from './modal-preview.client';
 import TogglePreview from './toggle-preview.client';
+import AccordionPreview from './accordion-preview.client';
 import { CodePreview } from '@/components/ui';
 
 export const metadata = {
@@ -41,6 +42,8 @@ export default function ComponentsPage() {
       case 'Modal':
       case 'Modal Component':
         return <ModalPreview />;
+      case 'Accordion':
+        return <AccordionPreview />;
       case 'Toggle':
         return <TogglePreview />;
       default:
