@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
 export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -23,105 +23,118 @@ export default function Modal({
   backdrop = true,
   allowMove = false,
   allowResize = false,
-  width = 600,
-  height = 300,
+  width,
+  height,
   initialTop = 100,
   initialLeft = 80,
   origin = 'center',
-  animationDuration: animationDurationProp,
+  animationDuration = 200,
   title,
   children,
   ...rest
 }: Readonly<ModalProps>) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const posRef = useRef({ left: initialLeft, top: initialTop });
-  const sizeRef = useRef({ w: width ?? 0, h: height ?? 0 });
-  const draggingRef = useRef(false);
-  const resizingRef = useRef(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
-  const resizeStart = useRef({ w: 0, h: 0, x: 0, y: 0 });
-  const [, setTick] = useState(0); // for re-render
-  const animationDuration = typeof animationDurationProp === 'number' ? animationDurationProp : 140; // ms
-  const [visible, setVisible] = useState(open);
-  const [closing, setClosing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [active, setActive] = useState(false);
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  
+  // Position and Size State
+  // We use refs for values that change frequently during drag to avoid stale closures in event listeners,
+  // but we also need state to trigger renders.
+  const posRef = useRef({ x: initialLeft, y: initialTop });
+  const sizeRef = useRef({ w: width, h: height });
+  
+  // Force update helper
+  const [, setTick] = useState(0);
+  const forceUpdate = () => setTick(t => t + 1);
 
+  // Drag/Resize Refs
+  const isDragging = useRef(false);
+  const isResizing = useRef(false);
+  const dragStart = useRef({ mouseX: 0, mouseY: 0, startX: 0, startY: 0 });
+  const resizeStart = useRef({ mouseX: 0, mouseY: 0, startW: 0, startH: 0 });
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Initialize Portal
   useEffect(() => {
-    // ensure root exists
-    const el = document.getElementById('modal-root');
-    if (!el) {
-      const root = document.createElement('div');
+    let root = document.getElementById('modal-root');
+    if (!root) {
+      root = document.createElement('div');
       root.id = 'modal-root';
       document.body.appendChild(root);
     }
+    setPortalRoot(root);
   }, []);
 
-  // When the modal first becomes visible, if autosize (no width/height) is used,
-  // compute size based on content after mount.
+  // Handle Open/Close Animation Lifecycle
   useEffect(() => {
-    if (!visible) return;
-    const el = modalRef.current;
-    if (!el) return;
-    // Only compute if width/height weren't provided
-    if (!width) {
-      sizeRef.current.w = el.offsetWidth;
-    }
-    if (!height) {
-      sizeRef.current.h = el.offsetHeight;
-    }
-    // trigger render update to apply sizes
-    setTick((t) => t + 1);
-  }, [visible]);
+    let timeoutId: NodeJS.Timeout;
+    let rafId: number;
 
-  useEffect(() => {
     if (open) {
-      setVisible(true);
-      setClosing(false);
-    } else if (visible) {
-      // start closing animation and unmount after animation completes
-      setClosing(true);
-      const id = setTimeout(() => {
-        setVisible(false);
-        setClosing(false);
-      }, animationDuration + 10);
-      return () => clearTimeout(id);
+      setMounted(true);
+      // Double RAF ensures the browser paints the "mounted" state (opacity 0) 
+      // before applying the "active" state (opacity 1), triggering the transition.
+      rafId = requestAnimationFrame(() => {
+        rafId = requestAnimationFrame(() => {
+          setActive(true);
+        });
+      });
+    } else {
+      setActive(false);
+      // Wait for the transition to finish before removing from DOM
+      timeoutId = setTimeout(() => {
+        setMounted(false);
+      }, animationDuration);
     }
-    return;
-  }, [open, visible]);
 
+    return () => {
+      clearTimeout(timeoutId);
+      cancelAnimationFrame(rafId);
+    };
+  }, [open, animationDuration]);
+
+  // Auto-size logic: if width/height are not provided, measure content once mounted
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape' && open) {
-        onClose?.();
+    if (mounted && modalRef.current) {
+      if (width === undefined) {
+        sizeRef.current.w = modalRef.current.offsetWidth;
+      } else {
+        sizeRef.current.w = width;
       }
+      if (height === undefined) {
+        sizeRef.current.h = modalRef.current.offsetHeight;
+      } else {
+        sizeRef.current.h = height;
+      }
+      forceUpdate();
     }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [mounted, width, height]);
 
+  // Drag and Resize Event Handlers
   useEffect(() => {
-    function onMouseMove(e: MouseEvent) {
-      if (draggingRef.current && allowMove) {
-        const x = e.clientX - dragOffset.current.x;
-        const y = e.clientY - dragOffset.current.y;
-        posRef.current.left = Math.max(8, x);
-        posRef.current.top = Math.max(8, y);
-        setTick((t) => t + 1);
-      }
-      if (resizingRef.current && allowResize) {
-        const dx = e.clientX - resizeStart.current.x;
-        const dy = e.clientY - resizeStart.current.y;
-        sizeRef.current.w = Math.max(200, resizeStart.current.w + dx);
-        sizeRef.current.h = Math.max(100, resizeStart.current.h + dy);
-        setTick((t) => t + 1);
-      }
-    }
+    if (!allowMove && !allowResize) return;
 
-    function onMouseUp() {
-      draggingRef.current = false;
-      resizingRef.current = false;
-      // commit position / size
-    }
+    const onMouseMove = (e: MouseEvent) => {
+      if (isDragging.current && allowMove) {
+        const dx = e.clientX - dragStart.current.mouseX;
+        const dy = e.clientY - dragStart.current.mouseY;
+        posRef.current.x = Math.max(0, dragStart.current.startX + dx);
+        posRef.current.y = Math.max(0, dragStart.current.startY + dy);
+        forceUpdate();
+      }
+      if (isResizing.current && allowResize) {
+        const dx = e.clientX - resizeStart.current.mouseX;
+        const dy = e.clientY - resizeStart.current.mouseY;
+        sizeRef.current.w = Math.max(200, resizeStart.current.startW + dx);
+        sizeRef.current.h = Math.max(100, resizeStart.current.startH + dy);
+        forceUpdate();
+      }
+    };
+
+    const onMouseUp = () => {
+      isDragging.current = false;
+      isResizing.current = false;
+    };
 
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
@@ -131,117 +144,129 @@ export default function Modal({
     };
   }, [allowMove, allowResize]);
 
-  function onTitlePointerDown(e: React.PointerEvent) {
+  // Keyboard Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  const onTitleMouseDown = (e: React.MouseEvent) => {
     if (!allowMove) return;
-    draggingRef.current = true;
-    dragOffset.current = {
-      x: e.clientX - posRef.current.left,
-      y: e.clientY - posRef.current.top,
+    // Prevent default to avoid text selection
+    e.preventDefault(); 
+    isDragging.current = true;
+    dragStart.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      startX: posRef.current.x,
+      startY: posRef.current.y
     };
-  }
-
-  function onResizePointerDown(e: React.PointerEvent) {
-    if (!allowResize) return;
-    resizingRef.current = true;
-    resizeStart.current = {
-      w: sizeRef.current.w,
-      h: sizeRef.current.h,
-      x: e.clientX,
-      y: e.clientY,
-    };
-    e.stopPropagation();
-  }
-
-  if (!visible) return null;
-
-  const modalStyle: React.CSSProperties = {
-    left: posRef.current.left,
-    top: posRef.current.top,
-    ...(width ? { width: `${sizeRef.current.w}px` } : {}),
-    ...(height ? { height: `${sizeRef.current.h}px` } : {}),
   };
 
-  const { transformOrigin, translateX, translateY } = (() => {
-    switch (origin) {
-      case 'top-left':
-        return { transformOrigin: '0 0', translateX: '-8px', translateY: '-8px' };
-      case 'top-right':
-        return { transformOrigin: '100% 0', translateX: '8px', translateY: '-8px' };
-      case 'bottom-left':
-        return { transformOrigin: '0 100%', translateX: '-8px', translateY: '8px' };
-      case 'bottom-right':
-        return { transformOrigin: '100% 100%', translateX: '8px', translateY: '8px' };
-      case 'center':
-      default:
-        return { transformOrigin: '50% 50%', translateX: '0px', translateY: '0px' };
-    }
-  })();
+  const onResizeMouseDown = (e: React.MouseEvent) => {
+    if (!allowResize) return;
+    e.preventDefault();
+    e.stopPropagation();
+    isResizing.current = true;
+    resizeStart.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      startW: sizeRef.current.w || 0,
+      startH: sizeRef.current.h || 0
+    };
+  };
 
-  const content = (
-    <div
-      ref={rootRef}
-      className="fixed inset-0 z-50 flex items-start justify-center"
-      role="presentation"
-    >
+  if (!mounted || !portalRoot) return null;
+
+  // Calculate Transform Origin and Initial Offsets for Animation
+  const getOriginStyles = () => {
+    switch (origin) {
+      case 'top-left': return { origin: '0% 0%', translate: '-10px -10px' };
+      case 'top-right': return { origin: '100% 0%', translate: '10px -10px' };
+      case 'bottom-left': return { origin: '0% 100%', translate: '-10px 10px' };
+      case 'bottom-right': return { origin: '100% 100%', translate: '10px 10px' };
+      case 'center': default: return { origin: '50% 50%', translate: '0px 0px' };
+    }
+  };
+  const { origin: tOrigin, translate: tTranslate } = getOriginStyles();
+
+  // Dynamic Styles
+  const modalStyle: React.CSSProperties = {
+    position: 'absolute',
+    left: posRef.current.x,
+    top: posRef.current.y,
+    width: sizeRef.current.w,
+    height: sizeRef.current.h,
+    // Animation properties
+    transition: `opacity ${animationDuration}ms ease-out, transform ${animationDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
+    transformOrigin: tOrigin,
+    opacity: active ? 1 : 0,
+    transform: active ? 'translate(0, 0) scale(1)' : `translate(${tTranslate}) scale(0.95)`,
+  };
+
+  const backdropStyle: React.CSSProperties = {
+    transition: `opacity ${animationDuration}ms ease-out`,
+    opacity: active ? 1 : 0,
+  };
+
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex items-start justify-center" role="presentation">
+      {/* Backdrop */}
       {backdrop && (
         <div
-          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${closing ? 'animate-backdropOut' : 'animate-backdropIn'}`}
-          style={{ animation: `${closing ? 'fadeOut' : 'fadeIn'} .12s ease` }}
-          onClick={() => onClose?.()}
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          style={backdropStyle}
+          onClick={onClose}
         />
       )}
 
+      {/* Modal Window */}
       <div
         ref={modalRef}
-        className={`relative bg-white dark:bg-neutral-900 rounded shadow-lg overflow-hidden transition-transform transform ${closing ? 'opacity-0' : 'opacity-100'} ${closing ? 'animate-modalClose' : 'animate-modalOpen'}`}
-        style={{ ...modalStyle, position: 'absolute', transformOrigin: transformOrigin, ["--modal-init-translate-x" as any]: translateX, ["--modal-init-translate-y" as any]: translateY }}
+        className="relative bg-white dark:bg-neutral-900 rounded shadow-lg overflow-hidden flex flex-col"
+        style={modalStyle}
         role="dialog"
         aria-modal
         {...rest}
       >
+        {/* Header / Title Bar */}
         <div
-          className={`flex items-center justify-between gap-2 px-4 py-2 text-sm border-b border-neutral-200 dark:border-neutral-800 ${allowMove ? 'cursor-grab' : 'cursor-default'}`}
-          onPointerDown={onTitlePointerDown}
+          className={`flex items-center justify-between gap-2 px-4 py-2 text-sm border-b border-neutral-200 dark:border-neutral-800 select-none ${allowMove ? 'cursor-grab active:cursor-grabbing' : ''}`}
+          onMouseDown={onTitleMouseDown}
         >
-          <div className="font-medium text-sm">{title ?? 'Modal'}</div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onClose?.()}
-              aria-label="Close"
-              className="px-2 py-1 rounded text-xs bg-neutral-100 dark:bg-neutral-800"
-            >
-              ✕
-            </button>
-          </div>
+          <div className="font-medium text-sm truncate">{title ?? 'Modal'}</div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="px-2 py-1 rounded text-xs bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors"
+          >
+            ✕
+          </button>
         </div>
 
-        <div className="p-4 overflow-auto h-[calc(100%-48px)]">{children}</div>
+        {/* Content */}
+        <div className="flex-1 p-4 overflow-auto">
+          {children}
+        </div>
 
+        {/* Resize Handle */}
         {allowResize && (
           <div
-            className="absolute right-0 bottom-0 w-4 h-4 cursor-se-resize z-10"
-            onPointerDown={onResizePointerDown}
+            className="absolute right-0 bottom-0 w-4 h-4 cursor-se-resize z-10 flex items-center justify-center"
+            onMouseDown={onResizeMouseDown}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="opacity-60">
-              <path d="M3 21L21 3" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="opacity-50">
+              <path d="M22 2L2 22" stroke="currentColor" strokeWidth={3} strokeLinecap="round" />
             </svg>
           </div>
         )}
       </div>
-
-      <style jsx global>{`
-        @keyframes modalOpen { from { opacity: 0; transform: translate(var(--modal-init-translate-x), var(--modal-init-translate-y)) scale(.86); } to { opacity: 1; transform: translate(0, 0) scale(1); } }
-        @keyframes modalClose { from { opacity: 1; transform: translate(0, 0) scale(1); } to { opacity: 0; transform: translate(var(--modal-init-translate-x), var(--modal-init-translate-y)) scale(.86); } }
-        .animate-modalOpen { animation: modalOpen ${animationDuration}ms cubic-bezier(.2,.9,.2,1) forwards; }
-        .animate-modalClose { animation: modalClose ${animationDuration}ms cubic-bezier(.2,.9,.2,1) forwards; }
-        @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes backdropOut { from { opacity: 1; } to { opacity: 0; } }
-        .animate-backdropIn { animation: backdropIn ${animationDuration}ms linear forwards; }
-        .animate-backdropOut { animation: backdropOut ${animationDuration}ms linear forwards; }
-      `}</style>
-    </div>
+    </div>,
+    portalRoot
   );
-
-  const root = document.getElementById('modal-root')!;
-  return ReactDOM.createPortal(content, root);
 }
