@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 
-export default function ThemeToggle(): JSX.Element {
+export default function ThemeToggle() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window === 'undefined') return 'light';
     const stored = localStorage.getItem('theme');

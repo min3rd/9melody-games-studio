@@ -86,7 +86,7 @@ export default function Dropdown({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((s) => !s)}
-        className={`inline-flex items-center gap-2 rounded-none px-3 py-2 bg-foreground text-background dark:bg-background dark:text-foreground pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-colors transition-shadow duration-150`}
+        className={`inline-flex items-center gap-2 rounded-none px-3 py-2 bg-foreground text-background dark:bg-background dark:text-foreground pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition duration-150 ease-out`}
       >
         {label}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="opacity-80">
