@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import ButtonPreview from './button-preview.client';
+import DropdownPreview from './dropdown-preview.client';
 
 export const metadata = {
   title: 'Components',
@@ -17,6 +18,17 @@ export default function ComponentsPage() {
       .filter((name) => fs.statSync(path.join(uiDir, name)).isDirectory());
   } catch (e) {
     components = [];
+  }
+
+  function renderPreview(name: string) {
+    switch (name) {
+      case 'Button':
+        return <ButtonPreview />;
+      case 'Dropdown':
+        return <DropdownPreview />;
+      default:
+        return <div className="text-sm text-neutral-600 dark:text-neutral-300">No preview available yet.</div>;
+    }
   }
 
   return (
@@ -41,37 +53,21 @@ export default function ComponentsPage() {
         </aside>
 
         <main className="col-span-3 space-y-8">
-          {components.includes('Button') && (
-            <section id="button" className="p-4 border rounded">
-              <h2 className="text-lg font-semibold mb-2">Button</h2>
-              <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-300">
-                The `Button` component is the primary clickable element used across the app. It
-                supports `variant` and `size` props for common cases.
-              </p>
-
-              <div className="mb-4">
-                <ButtonPreview />
-              </div>
+          {components.map((c) => (
+            <section id={c.toLowerCase()} key={c} className="p-4 border rounded">
+              <h2 className="text-lg font-semibold mb-2">{c}</h2>
+              <div className="mb-4">{renderPreview(c)}</div>
 
               <div className="text-sm">
                 <div className="font-medium mb-2">Usage</div>
                 <pre className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded text-sm overflow-auto">
-                  {`import { Button } from '@/components/ui'
+                  {`import { ${c} } from '@/components/ui'
 
-<Button variant="primary" size="md">Save</Button>`}
+<${c} />`}
                 </pre>
               </div>
             </section>
-          )}
-
-          {components
-            .filter((c) => c !== 'Button')
-            .map((c) => (
-              <section id={c.toLowerCase()} key={c} className="p-4 border rounded">
-                <h2 className="text-lg font-semibold mb-2">{c}</h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-300">No preview available yet.</p>
-              </section>
-            ))}
+          ))}
         </main>
       </div>
     </div>
