@@ -1,351 +1,70 @@
-## GitHub Copilot / AI Agent Instructions for 9Melody Games Studio
+# GitHub Copilot / AI Assistant Instructions for 9melody-games-studio
 
-Project summary:
- - Frontend: Next.js + React + TypeScript (recommended; app lives in the repo root). Vite+React is also supported for separate SPA apps but the default scaffolded app uses Next.js. Backend/API: Node.js + TypeScript (monorepo style) or Next.js API routes. PostgreSQL database via Prisma. This site hosts posts (devlog/blog), company info, job board and in-house forum.
+## Quick summary
+- This is a minimal Next.js 13+ (App Router) TypeScript project scaffolded via create-next-app.
+- Primary source code is in the `app/` folder (App Router): `layout.tsx`, `page.tsx`, `globals.css`.
+- Tailwind CSS is configured through `postcss.config.mjs` and `globals.css` (Tailwind v4 style).
 
-Target goals for the AI agent:
-- Be productive: implement features, update docs, scaffold pages & API routes, and create PRs that pass CI and follow project conventions.
-- Ask clarifying questions before making design decisions that would change architecture or cross-cutting behavior (auth, DB models, infra).
+## What an AI helper should know (big picture)
+- This repository follows Next.js App Router patterns (routes in `app/`). `layout.tsx` sets global fonts and `page.tsx` is the root page.
+- The style system uses Tailwind CSS + global CSS variables (see `app/globals.css`). The project also loads Google fonts using `next/font/google` in `layout.tsx`.
+- Metadata for the app root is exported via the `metadata` export in `layout.tsx` (Next 13+ pattern).
+- `package.json` contains standard scripts: `dev`, `build`, `start`, `lint`.
 
-Quick architecture overview (what to expect):
-- Frontend: Next.js + React + TypeScript (default; app lives in root). Use `src/` and React components in `src/components`.
-- Backend/API: Next.js API routes under `src/pages/api/*` (serverless) or Node.js services under `server/` for non-serverless.
-- Note: If you prefer a separate SPA setup, you can use Vite + React for client-only apps, but this repo scaffolds a Next.js fullstack app by default.
-- Database: `prisma/schema.prisma`. Use Prisma Client from `lib/prisma.ts` or `server/db.ts`.
-- Auth: Expect NextAuth or JWT cookie-based auth; `lib/auth` or `pages/api/auth/*`.
+## Development & build workflows (explicit commands)
+- Start dev server: `npm run dev` (or `pnpm dev`, `yarn dev` depending on the user).
+- Build for production (local): `npm run build`.
+- Start production server after build: `npm run start`.
+- Run linting: `npm run lint` (it uses the `eslint` package directly; see `eslint.config.mjs`).
 
- - Developer workflows & commands (standardized):
- - Local dev (Node.js v18+, pnpm/npm/yarn):
-```
-npm install
-cp .env.example .env    # populate env vars
-npx prisma migrate dev --name init
-npx prisma db seed       # if seed script exists
- # Previously in a Next.js monorepo using `web/` as app root; the app now lives in the repository root.
- npm install
- npm run dev
-```
- - Docker dev (optional):
- ```bash
- docker compose up --build
- ```
- This starts Postgres, the Next.js app (port 3000), and optional services (mailhog). To run migrations/seeds with docker-compose run:
- ```bash
- docker compose run --rm prisma npx prisma migrate dev --name init
- docker compose run --rm prisma npx prisma db seed
- ```
-- Build & test:
-```
- # Frontend (Next.js):
- # From project root
- npm install
- npm run dev          # next dev
- npm run build        # next build
- npm run start        # next start
+Notes for the agent: When adding scripts or commands, follow the existing `package.json` conventions and keep notations minimal.
 
-# Backend (if you maintain a separate server package or build artifacts):
- # e.g., server build may be `npm run build:server` in that package. In this repo we use Next.js API routes under `src/pages/api`, so there is no separate server build step.
-npm run test
-npm run lint
-```
-TypeScript & Linting (enforcement):
-```
- // package.json example scripts (Next.js project in the repo root)
-{
-	"scripts": {
-		"dev": "next dev",
-		"build": "next build",
-		"start": "next start",
-		"lint": "eslint --ext .ts,.tsx src",
-		"type-check": "tsc --noEmit",
-		"prisma:migrate": "prisma migrate dev",
-		"prisma:seed": "ts-node prisma/seed.ts",
-		"test": "vitest"
-	}
-}
-```
+## Project-specific conventions & patterns
+- Files under `app/` follow the Next.js App Router. Reusable components should follow stable conventions (e.g., move to `components/` if large or reused).
+- No `pages/` API or routing is present — use `app/` routes and colocation.
+- Fonts are defined with `next/font/google` and saved as CSS variables so they can be used across app components. Keep this pattern while adding fonts.
+- Styling uses Tailwind and custom CSS variables (color tokens in `globals.css`). Keep tokens consistent and avoid re-defining layout-level tokens per-component.
 
-ESLint config snippet (TypeScript-aware linting & rules):
-```
-{
-	"extends": [
-		"eslint:recommended",
-		"plugin:react/recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:jsx-a11y/recommended"
-	],
-	"parser": "@typescript-eslint/parser",
-	"plugins": ["@typescript-eslint", "react", "jsx-a11y"],
-	"rules": {
-		"@typescript-eslint/no-explicit-any": "warn",
-		"@typescript-eslint/explicit-module-boundary-types": "off",
-		"react/react-in-jsx-scope": "off",
-		"jsx-a11y/anchor-is-valid": "off"
-	}
-}
-```
+## Cross-component flows and integration points
+- App Router: `layout.tsx` wraps every route; `props.children` is the slot for the content of each route.
+- Image assets served from `public/`; see `app/page.tsx` for usage of `/next.svg` and `/vercel.svg`.
+- Tailwind utility classes are used for layout; do not mix component-level CSS modules unless necessary — prefer Tailwind utilities.
 
- CI steps (example) for Next.js app:
-```
-- name: Install Dependencies
-	run: npm ci
-- name: Type check
-	run: npm run type-check
-- name: Lint
-	run: npm run lint -- --max-warnings=0
-- name: Build
-	run: npm run build
-- name: Run Tests
-	run: npm run test
-```
-- DB migrations: `npx prisma migrate dev --name <desc>` and `npx prisma migrate deploy` in CI for deployments.
- - DB migrations: The `schema.prisma` file lives at the repo root in `prisma/schema.prisma`, so run migrations from the repo root or pass `--schema` if running from another folder.
-	 Example:
-	 - From repo root:
-		 `npx prisma migrate dev --schema=prisma/schema.prisma --name init`
- 	 - From repo root we expose scripts such as:
- 		`npm run prisma:migrate`
- 	 - From repo root, there's also a `dev` script that runs migration + seed and starts the dev server:
- 		`npm run dev` (from repo root)
+## Files and sections AI agents should edit (and how)
+- `app/layout.tsx`: modify metadata or fonts. Avoid changing signature of RootLayout — keep the Server component semantics.
+- `app/page.tsx`: main entry page; keep existing sample layout or expand with components.
+- `globals.css`: place global variables and Tailwind imports here. Prefer variable-driven theming.
+- `next.config.ts` and `eslint.config.mjs`: update only for project-level configuration.
 
-Code & API conventions (project-specific):
-- Responses: API handlers should return a consistent envelope, e.g.
-```
-{ success: true|false, data: ..., error?: { code, message } }
-```
-- Use `slug` fields for posts/jobs/threads. Keep slugs lowercase, `kebab-case`, and generated via `slugify(title)` helper located at `lib/slug.ts`.
-- Business logic belongs in `lib/services/*` or `server/services/*`. API routes are thin wrappers that validate input, call services, and return the envelope.
-- Use Prisma transactions for multi-step DB updates (e.g., creating a post & tags or an application + notification).
+## Testing & CI
+- No test framework or CI workflows are present in the repo. If adding test infra, prefer Jest + Testing Library or Vitest and add `test` and `ci` scripts in `package.json`.
+- For CI, if adding workflows, target `node: '18.x'` or newer for Next v16+. Ensure `npm ci` and `npm run build` run in the workflow.
 
-Testing patterns:
-- Unit tests in `__tests__` co-located with modules or under `tests/` (Vitest or Jest + React Testing Library). Use `vitest` for frontend components where possible.
-- Integration tests using Supertest for API endpoints; e2e with Playwright/Cypress for critical flows (auth, post creation, apply job).
+## Helpful patterns & examples (use these when generating code)
+- Prefer the App Router structure: add a folder `app/routeName/page.tsx` when adding routes.
+- Use `next/font/google` for font definitions and export CSS variables as in `layout.tsx`.
+- Use `/public` assets via `src="/asset.svg"` inside `next/image`.
+- Use `tailwind` utilities in JSX and keep `globals.css` for theming tokens.
 
-Security & infra notes (must-follow):
-- Hash passwords with bcrypt or argon2; SECRET and DB credentials must be stored in environment variables declared in `.env.example`.
-- File uploads: Use S3 signed URLs (`lib/s3.ts`) or remote CDNs. Do not accept raw base64 uploads in requests.
-- Rate limit public endpoints (login, register, apply job, forum creation). Add server-side checks to prevent spam.
+## When to ask for human help
+- If the change touches deployment (Vercel/other provider), confirm environment variables and build settings with maintainers.
+- If adding or modifying TypeScript config, request human confirmation when major compiler options or strictness flags change.
 
- - Patterns worth following:
- - Keep UI components small & pure; put shared hooks in `src/hooks/`.
- - Use `useSWR` or React Query for caching/fetching; avoid direct fetch in componentDidMount.
- - Use `lib/` for utility functions; `server/` for backend-only business logic.
- - For PRs, include unit tests and API test for any behavioral change.
- - TypeScript rules: All new code must be TypeScript. Add `tsconfig.json` with `"strict": true` and run `tsc --noEmit` in CI via `npm run type-check`.
- - Prefer typed helper utilities, e.g., typed translation helper generation, typed RPC/resolvers, and avoid `any` wherever possible.
+## Short actionable rules for Copilot/Suggested PRs (Do / Don't)
+- Do: Follow the `app/` App Router conventions; add routes under `app/`.
+- Do: Use Tailwind and global CSS variables for theming and layout.
+- Do: Use `next/image` for images stored in `public/`.
+- Don't: Add server-side APIs in `pages/api` — this repo uses `app/` routes only.
+- Don't: Change runtime Node or Next major versions without approval.
 
-Styling policy (MANDATORY):
-- Tailwind CSS is mandatory for all new UI work. Use Tailwind utility classes and variants for layout, spacing, colors, and responsiveness.
-- Do NOT create or import raw `.css` files for component styling. The only allowed exception is a global CSS file (e.g., `styles/globals.css`) that contains Tailwind directives (`@tailwind base; @tailwind components; @tailwind utilities;`) and project-wide resets only.
-- Do NOT use inline `style` attributes (e.g., `style={{ marginTop: 8 }}`) in React components — prefer Tailwind classes.
-- If a rare exception requires custom CSS, open a PR and request approval from a lead developer; document the reason in the PR description.
-
-Theming: Light/Dark mode support (MANDATORY):
-- All new UI work must support both light and dark themes.
-- Preference strategy: Prefer Tailwind's `class` dark mode strategy (recommended) or configure `media` with a server-side fallback for SSR.
-- Provide a theme toggle in the UI that persists user choice (localStorage, cookie or account preference); respect `prefers-color-scheme` as the initial default.
-- Avoid hardcoded colors in components; use Tailwind theme tokens (e.g., `text-primary`, `bg-surface`) and extend `tailwind.config.js` for app color tokens, with light/dark variants.
-- Use accessible contrast ratios for both themes (WCAG AA minimum for text and UI elements). Test color contrast in both themes.
-
-Implementation examples:
-```
-// tailwind.config.js
-module.exports = {
-	darkMode: 'class', // or 'media' depending on SSR needs
-	theme: {
-		extend: {
-			colors: {
-				primary: { DEFAULT: '#2563EB', dark: '#1E40AF' },
-				surface: { DEFAULT: '#FFFFFF', dark: '#111827' }
-			}
-		}
-	}
-}
-
-// In _app.tsx or RootProvider
-function App({ Component, pageProps }) {
-	// Reactively set `document.documentElement.classList` to 'dark' if theme === 'dark'
-	return <Component {...pageProps} />;
-}
-
-// Theme toggle example
-<button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Switch theme">Toggle</button>
-```
-
-SSR support & FOUC prevention:
-- When SSR is used, set the initial theme class on the `<html>` element during server render, using cookie/user preference or `prefers-color-scheme` detection to avoid flash of incorrect theme.
-
-Testing & acceptance criteria:
-- Manually test components in both light and dark themes with a theme toggle.
-- Run color contrast checks for large and normal text (WCAG AA). Tools: Lighthouse, axe, or https://contrast-ratio.com/
-- All new components must have Tailwind tokens (not HEX literals) so theme swapping works automatically.
-- Snapshots should be taken in both themes if visual regression testing is used (Chromatic or Playwright snapshot testing in dark/light modes).
-
-Pixel-art styling guidance (optional but recommended):
-- Use the provided `font-pixel` class (Press Start 2P) for pixel UI text.
-- Use `image-rendering: pixelated` for scaled pixel art images (`.pixelated` class).
-- Use `border-4` and thicker outlines for pixel borders to match the 8-bit aesthetic.
-- Avoid complex CSS transitions; prefer sharp toggles and no smoothing to keep the retro look.
-- Add a `/pixel-theme` demo page (already created) and add it to component tests and storybook snapshots.
-
-Exceptions:
-- Very specific marketing pages with unique designs may propose a themed exception — document reasons in a PR and obtain approval from a lead.
-
-Enforcement — Lint and CI checks (examples):
-- ESLint rule example to disallow inline `style` attributes (add to `.eslintrc`):
-```
-{
-	"rules": {
-		"no-restricted-syntax": [
-			"error",
-			{
-				"selector": "JSXAttribute[name.name='style']",
-				"message": "Inline style attributes are forbidden. Use Tailwind utility classes instead."
-			}
-		]
-	}
-}
-```
-- ESLint example to block `.css` imports (allow only `styles/globals.css`):
-```
-{
-	"rules": {
-		"no-restricted-imports": [
-			"error",
-			{
-				"patterns": [
-					"*.css",
-					"**/*.css"
-				]
-			}
-		]
-	}
-}
-```
-Note: The rule above will block all `.css` imports; you may configure a small override in the linter for `styles/globals.css` if needed.
-
-- CI check snippet (GitHub Actions step) to prevent accidental CSS imports and inline styles:
-```
-- name: Check CSS imports and inline styles
-	run: |
-		# Any import of .css outside of styles/globals.css
-		if git grep -n --line-number "import .*\.css" -- src | grep -v "styles/globals.css"; then
-			echo "CSS imports other than styles/globals.css are forbidden";
-			git grep -n --line-number "import .*\.css" -- src | grep -v "styles/globals.css";
-			exit 1;
-		fi
-		# Inline style attributes
-		if git grep -n "style={{" -- src; then
-			echo "Inline style attributes found. Use Tailwind classes instead.";
-			git grep -n "style={{" -- src;
-			exit 1;
-		fi
-```
-
-💡 Tip: Use `clsx` or `classnames` for conditional Tailwind classes and create small utility classes via `@apply` in `styles/globals.css` cautiously (prefer Tailwind utilities directly).
-
-Internationalization & No hardcoded strings (MANDATORY):
-- All visible, user-facing text in the UI must use an i18n library. Do not hardcode strings in JSX, metadata, or component output.
-- Recommended library for Next.js: `next-i18next` or `next-intl` (choose one and be consistent across the repo). Keep translations in `locales/{lang}/{namespace}.json` (e.g., `locales/vi/common.json`, `locales/en/common.json`).
-- Translation keys should be used everywhere visible strings appear (buttons, labels, error messages, alt text, placeholders, meta titles/descriptions).
-- Do NOT rely on database content to localize UI text; DB content (like posts from users) is free text and should be treated as-is (not forced through i18n).
-
-Examples:
-```
-// locales/vi/common.json
-{
-	"login": "Đăng nhập",
-	"signup": "Đăng ký",
-	"apply": "Ứng tuyển"
-}
-
-// In a component
-import { useTranslation } from 'next-i18next';
-
-export default function LoginButton() {
-	const { t } = useTranslation('common');
-	return <button>{t('login')}</button>;
-}
-```
-
-Server-side rendering with `next-i18next`:
-```
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-
-export const getStaticProps = async ({ locale }) => ({
-	props: {
-		...(await serverSideTranslations(locale, ['common']))
-	}
-});
-```
-
-ESLint: enforce no literal strings in JSX
-- Add `eslint-plugin-i18next` and enable the rule `i18next/no-literal-string` to block string literals in markup while allowing attribute whitelists like `data-testid` or `aria-*`:
-```
-{
-	"plugins": ["i18next"],
-	"rules": {
-		"i18next/no-literal-string": ["error", {
-			"markupOnly": true,
-			"ignoreAttribute": ["data-testid", "aria-label", "aria-labelledby", "title"],
-			"markupComponents": ["Trans"]
-		}]
-	}
-}
-```
-
-CI enforcement:
-```
-- name: Run ESLint
-	run: npm run lint -- --max-warnings=0
-```
-
-Exceptions & notes:
-- Test files and snapshot fixtures can use literal strings.
-- Console logs, internal server errors and debug messages may be non-localized.
-- UI strings loaded from an external CMS are considered content (not hardcoded), but their presentation strings should still be translated in the UI templates/shells (e.g., labels).
-- If a component receives text as children (from parent) that's not translated, verify the parent component uses `t()` or a translation pipeline.
-- For `dangerouslySetInnerHTML` content, ensure content is sanitized and translated at the source if it's UI text.
-
-Tip: Use typed translation helper generation where possible (e.g., `next-i18next` with types or manual TS types from translation keys) to avoid misspellings and missing translations.
-
-- Database: `DATABASE_URL`
-- JWT/NextAuth secret: `JWT_SECRET` / `NEXTAUTH_SECRET`
-- SMTP for emails: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`
-- S3/Cloudinary keys for media: `S3_BUCKET`, `S3_KEY`, `S3_SECRET`
-Integration points and environment variables:
-- Database: `DATABASE_URL`
-- JWT/NextAuth secret: `JWT_SECRET` / `NEXTAUTH_SECRET`
-- SMTP for emails: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`
-- S3/Cloudinary keys for media: `S3_BUCKET`, `S3_KEY`, `S3_SECRET`
-- Next.js env vars: use `NEXT_PUBLIC_` prefix for public client-side environment variables (e.g., `NEXT_PUBLIC_API_URL`). If using Vite for a separate SPA, keep `VITE_` prefix for that package.
-
-What to do when making changes:
-1. Run tests & lint locally. Fix any issues before committing.
-2. Update `prisma/schema.prisma` and run `npx prisma migrate dev` if schema changed.
-3. Add/Update API contract examples in `docs/` or OpenAPI spec (if present).
-4. Add migration/seed steps in PR description.
-5. Provide a short, clear PR description with the problem and the solution; link any relevant issue.
-
-When to ask a human:
-- If a requested change affects authentication flows, DB schema, infra (e.g., storage provider), or cross-component contracts, stop and ask for confirmation.
- - If there is no clear guideline for a style or hook name, follow the nearest existing example in `src/` and mention the pattern in the PR.
-
-Files to examine for project-specific patterns:
-- `README.md` (root) for project overview & commands
- - `package.json` for scripts
- - `prisma/schema.prisma` for DB models
- - `src/pages/api/*` or `server/*` for API structure
- - `src/components/` and `styles/` for UI patterns
-- `.github/workflows/*` for CI
-
-Post-PR checklist:
-- Tests pass in CI and locally ✅
-- Lint passes ✅
-- DB migrations included if needed ✅
-- Changes are documented (README, docs/opinionated) ✅
-
-If the repository already contains an existing `.github/copilot-instructions.md`, merge the above content keeping any valid, up-to-date lines; otherwise add the file and raise a PR describing the change.
+## Helpful file references
+- `app/layout.tsx` — root layout, fonts, metadata.
+- `app/page.tsx` — example root page.
+- `app/globals.css` — tailwind import and root variables.
+- `next.config.ts`, `eslint.config.mjs`, `package.json` — project config & scripts.
 
 ---
-Feedback: If anything here is unclear or this repo contains files that differ from the above assumptions, reply with the specific file paths and I will update the instructions accordingly.
+
+If any of these points are unclear, or if you want the agent to be stricter about naming, testing, or CI style, tell me and I will refine the instructions.  
+
+(Generated by GitHub Copilot-style guidance generator.)
