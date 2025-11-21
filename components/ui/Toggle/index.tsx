@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useId, useRef, useState } from 'react';
 
+export type TogglePreset = 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
+
 export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {
   checked?: boolean;
   defaultChecked?: boolean;
@@ -9,7 +11,8 @@ export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   title?: React.ReactNode;
   description?: React.ReactNode;
   hint?: React.ReactNode;
-  color?: string; // any valid CSS color for the "on" state
+  color?: string; // any valid CSS color for the "on" state (custom override)
+  preset?: TogglePreset; // use a preset color
 }
 
 export default function Toggle({
@@ -21,6 +24,7 @@ export default function Toggle({
   description,
   hint,
   color,
+  preset,
   className = '',
   ...rest
 }: Readonly<ToggleProps>) {
@@ -43,7 +47,19 @@ export default function Toggle({
     onCheckedChangeProp?.(next);
   };
 
-  const trackColor = checked ? (color ?? 'rgb(59 130 246)') : 'rgb(226 232 240)';
+  // Preset mapping
+  const PRESET_MAP: Record<TogglePreset, string> = {
+    primary: '#3b82f6',
+    success: '#16a34a',
+    danger: '#ef4444',
+    warning: '#f59e0b',
+    info: '#06b6d4',
+    muted: '#94a3b8',
+  };
+
+  const presetColor = preset ? PRESET_MAP[preset] : undefined;
+  const activeColor = color ?? presetColor ?? '#3b82f6'; // default primary
+  const trackColor = checked ? activeColor : 'rgb(226 232 240)';
   const knobTranslate = checked ? 'translateX(20px)' : 'translateX(0)';
 
   return (

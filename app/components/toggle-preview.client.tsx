@@ -7,6 +7,7 @@ export default function TogglePreview() {
   const [checked, setChecked] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [color, setColor] = useState('#3b82f6');
+  const [preset, setPreset] = useState<'primary'|'success'|'danger'|'warning'|'info'|'muted'|'custom'|'none'>('primary');
   const [title, setTitle] = useState('Enable feature');
   const [description, setDescription] = useState('Toggle this to enable or disable the feature');
   const [hint, setHint] = useState('Beta');
@@ -18,9 +19,23 @@ export default function TogglePreview() {
           Toggle controlled
         </button>
         <label className="text-sm"><input type="checkbox" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} /> Disabled</label>
-        <label className="text-sm ml-2">Color
-          <input type="color" className="ml-2" value={color} onChange={(e) => setColor(e.target.value)} />
+        <label className="text-sm ml-2">Preset
+          <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as any)}>
+            <option value="primary">Primary</option>
+            <option value="success">Success</option>
+            <option value="danger">Danger</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+            <option value="muted">Muted</option>
+            <option value="custom">Custom</option>
+            <option value="none">None</option>
+          </select>
         </label>
+        {preset === 'custom' && (
+          <label className="text-sm ml-2">Custom
+            <input type="color" className="ml-2" value={color} onChange={(e) => setColor(e.target.value)} />
+          </label>
+        )}
       </div>
 
       <Toggle
@@ -30,7 +45,8 @@ export default function TogglePreview() {
         title={title}
         description={description}
         hint={hint}
-        color={color}
+        {...(preset === 'custom' ? { color } : {})}
+        {...(preset !== 'custom' && preset !== 'none' ? { preset } : {})}
       />
 
       <CodePreview code={`<Toggle
@@ -40,7 +56,7 @@ export default function TogglePreview() {
   title={\"${title}\"}
   description={\"${description}\"}
   hint={\"${hint}\"}
-  color={\"${color}\"}
+  ${preset === 'custom' ? `color={"${color}"}` : (preset !== 'none' ? `preset={"${preset}"}` : '')}
 />`} />
     </div>
   );
