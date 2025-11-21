@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useRef, useState } from 'react';
 
 export interface DropdownItem {
@@ -76,7 +77,7 @@ export default function Dropdown({
     'mt-2 w-48 bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-sm shadow-sm ring-1 ring-black/5 focus:outline-none z-50';
 
   const itemBase =
-    'px-3 py-2 text-sm text-foreground dark:text-foreground cursor-pointer select-none focus:bg-neutral-100 dark:focus:bg-neutral-900';
+    'px-3 py-2 text-sm text-foreground dark:text-foreground cursor-pointer select-none focus:bg-neutral-100 dark:focus:bg-neutral-900 transform transition-transform duration-100 hover:translate-x-1 hover:bg-neutral-100 dark:hover:bg-neutral-900';
 
   return (
     <div ref={rootRef} className={`relative inline-block ${className}`} {...rest}>
@@ -85,7 +86,7 @@ export default function Dropdown({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((s) => !s)}
-        className={`inline-flex items-center gap-2 rounded-none px-3 py-2 bg-foreground text-background dark:bg-background dark:text-foreground pixel-btn transition-transform transform hover:-translate-y-1 hover:scale-105`}
+        className={`inline-flex items-center gap-2 rounded-none px-3 py-2 bg-foreground text-background dark:bg-background dark:text-foreground pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-colors transition-shadow duration-150`}
       >
         {label}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="opacity-80">
