@@ -11,6 +11,10 @@
     "prisma:migrate": "prisma migrate dev --schema=src/prisma/schema.prisma && prisma db seed --schema=src/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=src/prisma/schema.prisma",
     "prisma:seed": "prisma db seed --schema=src/prisma/schema.prisma",
+    "docker:dev:up": "docker compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:deploy:up": "docker compose -f docker-compose.deploy.yml up --build -d",
+    "docker:deploy:down": "docker compose -f docker-compose.deploy.yml down",
     "test": "vitest"
   },
   "dependencies": {
