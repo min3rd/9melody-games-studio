@@ -8,8 +8,10 @@ export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   backdrop?: boolean; // show backdrop
   allowMove?: boolean; // draggable
   allowResize?: boolean; // resizable
-  width?: number; // default width (px)
-  height?: number; // default height (px)
+  width?: number; // default width (px) - omit to auto-fit
+  height?: number; // default height (px) - omit to auto-fit
+  origin?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+  animationDuration?: number; // ms
   initialTop?: number;
   initialLeft?: number;
   title?: React.ReactNode;
@@ -25,6 +27,8 @@ export default function Modal({
   height = 300,
   initialTop = 100,
   initialLeft = 80,
+  origin = 'center',
+  animationDuration: animationDurationProp,
   title,
   children,
   ...rest
@@ -32,12 +36,15 @@ export default function Modal({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const posRef = useRef({ left: initialLeft, top: initialTop });
-  const sizeRef = useRef({ w: width, h: height });
+  const sizeRef = useRef({ w: width ?? 0, h: height ?? 0 });
   const draggingRef = useRef(false);
   const resizingRef = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const resizeStart = useRef({ w: 0, h: 0, x: 0, y: 0 });
   const [, setTick] = useState(0); // for re-render
+  const animationDuration = typeof animationDurationProp === 'number' ? animationDurationProp : 140; // ms
+  const [visible, setVisible] = useState(open);
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     // ensure root exists
@@ -48,6 +55,39 @@ export default function Modal({
       document.body.appendChild(root);
     }
   }, []);
+
+  // When the modal first becomes visible, if autosize (no width/height) is used,
+  // compute size based on content after mount.
+  useEffect(() => {
+    if (!visible) return;
+    const el = modalRef.current;
+    if (!el) return;
+    // Only compute if width/height weren't provided
+    if (!width) {
+      sizeRef.current.w = el.offsetWidth;
+    }
+    if (!height) {
+      sizeRef.current.h = el.offsetHeight;
+    }
+    // trigger render update to apply sizes
+    setTick((t) => t + 1);
+  }, [visible]);
+
+  useEffect(() => {
+    if (open) {
+      setVisible(true);
+      setClosing(false);
+    } else if (visible) {
+      // start closing animation and unmount after animation completes
+      setClosing(true);
+      const id = setTimeout(() => {
+        setVisible(false);
+        setClosing(false);
+      }, animationDuration + 10);
+      return () => clearTimeout(id);
+    }
+    return;
+  }, [open, visible]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -112,14 +152,30 @@ export default function Modal({
     e.stopPropagation();
   }
 
-  if (!open) return null;
+  if (!visible) return null;
 
   const modalStyle: React.CSSProperties = {
-    width: `${sizeRef.current.w}px`,
-    height: `${sizeRef.current.h}px`,
     left: posRef.current.left,
     top: posRef.current.top,
+    ...(width ? { width: `${sizeRef.current.w}px` } : {}),
+    ...(height ? { height: `${sizeRef.current.h}px` } : {}),
   };
+
+  const { transformOrigin, translateX, translateY } = (() => {
+    switch (origin) {
+      case 'top-left':
+        return { transformOrigin: '0 0', translateX: '-8px', translateY: '-8px' };
+      case 'top-right':
+        return { transformOrigin: '100% 0', translateX: '8px', translateY: '-8px' };
+      case 'bottom-left':
+        return { transformOrigin: '0 100%', translateX: '-8px', translateY: '8px' };
+      case 'bottom-right':
+        return { transformOrigin: '100% 100%', translateX: '8px', translateY: '8px' };
+      case 'center':
+      default:
+        return { transformOrigin: '50% 50%', translateX: '0px', translateY: '0px' };
+    }
+  })();
 
   const content = (
     <div
@@ -129,22 +185,22 @@ export default function Modal({
     >
       {backdrop && (
         <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-          style={{ animation: 'fadeIn .12s ease' }}
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${closing ? 'animate-backdropOut' : 'animate-backdropIn'}`}
+          style={{ animation: `${closing ? 'fadeOut' : 'fadeIn'} .12s ease` }}
           onClick={() => onClose?.()}
         />
       )}
 
       <div
         ref={modalRef}
-        className="relative bg-white dark:bg-neutral-900 rounded shadow-lg overflow-hidden transition-transform transform scale-95 opacity-0 animate-modalOpen"
-        style={{ ...modalStyle, position: 'absolute' }}
+        className={`relative bg-white dark:bg-neutral-900 rounded shadow-lg overflow-hidden transition-transform transform ${closing ? 'opacity-0' : 'opacity-100'} ${closing ? 'animate-modalClose' : 'animate-modalOpen'}`}
+        style={{ ...modalStyle, position: 'absolute', transformOrigin: transformOrigin, ["--modal-init-translate-x" as any]: translateX, ["--modal-init-translate-y" as any]: translateY }}
         role="dialog"
         aria-modal
         {...rest}
       >
         <div
-          className={`flex items-center justify-between gap-2 px-4 py-2 text-sm border-b border-neutral-200 dark:border-neutral-800 cursor-${allowMove ? 'grab' : 'default'}`}
+          className={`flex items-center justify-between gap-2 px-4 py-2 text-sm border-b border-neutral-200 dark:border-neutral-800 ${allowMove ? 'cursor-grab' : 'cursor-default'}`}
           onPointerDown={onTitlePointerDown}
         >
           <div className="font-medium text-sm">{title ?? 'Modal'}</div>
@@ -174,8 +230,14 @@ export default function Modal({
       </div>
 
       <style jsx global>{`
-        @keyframes modalOpen { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .animate-modalOpen { animation: modalOpen .14s cubic-bezier(.2,.9,.2,1) forwards; }
+        @keyframes modalOpen { from { opacity: 0; transform: translate(var(--modal-init-translate-x), var(--modal-init-translate-y)) scale(.86); } to { opacity: 1; transform: translate(0, 0) scale(1); } }
+        @keyframes modalClose { from { opacity: 1; transform: translate(0, 0) scale(1); } to { opacity: 0; transform: translate(var(--modal-init-translate-x), var(--modal-init-translate-y)) scale(.86); } }
+        .animate-modalOpen { animation: modalOpen ${animationDuration}ms cubic-bezier(.2,.9,.2,1) forwards; }
+        .animate-modalClose { animation: modalClose ${animationDuration}ms cubic-bezier(.2,.9,.2,1) forwards; }
+        @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes backdropOut { from { opacity: 1; } to { opacity: 0; } }
+        .animate-backdropIn { animation: backdropIn ${animationDuration}ms linear forwards; }
+        .animate-backdropOut { animation: backdropOut ${animationDuration}ms linear forwards; }
       `}</style>
     </div>
   );
