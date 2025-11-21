@@ -2,7 +2,7 @@
 import React from 'react';
 import { Dropdown } from '@/components/ui';
 
-export default function DropdownPreview(): JSX.Element {
+export default function DropdownPreview(): React.ReactElement {
   const items = [
     { key: 'edit', label: 'Edit', onClick: () => alert('Edit clicked') },
     { key: 'duplicate', label: 'Duplicate', onClick: () => alert('Duplicate clicked') },

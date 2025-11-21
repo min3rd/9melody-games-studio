@@ -20,3 +20,16 @@ consistent and maintainable.
   --font-pixel: "Press Start 2P", "PixelOperatorMono", ui-monospace,
     SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
 }
+
+/* Default app background & text color setup so pages inherit the correct
+   background in both light and dark modes — avoids forgetting dark variants
+   on individual pages. Use Tailwind utility @apply to remain consistent.
+*/
+html, body {
+  @apply bg-zinc-50 text-neutral-900;
+}
+
+/* When `html` has the `.dark` class (our ThemeToggle sets this on documentElement) */
+html.dark, html.dark body {
+  @apply bg-neutral-900 text-neutral-100;
+}

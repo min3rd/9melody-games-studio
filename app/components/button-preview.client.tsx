@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui';
 
-export default function ButtonPreview(): JSX.Element {
+export default function ButtonPreview(): React.ReactElement {
   const [count, setCount] = useState(0);
 
   return (
