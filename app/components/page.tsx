@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import ButtonPreview from './button-preview.client';
 import DropdownPreview from './dropdown-preview.client';
+import CodePreviewPreview from './code-preview.client';
 
 export const metadata = {
   title: 'Components',
@@ -26,6 +27,8 @@ export default function ComponentsPage() {
         return <ButtonPreview />;
       case 'Dropdown':
         return <DropdownPreview />;
+      case 'CodePreview':
+        return <CodePreviewPreview />;
       default:
         return <div className="text-sm text-neutral-600 dark:text-neutral-300">No preview available yet.</div>;
     }
