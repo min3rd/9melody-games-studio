@@ -5,6 +5,7 @@ import DropdownPreview from './dropdown-preview.client';
 import CodePreviewPreview from './code-preview.client';
 import i18n from '@/lib/i18n'
 import LanguageSwitcherPreview from './language-switcher-preview.client';
+import ModalPreview from './modal-preview.client';
 import { CodePreview } from '@/components/ui';
 
 export const metadata = {
@@ -36,6 +37,9 @@ export default function ComponentsPage() {
       case 'LanguageSwitcher':
       case 'Language Switcher':
         return <LanguageSwitcherPreview />;
+      case 'Modal':
+      case 'Modal Component':
+        return <ModalPreview />;
       default:
         return <div className="text-sm text-neutral-600 dark:text-neutral-300">{i18n.t('noPreview')}</div>;
     }
