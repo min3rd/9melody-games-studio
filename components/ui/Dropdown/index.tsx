@@ -76,8 +76,10 @@ export default function Dropdown({
   const menuClasses =
     'mt-2 w-48 bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-sm shadow-sm ring-1 ring-black/5 focus:outline-none z-50';
 
+  // Temporarily remove hover animations and hover bg so popover items don't
+  // animate unexpectedly — keep focus styles for keyboard accessibility.
   const itemBase =
-    'px-3 py-2 text-sm text-foreground dark:text-foreground cursor-pointer select-none focus:bg-neutral-100 dark:focus:bg-neutral-900 transform transition-transform duration-100 hover:translate-x-1 hover:bg-neutral-100 dark:hover:bg-neutral-900';
+    'px-3 py-2 text-sm text-foreground dark:text-foreground cursor-pointer select-none focus:bg-neutral-100 dark:focus:bg-neutral-900';
 
   return (
     <div ref={rootRef} className={`relative inline-block ${className}`} {...rest}>
@@ -118,7 +120,7 @@ export default function Dropdown({
                   setOpen(false);
                 }
               }}
-              className={`${itemBase} ${it.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-100 dark:hover:bg-neutral-900'}`}
+              className={`${itemBase} ${it.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {it.href ? (
                 <a href={it.href} className="block w-full">{it.label}</a>
