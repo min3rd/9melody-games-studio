@@ -3,6 +3,7 @@ import path from 'path';
 import ButtonPreview from './button-preview.client';
 import DropdownPreview from './dropdown-preview.client';
 import CodePreviewPreview from './code-preview.client';
+import LanguageSwitcherPreview from './language-switcher-preview.client';
 import { CodePreview } from '@/components/ui';
 
 export const metadata = {
@@ -28,9 +29,12 @@ export default function ComponentsPage() {
         return <ButtonPreview />;
       case 'Dropdown':
         return <DropdownPreview />;
+      case 'CodePreview':
       case 'Code Preview':
         return <CodePreviewPreview />;
-      default:
+      case 'LanguageSwitcher':
+      case 'Language Switcher':
+        return <LanguageSwitcherPreview />;
         return <div className="text-sm text-neutral-600 dark:text-neutral-300">No preview available yet.</div>;
     }
   }
