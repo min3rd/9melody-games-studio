@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import i18n from '@/lib/i18n';
 
 export default function LanguageSwitcher() {
   const [lang, setLang] = useState<'en' | 'vi'>(() => {
@@ -13,6 +14,8 @@ export default function LanguageSwitcher() {
       localStorage.setItem('lang', lang);
     } catch (e) {}
     if (typeof document !== 'undefined') document.documentElement.lang = lang;
+    // inform i18n about language change
+    if (i18n && i18n.language !== lang) i18n.changeLanguage(lang);
   }, [lang]);
 
   function setLanguage(l: 'en' | 'vi') {

@@ -1,0 +1,14 @@
+{
+  "components": "Các thành phần",
+  "noComponents": "Không tìm thấy thành phần",
+  "noPreview": "Chưa có bản xem trước.",
+  "usage": "Sử dụng",
+  "code": "Mã",
+  "copy": "Sao chép",
+  "copied": "Đã sao chép",
+  "clicked": "Đã nhấn",
+  "selected": "Đã chọn",
+  "selected_lang": "Đã chọn: {{lang}}",
+  "example_text": "Đây là đoạn văn ví dụ bằng tiếng Việt.",
+  "actions": "Hành động"
+}

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useI18n } from "@/hooks/useI18n";
 
 export interface CodePreviewProps {
   code: string;
@@ -13,6 +14,7 @@ export default function CodePreview({
   showCopy = true,
 }: Readonly<CodePreviewProps>) {
   const [copied, setCopied] = useState(false);
+  const { t } = useI18n();
 
   async function copy() {
     try {
@@ -32,7 +34,7 @@ export default function CodePreview({
           aria-label="Copy code"
           className="absolute right-1 top-1 px-2 py-1 rounded-sm text-xs bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-700"
         >
-          {copied ? "Copied" : "Copy"}
+          {copied ? t("copied") : t("copy")}
         </button>
       )}
 

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { LanguageSwitcher } from '@/components/ui';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function LanguageSwitcherPreview(): React.ReactElement {
   const [lang, setLang] = useState<'en' | 'vi'>(() => {
@@ -17,14 +18,16 @@ export default function LanguageSwitcherPreview(): React.ReactElement {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <LanguageSwitcher />
-        <div className="text-sm text-neutral-700 dark:text-neutral-300">Selected: <span className="font-medium">{lang === 'en' ? 'English' : 'Tiếng Việt'}</span></div>
+        <div className="text-sm text-neutral-700 dark:text-neutral-300">{t('selected')} <span className="font-medium">{lang === 'en' ? 'English' : 'Tiếng Việt'}</span></div>
       </div>
       <div className="text-sm text-neutral-700 dark:text-neutral-300">
-        {lang === 'en' ? 'This is an example text in English.' : 'Đây là đoạn văn ví dụ bằng tiếng Việt.'}
+        {t('example_text')}
       </div>
     </div>
   );

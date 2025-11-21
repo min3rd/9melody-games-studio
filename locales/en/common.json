@@ -1,0 +1,14 @@
+{
+  "components": "Components",
+  "noComponents": "No components found",
+  "noPreview": "No preview available yet.",
+  "usage": "Usage",
+  "code": "Code",
+  "copy": "Copy",
+  "copied": "Copied",
+  "clicked": "Clicked",
+  "selected": "Selected",
+  "selected_lang": "Selected: {{lang}}",
+  "example_text": "This is an example text in English.",
+  "actions": "Actions"
+}

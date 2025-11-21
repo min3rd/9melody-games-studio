@@ -3,6 +3,7 @@ import path from 'path';
 import ButtonPreview from './button-preview.client';
 import DropdownPreview from './dropdown-preview.client';
 import CodePreviewPreview from './code-preview.client';
+import i18n from '@/lib/i18n'
 import LanguageSwitcherPreview from './language-switcher-preview.client';
 import { CodePreview } from '@/components/ui';
 
@@ -35,7 +36,8 @@ export default function ComponentsPage() {
       case 'LanguageSwitcher':
       case 'Language Switcher':
         return <LanguageSwitcherPreview />;
-        return <div className="text-sm text-neutral-600 dark:text-neutral-300">No preview available yet.</div>;
+      default:
+        return <div className="text-sm text-neutral-600 dark:text-neutral-300">{i18n.t('noPreview')}</div>;
     }
   }
 
@@ -44,9 +46,9 @@ export default function ComponentsPage() {
       <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
         <aside className="col-span-1">
           <nav className="sticky top-6 space-y-2">
-            <h3 className="text-sm font-semibold mb-2 text-neutral-900 dark:text-neutral-100">Components</h3>
+            <h3 className="text-sm font-semibold mb-2 text-neutral-900 dark:text-neutral-100">{i18n.t('components')}</h3>
             {components.length === 0 && (
-              <div className="text-sm text-neutral-500">No components found</div>
+              <div className="text-sm text-neutral-500">{i18n.t('noComponents')}</div>
             )}
             {components.map((c) => (
                 <a
@@ -71,7 +73,7 @@ export default function ComponentsPage() {
               <div className="mb-4">{renderPreview(c)}</div>
 
               <div className="text-sm">
-                <div className="font-medium mb-2">Usage</div>
+                <div className="font-medium mb-2">{i18n.t('usage')}</div>
                 <CodePreview
                   code={`import { ${c} } from '@/components/ui'\n\n<${c} />`}
                 />

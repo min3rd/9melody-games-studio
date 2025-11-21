@@ -1,9 +1,11 @@
 "use client";
 import React, { useState } from 'react';
 import { Button } from '@/components/ui';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function ButtonPreview(): React.ReactElement {
   const [count, setCount] = useState(0);
+  const { t } = useI18n();
 
   return (
     <div className="space-y-4">
@@ -15,7 +17,7 @@ export default function ButtonPreview(): React.ReactElement {
         <Button size="lg">Large</Button>
       </div>
 
-      <div className="text-sm text-neutral-600 dark:text-neutral-300">Clicked: {count}</div>
+      <div className="text-sm text-neutral-600 dark:text-neutral-300">{t('clicked')}: {count}</div>
     </div>
   );
 }

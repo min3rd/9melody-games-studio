@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { Dropdown } from '@/components/ui';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function DropdownPreview(): React.ReactElement {
   const items = [
@@ -10,9 +11,11 @@ export default function DropdownPreview(): React.ReactElement {
     { key: 'docs', label: 'Docs', href: '/docs' },
   ];
 
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
-      <Dropdown label={<span>Actions</span>} items={items} />
+      <Dropdown label={<span>{t('actions')}</span>} items={items} />
     </div>
   );
 }
