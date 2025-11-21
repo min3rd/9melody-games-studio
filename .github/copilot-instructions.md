@@ -56,6 +56,63 @@ Notes for the agent: When adding scripts or commands, follow the existing `packa
 - Image assets served from `public/`; see `app/page.tsx` for usage of `/next.svg` and `/vercel.svg`.
 - Tailwind utility classes are used for layout; do not mix component-level CSS modules unless necessary — prefer Tailwind utilities.
 
+## In-house component library (REQUIRED)
+- Purpose: Provide a consistent set of UI building blocks and style tokens (pixel-art look & feel) across the app. Avoid ad-hoc UI markup in page code.
+- Location: Add components under `components/ui/` (or `packages/ui` if converting to monorepo later). Follow the same naming convention as Next's App Router (one component per folder, export `index.tsx`).
+- Required primitives (examples): `Button`, `Input`, `Label`, `Select`, `Modal`, `Card`, `Icon`, `Avatar`, `Typography`, `Grid`.
+- Theme support: All components MUST be theme-aware and use the color variables defined in `app/globals.css` (`--background`, `--foreground`) or Tailwind `dark:` variants to support light/dark mode.
+- Pixel-art style: Components should adopt a pixel-art look by default. Use low-res pixel assets or CSS rules for pixelation where applicable (e.g., `image-rendering: pixelated`), maintain crisp 1px borders, and use a pixel-style font when appropriate (define as a CSS variable like `--font-pixel` if needed).
+- Accessibility & i18n: Components must be accessible (ARIA attributes, focus outline) and accept translation keys or `children` props. Avoid putting localized strings inside the component (use props to pass strings so the page can pass `t('key')`).
+- Reusability rules: If a piece of UI is repeated more than once or can be reused, add it to the component library; do not duplicate markup across pages.
+
+Examples:
+
+```tsx
+// components/ui/Button/index.tsx
+import clsx from 'clsx';
+import React from 'react';
+
+export default function Button({ children, className, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+	// Use CSS vars and tailwind for light/dark, and accept className for overrides
+	return (
+		<button
+			{...rest}
+			className={clsx(
+				'rounded-sm px-3 py-2 text-sm leading-none',
+				'bg-foreground text-background dark:bg-background dark:text-foreground',
+				className
+			)}
+		>
+			{children}
+		</button>
+	);
+}
+```
+
+```css
+/* Example pixel-art helper (globals or component CSS) */
+.pixel-art-image {
+	image-rendering: pixelated;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: crisp-edges;
+}
+```
+
+Notes for agents: When creating or editing components, prefer building theme-aware primitives that are small, composable and tested across both light & dark themes.
+
+### Example usage (Button)
+When using built-in components prefer to import from `components/ui` (the alias `@` is configured):
+
+```tsx
+import { Button } from '@/components/ui';
+import { useTranslations } from 'next-intl';
+
+export default function Home() {
+	const t = useTranslations('home');
+	return <Button>{t('cta.deploy')}</Button>;
+}
+```
+
 ## Files and sections AI agents should edit (and how)
 - `app/layout.tsx`: modify metadata or fonts. Avoid changing signature of RootLayout — keep the Server component semantics.
 - `app/page.tsx`: main entry page; keep existing sample layout or expand with components.
@@ -73,6 +130,7 @@ Notes for the agent: When adding scripts or commands, follow the existing `packa
 - Use `next/font/google` for font definitions and export CSS variables as in `layout.tsx`.
 - Use `/public` assets via `src="/asset.svg"` inside `next/image`.
 - Use `tailwind` utilities in JSX and keep `globals.css` for theming tokens.
+ - We expose a public component preview at `/components` for quick visual checks and interactive testing. Add new component preview pages under `app/components/<component>`.
 
 ## When to ask for human help
 - If the change touches deployment (Vercel/other provider), confirm environment variables and build settings with maintainers.
