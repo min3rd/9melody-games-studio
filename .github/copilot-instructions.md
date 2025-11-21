@@ -25,6 +25,12 @@ Notes for the agent: When adding scripts or commands, follow the existing `packa
 - Fonts are defined with `next/font/google` and saved as CSS variables so they can be used across app components. Keep this pattern while adding fonts.
 - Styling uses Tailwind and custom CSS variables (color tokens in `globals.css`). Keep tokens consistent and avoid re-defining layout-level tokens per-component.
 
+### Styling policy (Tailwind-first)
+- Use Tailwind utility classes for styling UI components and layouts by default. Keep utility composition in JSX whenever possible.
+- Avoid adding one-off CSS rules inside component files. If a reusable pattern emerges, extract it as a small utility using Tailwind's `@apply` in `app/globals.css`.
+- If a very special-case style is required that cannot reasonably be expressed with Tailwind utilities (rare), declare the value as a theme/global token in `app/globals.css` (under `:root`) and add a short comment above the token explaining the reason for the exception.
+- Keep global exceptions minimal and documented so styles remain consistent and themeable.
+
 ### Localization / i18n (REQUIRED)
 - All user-facing text must use an i18n/localization system — do not hardcode strings in components or pages.
 - Default supported locales: `en` (English) and `vi` (Vietnamese). If you need more languages, request confirmation from a maintainer.

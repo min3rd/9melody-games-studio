@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/*
+Project Styling Rule (Tailwind-first)
+
+- Use Tailwind CSS utility classes for styling UI components and layouts by default.
+- Avoid adding one-off CSS rules in component files. Prefer composing Tailwind utilities
+  or extracting small reusable classes using Tailwind's `@apply` in a central CSS file.
+- If a very special-case style is required that cannot be expressed reasonably with
+  Tailwind utilities (rare), declare the exception as a theme/global token here and
+  document the reason above the token. Example: `--custom-outline-size: 3px;`
+
+This file contains global theme tokens and helper classes intended for those
+project-level exceptions. Keep the list small and documented so styles remain
+consistent and maintainable.
+*/
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
