@@ -3,6 +3,7 @@ import path from 'path';
 import ButtonPreview from './button-preview.client';
 import DropdownPreview from './dropdown-preview.client';
 import CodePreviewPreview from './code-preview.client';
+import { CodePreview } from '@/components/ui';
 
 export const metadata = {
   title: 'Components',
@@ -27,7 +28,7 @@ export default function ComponentsPage() {
         return <ButtonPreview />;
       case 'Dropdown':
         return <DropdownPreview />;
-      case 'CodePreview':
+      case 'Code Preview':
         return <CodePreviewPreview />;
       default:
         return <div className="text-sm text-neutral-600 dark:text-neutral-300">No preview available yet.</div>;
@@ -67,11 +68,9 @@ export default function ComponentsPage() {
 
               <div className="text-sm">
                 <div className="font-medium mb-2">Usage</div>
-                <pre className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded text-sm overflow-auto">
-                  {`import { ${c} } from '@/components/ui'
-
-<${c} />`}
-                </pre>
+                <CodePreview
+                  code={`import { ${c} } from '@/components/ui'\n\n<${c} />`}
+                />
               </div>
             </section>
           ))}
