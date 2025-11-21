@@ -27,12 +27,14 @@ export default function CodePreview({
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full overflow-hidden">
       {showCopy && (
         <button
           onClick={copy}
-          aria-label="Copy code"
-          className="absolute right-1 top-1 px-2 py-1 rounded-sm text-xs bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-700"
+          aria-label={copied ? t("copied") : t("copy")}
+          className={`absolute right-1 top-1 px-2 py-1 rounded-sm text-xs bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 ${
+            copied ? "text-green-600 dark:text-green-400" : "text-neutral-800 dark:text-neutral-100"
+          }`}
         >
           {copied ? t("copied") : t("copy")}
         </button>

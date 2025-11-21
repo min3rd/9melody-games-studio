@@ -7,7 +7,7 @@ interface Props {
   code?: string;
 }
 
-export default function CodePreviewPreview({ code = '' }: Props): React.ReactElement {
+export default function CodePreviewPreview({ code = 'npx create-react-app my-app' }: Props): React.ReactElement {
   const { t } = useI18n();
   return (
     <div className="space-y-4">
