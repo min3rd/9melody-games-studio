@@ -6,6 +6,7 @@ import CodePreviewPreview from './code-preview.client';
 import i18n from '@/lib/i18n'
 import LanguageSwitcherPreview from './language-switcher-preview.client';
 import ModalPreview from './modal-preview.client';
+import TogglePreview from './toggle-preview.client';
 import { CodePreview } from '@/components/ui';
 
 export const metadata = {
@@ -40,6 +41,8 @@ export default function ComponentsPage() {
       case 'Modal':
       case 'Modal Component':
         return <ModalPreview />;
+      case 'Toggle':
+        return <TogglePreview />;
       default:
         return <div className="text-sm text-neutral-600 dark:text-neutral-300">{i18n.t('noPreview')}</div>;
     }
