@@ -26,3 +26,4 @@ export { default as Step } from './Step';
 export { default as Tabs } from './Tabs';
 export { default as Alert } from './Alert';
 export { default as Loading } from './Loading';
+export { default as Progress } from './Progress';
