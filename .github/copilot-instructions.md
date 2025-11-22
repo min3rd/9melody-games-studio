@@ -71,6 +71,9 @@ Notes for the agent: When adding scripts or commands, follow the existing `packa
 - Accessibility & i18n: Components must be accessible (ARIA attributes, focus outline) and accept translation keys or `children` props. Avoid putting localized strings inside the component (use props to pass strings so the page can pass `t('key')`).
 - Reusability rules: If a piece of UI is repeated more than once or can be reused, add it to the component library; do not duplicate markup across pages.
 
+- Component options: All components in the library MUST expose standard, configurable props for color/variant, size, and an effects toggle to enable/disable visual/interaction effects (for example hover/active transforms, shadows, or transitions). The effects toggle should be a boolean prop (e.g. `withEffects?: boolean`) and must default to `true` (effects enabled). Keep prop names consistent across components — prefer `variant`/`preset` for named color variants, `size` for size variants (e.g., `sm`, `md`, `lg`) and `withEffects` for the boolean toggle. Use theme color tokens where possible and accept a CSS color/string for overrides.
+ - Component options: All components in the library MUST expose standard, configurable props for color/variant, size, and an effects toggle to enable/disable visual/interaction effects (for example hover/active transforms, shadows, or transitions) and a `rounded` boolean to control border radius. The effects toggle should be a boolean prop (e.g. `withEffects?: boolean`) and must default to `true` (effects enabled). Keep prop names consistent across components — prefer `variant`/`preset` for named color variants, `size` for size variants (e.g., `sm`, `md`, `lg`), `rounded` for border radius control, and `withEffects` for the boolean toggle. Use theme color tokens where possible and accept a CSS color/string for overrides.
+
 Examples:
 
 ```tsx
@@ -78,7 +81,7 @@ Examples:
 import clsx from 'clsx';
 import React from 'react';
 
-export default function Button({ children, className, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export default function Button({ children, className, withEffects = true, rounded = true, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { withEffects?: boolean; rounded?: boolean }) {
 	// Use CSS vars and tailwind for light/dark, and accept className for overrides
 	return (
 		<button

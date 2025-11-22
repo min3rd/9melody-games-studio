@@ -7,12 +7,13 @@ export default function ButtonPreview(): React.ReactElement {
   const [count, setCount] = useState(0);
   const [preset, setPreset] = useState<'primary'|'success'|'danger'|'warning'|'info'|'muted'|'custom'|'none'>('primary');
   const [color, setColor] = useState('#3b82f6');
+  const [withEffects, setWithEffects] = useState(true);
   const { t } = useI18n();
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Button onClick={() => setCount((c) => c + 1)} preset={preset !== 'none' && preset !== 'custom' ? (preset as any) : undefined} color={preset === 'custom' ? color : undefined}>Primary</Button>
+  <Button onClick={() => setCount((c) => c + 1)} preset={preset !== 'none' && preset !== 'custom' ? (preset as any) : undefined} color={preset === 'custom' ? color : undefined} withEffects={withEffects}>Primary</Button>
         <Button variant="ghost">Ghost</Button>
         <Button variant="danger">Danger</Button>
         <Button size="sm">Small</Button>
@@ -39,11 +40,17 @@ export default function ButtonPreview(): React.ReactElement {
         )}
       </div>
 
+      <div className="flex gap-2 items-center mt-2">
+        <label className="text-sm">Effects
+          <input className="ml-2" type="checkbox" checked={withEffects} onChange={(e) => setWithEffects(e.target.checked)} />
+        </label>
+      </div>
+
       <div className="text-sm text-neutral-600 dark:text-neutral-300">{t('clicked')}: {count}</div>
       <div className="text-sm">
         <div className="font-medium mb-2">Usage</div>
         <pre className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded text-xs">
-{`<Button preset="${preset === 'custom' ? 'primary' : preset}" ${preset === 'custom' ? `color="${color}"` : ''}>Primary</Button>`}
+{`<Button preset="${preset === 'custom' ? 'primary' : preset}" ${preset === 'custom' ? `color="${color}" ` : ''}${`withEffects={${withEffects}}`}>Primary</Button>`}
         </pre>
       </div>
     </div>

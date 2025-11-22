@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import ButtonPreview from './button-preview.client';
+import IndicatorPreview from './indicator-preview.client';
 import DropdownPreview from './dropdown-preview.client';
 import CodePreviewPreview from './code-preview.client';
 import i18n from '@/lib/i18n'
@@ -46,6 +47,8 @@ export default function ComponentsPage() {
         return <AccordionPreview />;
       case 'Toggle':
         return <TogglePreview />;
+      case 'Indicator':
+        return <IndicatorPreview />;
       default:
         return <div className="text-sm text-neutral-600 dark:text-neutral-300">{i18n.t('noPreview')}</div>;
     }

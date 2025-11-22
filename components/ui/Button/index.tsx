@@ -9,6 +9,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   size?: ButtonSize;
   color?: string; // custom color for the button (hex or CSS color)
   preset?: ButtonPreset;
+  withEffects?: boolean;
 }
 
 export default function Button({
@@ -18,10 +19,11 @@ export default function Button({
   size = 'md',
   color,
   preset,
+  withEffects = true,
   ...rest
 }: Readonly<ButtonProps>) {
-  const base =
-    'rounded-none font-medium inline-flex items-center justify-center gap-2 transform transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-1 hover:scale-105 hover:shadow-lg active:translate-y-0 active:scale-95 active:shadow-sm pixel-btn';
+  const base = 'rounded-none font-medium inline-flex items-center justify-center gap-2 pixel-btn';
+  const effectsClasses = 'transform transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-1 hover:scale-105 hover:shadow-lg active:translate-y-0 active:scale-95 active:shadow-sm';
 
   const variantClasses: Record<ButtonVariant, string> = {
     primary:
@@ -36,7 +38,7 @@ export default function Button({
     lg: 'px-4 py-3 text-base',
   };
 
-  const classes = `${base} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
+  const classes = `${base} ${withEffects ? effectsClasses : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
 
   // Preset map
   const PRESET_MAP: Record<ButtonPreset, string> = {
