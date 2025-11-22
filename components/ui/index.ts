@@ -20,3 +20,4 @@ export { default as TextRotate } from './TextRotate';
 export { default as Breadcrumbs } from './Breadcrumbs';
 export { default as Dock } from './Dock';
 export { default as Menu, MenuItem } from './Menu';
+export { default as Navbar } from './Navbar';
