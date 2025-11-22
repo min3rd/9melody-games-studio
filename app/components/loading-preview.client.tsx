@@ -11,7 +11,9 @@ export default function LoadingPreview(): React.ReactElement {
   const [color, setColor] = useState('#06b6d4');
   const [inline, setInline] = useState(false);
   const [overlay, setOverlay] = useState(false);
-  const [text] = useState('Loading...');
+  // Keep `text` for backward-compat if needed by component API; not used in preview
+  // const [text, setText] = useState('Loading...');
+  const [label, setLabel] = useState('Loading...');
 
   return (
     <div className="space-y-4">
@@ -45,11 +47,14 @@ export default function LoadingPreview(): React.ReactElement {
         <label className="text-sm">Overlay
           <input className="ml-2" type="checkbox" checked={overlay} onChange={(e) => setOverlay(e.target.checked)} />
         </label>
+        <label className="text-sm">Label
+          <input className="ml-2 rounded p-1 border text-sm" value={label} onChange={(e) => setLabel(e.target.value)} />
+        </label>
       </div>
 
       <div className="p-4 bg-white border rounded">
         <div className={`p-6 ${overlay ? 'relative' : ''}`}>
-          <Loading size={size} preset={preset} color={useCustom ? color : undefined} text={text} inline={inline} overlay={overlay} />
+          <Loading size={size} preset={preset} color={useCustom ? color : undefined} label={label} inline={inline} overlay={overlay} />
         </div>
       </div>
     </div>
