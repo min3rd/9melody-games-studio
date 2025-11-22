@@ -169,8 +169,8 @@ export function TimelineItem({ preset = 'muted', color, size = 'md', rounded = t
   const markerRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <li {...rest} aria-current={status === 'active' ? 'step' : undefined} className={`relative grid grid-cols-[48px_1fr] gap-4 items-start ${className}`.trim()}>
-  <div ref={markerRef} data-timeline-marker={markerId !== undefined ? String(markerId) : undefined} className="relative z-20 col-start-1 flex flex-col items-center" aria-hidden>
+    <li {...rest} aria-current={status === 'active' ? 'step' : undefined} className={`relative grid grid-cols-[48px_1fr] grid-rows-[auto_1fr] gap-4 ${className}`.trim()}>
+      <div ref={markerRef} data-timeline-marker={markerId !== undefined ? String(markerId) : undefined} className="relative z-20 col-start-1 row-start-1 flex items-center justify-center" aria-hidden>
         {/* indicator circle */}
   {image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -192,16 +192,20 @@ export function TimelineItem({ preset = 'muted', color, size = 'md', rounded = t
         {/* per-item connector removed — overlay segments handle connectors between markers */}
       </div>
 
-  <div className={`col-start-2 ${contentPadding} ${effectClass}`.trim()}>
+      <div className={`col-start-2 row-start-1 ${contentPadding} ${effectClass}`.trim()}>
         <div className="flex items-center gap-3">
           <div className="flex-1">
             {heading && <div className="text-sm font-semibold">{heading}</div>}
             {short && <div className="text-xs text-neutral-500 dark:text-neutral-400">{short}</div>}
-            {description && <div className="text-sm text-neutral-700 dark:text-neutral-200 mt-2">{description}</div>}
           </div>
           {date && <div className="text-xs text-neutral-500 dark:text-neutral-400">{date}</div>}
         </div>
       </div>
+      {description && (
+        <div className={`col-start-2 row-start-2 ${contentPadding} ${effectClass}`.trim()}>
+          <div className="text-sm text-neutral-700 dark:text-neutral-200">{description}</div>
+        </div>
+      )}
     </li>
   );
 }
