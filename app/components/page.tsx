@@ -20,6 +20,7 @@ import TimelinePreview from "./timeline-preview.client";
 import TextRotatePreview from "./text-rotate-preview.client";
 import BreadcrumbsPreview from './breadcrumbs-preview.client';
 import DockPreview from './dock-preview.client';
+import MenuPreview from './menu-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -84,6 +85,8 @@ export default function ComponentsPage() {
         return <BreadcrumbsPreview />;
       case "Dock":
         return <DockPreview />;
+      case "Menu":
+        return <MenuPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
