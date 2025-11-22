@@ -1,11 +1,13 @@
 "use client";
 import React, { useState } from 'react';
 import { Button } from '@/components/ui';
+import type { Preset } from '@/components/ui/presets';
 import { useI18n } from '@/hooks/useI18n';
 
 export default function ButtonPreview(): React.ReactElement {
   const [count, setCount] = useState(0);
-  const [preset, setPreset] = useState<'primary'|'success'|'danger'|'warning'|'info'|'muted'|'custom'|'none'>('primary');
+  type UIButtonPreset = Preset | 'custom' | 'none';
+  const [preset, setPreset] = useState<UIButtonPreset>('primary');
   const [color, setColor] = useState('#3b82f6');
   const [withEffects, setWithEffects] = useState(true);
   const { t } = useI18n();
@@ -13,7 +15,7 @@ export default function ButtonPreview(): React.ReactElement {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-  <Button onClick={() => setCount((c) => c + 1)} preset={preset !== 'none' && preset !== 'custom' ? (preset as any) : undefined} color={preset === 'custom' ? color : undefined} withEffects={withEffects}>Primary</Button>
+  <Button onClick={() => setCount((c) => c + 1)} preset={preset !== 'none' && preset !== 'custom' ? (preset as Preset) : undefined} color={preset === 'custom' ? color : undefined} withEffects={withEffects}>Primary</Button>
         <Button variant="ghost">Ghost</Button>
         <Button variant="danger">Danger</Button>
         <Button size="sm">Small</Button>
@@ -22,7 +24,7 @@ export default function ButtonPreview(): React.ReactElement {
 
       <div className="flex gap-2 items-center mt-2">
         <label className="text-sm">Preset
-          <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as any)}>
+          <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as UIButtonPreset)}>
             <option value="primary">Primary</option>
             <option value="success">Success</option>
             <option value="danger">Danger</option>

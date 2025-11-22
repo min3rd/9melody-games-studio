@@ -1,6 +1,7 @@
 import React from 'react';
+import { PRESET_MAP, type Preset } from '../presets';
 
-export type IndicatorPreset = 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
+export type IndicatorPreset = Preset;
 type IndicatorSize = 'sm' | 'md' | 'lg';
 
 export interface IndicatorProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -22,16 +23,6 @@ export default function Indicator({
   children,
   ...rest
 }: Readonly<IndicatorProps>) {
-  // Preset mapping
-  const PRESET_MAP: Record<IndicatorPreset, string> = {
-    primary: '#3b82f6',
-    success: '#16a34a',
-    danger: '#ef4444',
-    warning: '#f59e0b',
-    info: '#06b6d4',
-    muted: '#94a3b8',
-  };
-
   const activeColor = color ?? PRESET_MAP[preset];
 
   const sizeClasses: Record<IndicatorSize, string> = {

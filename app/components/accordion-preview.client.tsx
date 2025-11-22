@@ -1,11 +1,13 @@
 "use client";
 import React, { useState } from 'react';
 import { Accordion } from '@/components/ui';
+import type { Preset } from '@/components/ui/presets';
 import { CodePreview } from '@/components/ui';
 
 export default function AccordionPreview() {
   const [open, setOpen] = useState(false);
-  const [preset, setPreset] = useState<'primary'|'success'|'danger'|'warning'|'info'|'muted'|'custom'|'none'>('primary');
+  type UIAccordionPreset = Preset | 'custom' | 'none';
+  const [preset, setPreset] = useState<UIAccordionPreset>('primary');
   const [color, setColor] = useState('#3b82f6');
   const [disabled, setDisabled] = useState(false);
   const [withIcon, setWithIcon] = useState(true);
@@ -24,7 +26,7 @@ export default function AccordionPreview() {
         <button className="px-3 py-2 rounded bg-foreground text-background" onClick={() => setOpen((o) => !o)}>Toggle open</button>
         <label className="text-sm"><input type="checkbox" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} /> Disabled</label>
         <label className="text-sm ml-2">Preset
-          <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as any)}>
+          <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as UIAccordionPreset)}>
             <option value="primary">Primary</option>
             <option value="success">Success</option>
             <option value="danger">Danger</option>

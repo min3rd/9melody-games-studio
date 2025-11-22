@@ -7,3 +7,4 @@ export { default as Modal } from './Modal';
 export { default as Toggle } from './Toggle';
 export { default as Accordion } from './Accordion';
 export { default as Indicator } from './Indicator';
+export { PRESET_MAP, type Preset } from './presets';

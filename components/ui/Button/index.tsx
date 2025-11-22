@@ -1,7 +1,8 @@
 import React from 'react';
+import { PRESET_MAP, type Preset } from '../presets';
 
 type ButtonVariant = 'primary' | 'ghost' | 'danger';
-export type ButtonPreset = 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
+export type ButtonPreset = Preset;
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -40,15 +41,7 @@ export default function Button({
 
   const classes = `${base} ${withEffects ? effectsClasses : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
 
-  // Preset map
-  const PRESET_MAP: Record<ButtonPreset, string> = {
-    primary: '#3b82f6',
-    success: '#16a34a',
-    danger: '#ef4444',
-    warning: '#f59e0b',
-    info: '#06b6d4',
-    muted: '#94a3b8',
-  };
+  // Use shared PRESET_MAP
 
   const presetColor = preset ? PRESET_MAP[preset] : undefined;
   const activeColor = color ?? presetColor;

@@ -9,7 +9,8 @@ export default function ModalPreview(): React.ReactElement {
   const [allowMove, setAllowMove] = useState(true);
   const [allowResize, setAllowResize] = useState(true);
   const [animationDuration, setAnimationDuration] = useState(140);
-  const [origin, setOrigin] = useState<'top-left'|'top-right'|'bottom-left'|'bottom-right'|'center'>('center');
+  type ModalOrigin = 'top-left'|'top-right'|'bottom-left'|'bottom-right'|'center';
+  const [origin, setOrigin] = useState<ModalOrigin>('center');
   const [autoSize, setAutoSize] = useState(false);
 
   return (
@@ -21,7 +22,7 @@ export default function ModalPreview(): React.ReactElement {
         <label className="text-sm"><input type="checkbox" checked={allowResize} onChange={(e) => setAllowResize(e.target.checked)} /> Resizable</label>
         <label className="text-sm"><input type="checkbox" checked={autoSize} onChange={(e) => setAutoSize(e.target.checked)} /> Auto-size</label>
         <label className="text-sm">Origin
-          <select value={origin} onChange={(e) => setOrigin(e.target.value as any)} className="ml-2 text-sm">
+          <select value={origin} onChange={(e) => setOrigin(e.target.value as ModalOrigin)} className="ml-2 text-sm">
             <option value="center">Center</option>
             <option value="top-left">Top Left</option>
             <option value="top-right">Top Right</option>

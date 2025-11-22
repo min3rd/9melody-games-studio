@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useId, useRef, useState } from 'react';
+import { PRESET_MAP, type Preset } from '../presets';
 
-export type TogglePreset = 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
+export type TogglePreset = Preset;
 
 export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {
   checked?: boolean;
@@ -47,15 +48,7 @@ export default function Toggle({
     onCheckedChangeProp?.(next);
   };
 
-  // Preset mapping
-  const PRESET_MAP: Record<TogglePreset, string> = {
-    primary: '#3b82f6',
-    success: '#16a34a',
-    danger: '#ef4444',
-    warning: '#f59e0b',
-    info: '#06b6d4',
-    muted: '#94a3b8',
-  };
+  // Use shared PRESET_MAP
 
   const presetColor = preset ? PRESET_MAP[preset] : undefined;
   const activeColor = color ?? presetColor ?? '#3b82f6'; // default primary
