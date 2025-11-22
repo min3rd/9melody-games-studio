@@ -12,3 +12,4 @@ export { BUTTON_SIZE_CLASSES, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CL
 export { default as Avatar, AvatarGroup } from './Avatar';
 export { default as Badge } from './Badge';
 export { default as Card, CardHeader, CardBody, CardFooter, CardTitle, CardThumbnail } from './Card';
+export { default as Carousel } from './Carousel';

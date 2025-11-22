@@ -3,6 +3,7 @@ import path from 'path';
 import ButtonPreview from './button-preview.client';
 import AvatarPreview from './avatar-preview.client';
 import CardPreview from './card-preview.client';
+import CarouselPreview from './carousel-preview.client';
 import IndicatorPreview from './indicator-preview.client';
 import BadgePreview from './badge-preview.client';
 import DropdownPreview from './dropdown-preview.client';
@@ -33,6 +34,9 @@ export default function ComponentsPage() {
 
   function renderPreview(name: string) {
     switch (name) {
+      case 'Carousel':
+        return <CarouselPreview />;
+      
       case 'Card':
         return <CardPreview />;
       
