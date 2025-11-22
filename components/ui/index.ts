@@ -25,3 +25,4 @@ export { default as Pagination } from './Pagination';
 export { default as Step } from './Step';
 export { default as Tabs } from './Tabs';
 export { default as Alert } from './Alert';
+export { default as Loading } from './Loading';

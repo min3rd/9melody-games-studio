@@ -27,6 +27,7 @@ import PaginationPreview from './pagination-preview.client';
 import StepPreview from './step-preview.client';
 import TabPreview from './tab-preview.client';
 import AlertPreview from './alert-preview.client';
+import LoadingPreview from './loading-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -105,6 +106,8 @@ export default function ComponentsPage() {
         return <TabPreview />;
       case "Alert":
         return <AlertPreview />;
+      case "Loading":
+        return <LoadingPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
