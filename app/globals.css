@@ -47,3 +47,73 @@ html.dark, html.dark body {
   background-repeat: no-repeat;
 }
 
+/* Pixel-pattern background for buttons with a 3D wave overlay */
+.btn-pattern-pixel {
+  --btn-pattern-size: 6px; /* size of the pixel grid */
+  --btn-pattern-shine: rgba(255,255,255,0.18);
+  --btn-pattern-overlay: rgba(0,0,0,0.06);
+  background-image: linear-gradient(0deg, var(--btn-pattern-overlay), var(--btn-pattern-overlay)),
+    linear-gradient(90deg, rgba(0,0,0,0.08) 10%, transparent 10%),
+    linear-gradient(0deg, rgba(0,0,0,0.08) 10%, transparent 10%);
+  background-size: var(--btn-pattern-size) var(--btn-pattern-size), calc(var(--btn-pattern-size) * 2) var(--btn-pattern-size), var(--btn-pattern-size) calc(var(--btn-pattern-size) * 2);
+  background-position: 0 0, 0 0, 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-pattern-pixel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.0), var(--btn-pattern-shine), rgba(255,255,255,0.0));
+  mix-blend-mode: overlay;
+  transform: translateX(-120%);
+  animation: btn-pattern-wave 2.2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes btn-pattern-wave {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+/* Grid overlay with per-tile pop (3D-ish) animation */
+.btn-pattern-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 1px;
+  z-index: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+
+.pixel-btn > *:not(.btn-pattern-overlay) {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-pattern-tile {
+  display: inline-block;
+  width: var(--btn-pattern-size);
+  height: var(--btn-pattern-size);
+  background-color: var(--btn-pattern-overlay);
+  border-radius: 0.2px; /* keep pixel crisp */
+  transform-origin: center center;
+  will-change: transform, box-shadow, filter;
+  animation: btn-pattern-hover 0.85s cubic-bezier(.2,.9,.2,1) infinite;
+}
+
+@keyframes btn-pattern-hover {
+  0% { transform: translateY(0) scale(1); box-shadow: none; background-color: var(--btn-pattern-overlay); }
+  50% { transform: translateY(-4px) scale(1.05); box-shadow: 0 8px 14px rgba(0,0,0,0.18); background-color: var(--btn-pattern-shine); }
+  100% { transform: translateY(0) scale(1); box-shadow: none; background-color: var(--btn-pattern-overlay); }
+}
+
+/* Prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn-pattern-tile { animation: none; }
+  .btn-pattern-pixel::after { animation: none; }
+}
+
