@@ -58,4 +58,12 @@ export const AVATAR_SIZE_CLASSES = {
 } as const;
 
 export type UIAvatarSize = keyof typeof AVATAR_SIZE_CLASSES;
+ 
+export const CARD_PADDING_MAP = {
+  sm: 'px-3 py-2',
+  md: 'px-4 py-3',
+  lg: 'px-6 py-4',
+} as const;
+
+export type UICardSize = keyof typeof CARD_PADDING_MAP;
 

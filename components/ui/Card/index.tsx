@@ -1,5 +1,8 @@
-import React from 'react';
-import { PRESET_MAP, type Preset, ROUND_CLASSES } from '../presets';
+"use client";
+import React, { createContext, useContext } from 'react';
+import { PRESET_MAP, type Preset, ROUND_CLASSES, CARD_PADDING_MAP, type UICardSize } from '../presets';
+
+const CardContext = createContext<{ size: UICardSize } | undefined>(undefined);
 
 export interface CardProps extends React.HTMLAttributes<HTMLElement> {
   preset?: Preset;
@@ -7,6 +10,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLElement> {
   withEffects?: boolean;
   rounded?: boolean;
   elevation?: 'none' | 'sm' | 'md' | 'lg';
+  size?: UICardSize;
 }
 
 export interface CardHeaderProps extends React.HTMLAttributes<HTMLElement> {
@@ -45,6 +49,7 @@ export function Card({
   withEffects = true,
   rounded = true,
   elevation = 'sm',
+  size = 'md',
   className = '',
   children,
   ...rest
@@ -55,6 +60,7 @@ export function Card({
   const effects = withEffects ? 'transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-0.5' : '';
 
   return (
+    <CardContext.Provider value={{ size }}>
     <article
       {...rest}
       className={`bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 ${roundClass} ${elevationClasses(elevation)} ${effects} ${className}`.trim()}
@@ -62,12 +68,15 @@ export function Card({
     >
       {children}
     </article>
+    </CardContext.Provider>
   );
 }
 
 export function CardHeader({ heading, subtitle, actions, className = '', children, ...rest }: Readonly<CardHeaderProps>) {
+  const ctx = useContext(CardContext);
+  const size = (ctx?.size ?? 'md') as UICardSize;
   return (
-    <header {...rest} className={`flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 ${className}`.trim()}>
+    <header {...rest} className={`flex items-center justify-between ${CARD_PADDING_MAP[size]} border-b border-neutral-100 dark:border-neutral-800 ${className}`.trim()}>
       <div className="flex flex-col">
         {heading && <div className="text-sm font-semibold truncate">{heading}</div>}
         {subtitle && <div className="text-xs text-neutral-500 dark:text-neutral-400">{subtitle}</div>}
@@ -87,16 +96,20 @@ export function CardTitle({ children, className = '', ...rest }: Readonly<CardTi
 }
 
 export function CardBody({ children, className = '', ...rest }: Readonly<CardBodyProps>) {
+  const ctx = useContext(CardContext);
+  const size = (ctx?.size ?? 'md') as UICardSize;
   return (
-    <div {...rest} className={`px-4 py-3 ${className}`.trim()}>
+    <div {...rest} className={`${CARD_PADDING_MAP[size]} ${className}`.trim()}>
       {children}
     </div>
   );
 }
 
 export function CardFooter({ children, className = '', ...rest }: Readonly<CardFooterProps>) {
+  const ctx = useContext(CardContext);
+  const size = (ctx?.size ?? 'md') as UICardSize;
   return (
-    <footer {...rest} className={`px-4 py-3 border-t border-neutral-100 dark:border-neutral-800 ${className}`.trim()}>
+    <footer {...rest} className={`${CARD_PADDING_MAP[size]} border-t border-neutral-100 dark:border-neutral-800 ${className}`.trim()}>
       {children}
     </footer>
   );
