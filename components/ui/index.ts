@@ -14,3 +14,4 @@ export { default as Badge } from './Badge';
 export { default as Card, CardHeader, CardBody, CardFooter, CardTitle, CardThumbnail } from './Card';
 export { default as Carousel } from './Carousel';
 export { default as Kbd } from './Kbd';
+export { default as List, ListItem } from './List';
