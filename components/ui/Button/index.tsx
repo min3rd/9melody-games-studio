@@ -1,9 +1,9 @@
 import React from 'react';
-import { PRESET_MAP, type Preset } from '../presets';
+import { PRESET_MAP, type Preset, BUTTON_SIZE_CLASSES, ROUND_CLASSES, type UISize } from '../presets';
 
 type ButtonVariant = 'primary' | 'ghost' | 'danger';
 export type ButtonPreset = Preset;
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonSize = UISize;
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -11,6 +11,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   color?: string; // custom color for the button (hex or CSS color)
   preset?: ButtonPreset;
   withEffects?: boolean;
+  rounded?: boolean;
 }
 
 export default function Button({
@@ -21,9 +22,11 @@ export default function Button({
   color,
   preset,
   withEffects = true,
+  rounded = false,
   ...rest
 }: Readonly<ButtonProps>) {
-  const base = 'rounded-none font-medium inline-flex items-center justify-center gap-2 pixel-btn';
+  const base = 'font-medium inline-flex items-center justify-center gap-2 pixel-btn';
+  const roundClass = rounded ? ROUND_CLASSES.sm : ROUND_CLASSES.none; // keep default `none` to preserve pixel-art look
   const effectsClasses = 'transform transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-1 hover:scale-105 hover:shadow-lg active:translate-y-0 active:scale-95 active:shadow-sm';
 
   const variantClasses: Record<ButtonVariant, string> = {
@@ -33,13 +36,9 @@ export default function Button({
     danger: 'bg-red-600 text-white dark:bg-red-500 border border-transparent',
   };
 
-  const sizeClasses: Record<ButtonSize, string> = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-3 py-2 text-sm',
-    lg: 'px-4 py-3 text-base',
-  };
+  const sizeClasses = BUTTON_SIZE_CLASSES as Record<ButtonSize, string>;
 
-  const classes = `${base} ${withEffects ? effectsClasses : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
+  const classes = `${base} ${roundClass} ${withEffects ? effectsClasses : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
 
   // Use shared PRESET_MAP
 

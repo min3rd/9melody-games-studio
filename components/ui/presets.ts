@@ -10,3 +10,44 @@ export const PRESET_MAP = {
 export type Preset = keyof typeof PRESET_MAP;
 
 export default PRESET_MAP;
+
+/*
+ Shared size classes and helpers for UI components.
+ Components should import the specific mapping they need, for example:
+ import { BUTTON_SIZE_CLASSES, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CLASSES } from '@/components/ui/presets'
+ */
+export const BUTTON_SIZE_CLASSES = {
+  sm: 'px-2 py-1 text-xs',
+  md: 'px-3 py-2 text-sm',
+  lg: 'px-4 py-3 text-base',
+} as const;
+
+export const INDICATOR_SIZE_CLASSES = {
+  sm: 'w-2 h-2 text-xs',
+  md: 'w-3 h-3 text-sm',
+  lg: 'w-4 h-4 text-base',
+} as const;
+
+export const PILL_PADDING_MAP = {
+  sm: 'px-1 py-[1px] text-[10px]',
+  md: 'px-2 py-0.5 text-xs',
+  lg: 'px-3 py-1 text-sm',
+} as const;
+
+export const ROUND_CLASSES = {
+  full: 'rounded-full',
+  sm: 'rounded-sm',
+  none: 'rounded-none',
+} as const;
+
+export type UISize = keyof typeof BUTTON_SIZE_CLASSES;
+export type UIRound = keyof typeof ROUND_CLASSES;
+
+export const TOGGLE_SIZE_MAP = {
+  sm: { track: 'w-10 h-6', knob: 'w-4 h-4', knobTranslate: 'translateX(14px)' },
+  md: { track: 'w-12 h-7', knob: 'w-5 h-5', knobTranslate: 'translateX(20px)' },
+  lg: { track: 'w-14 h-8', knob: 'w-6 h-6', knobTranslate: 'translateX(24px)' },
+} as const;
+
+export type UIToggleSize = keyof typeof TOGGLE_SIZE_MAP;
+

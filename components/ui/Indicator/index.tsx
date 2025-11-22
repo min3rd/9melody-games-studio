@@ -1,8 +1,8 @@
 import React from 'react';
-import { PRESET_MAP, type Preset } from '../presets';
+import { PRESET_MAP, type Preset, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CLASSES, type UISize } from '../presets';
 
 export type IndicatorPreset = Preset;
-type IndicatorSize = 'sm' | 'md' | 'lg';
+type IndicatorSize = UISize;
 
 export interface IndicatorProps extends React.HTMLAttributes<HTMLSpanElement> {
   preset?: IndicatorPreset;
@@ -24,21 +24,11 @@ export default function Indicator({
   ...rest
 }: Readonly<IndicatorProps>) {
   const activeColor = color ?? PRESET_MAP[preset];
-
-  const sizeClasses: Record<IndicatorSize, string> = {
-    sm: 'w-2 h-2 text-xs',
-    md: 'w-3 h-3 text-sm',
-    lg: 'w-4 h-4 text-base',
-  };
-
-  const pillPadding: Record<IndicatorSize, string> = {
-    sm: 'px-1 py-[1px] text-[10px]',
-    md: 'px-2 py-0.5 text-xs',
-    lg: 'px-3 py-1 text-sm',
-  };
+  const sizeClasses = INDICATOR_SIZE_CLASSES as Record<IndicatorSize, string>;
+  const pillPadding = PILL_PADDING_MAP as Record<IndicatorSize, string>;
 
   const base = 'inline-flex items-center justify-center gap-1 font-medium select-none';
-  const roundClass = rounded ? 'rounded-full' : 'rounded-sm';
+  const roundClass = rounded ? ROUND_CLASSES.full : ROUND_CLASSES.sm;
   const effects = withEffects ? 'transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:scale-105 hover:shadow-sm' : '';
 
   // If children are provided, render a pill with padding; otherwise render a dot

@@ -76,6 +76,14 @@ Notes for the agent: When adding scripts or commands, follow the existing `packa
 
  - Preset mappings: To keep colors consistent across components, use the shared `PRESET_MAP` mapping exported from `components/ui/presets.ts`. Import as `import { PRESET_MAP, type Preset } from '@/components/ui/presets'` and prefer using `Preset` for component `preset` types (you may alias to a component-specific `*Preset` if desired, e.g. `export type ButtonPreset = Preset`).
 
+ - Size & rounding tokens: To keep sizing consistent across components, use the shared size and rounding mappings exported from `components/ui/presets.ts` such as `BUTTON_SIZE_CLASSES`, `INDICATOR_SIZE_CLASSES`, `PILL_PADDING_MAP`, `ROUND_CLASSES`, and `TOGGLE_SIZE_MAP`. Import them as:
+
+```ts
+import { BUTTON_SIZE_CLASSES, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CLASSES, TOGGLE_SIZE_MAP, type UISize } from '@/components/ui/presets'
+```
+
+Prefer to standardize on `sm` / `md` / `lg` sizes across components and use the shared mappings rather than duplicating class strings. The mappings provide consistent Tailwind class tokens for padding, text sizes, and dimensions.
+
 Examples:
 
 ```tsx

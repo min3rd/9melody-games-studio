@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { PRESET_MAP, type Preset } from '../presets';
+import { PRESET_MAP, type Preset, TOGGLE_SIZE_MAP, type UIToggleSize, ROUND_CLASSES } from '../presets';
 
 export type TogglePreset = Preset;
+type ToggleSize = UIToggleSize;
 
 export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {
   checked?: boolean;
@@ -14,6 +15,7 @@ export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   hint?: React.ReactNode;
   color?: string; // any valid CSS color for the "on" state (custom override)
   preset?: TogglePreset; // use a preset color
+  size?: ToggleSize;
 }
 
 export default function Toggle({
@@ -26,6 +28,7 @@ export default function Toggle({
   hint,
   color,
   preset,
+  size = 'md',
   className = '',
   ...rest
 }: Readonly<ToggleProps>) {
@@ -52,8 +55,9 @@ export default function Toggle({
 
   const presetColor = preset ? PRESET_MAP[preset] : undefined;
   const activeColor = color ?? presetColor ?? '#3b82f6'; // default primary
+  const toggleSize = TOGGLE_SIZE_MAP[size];
   const trackColor = checked ? activeColor : 'rgb(226 232 240)';
-  const knobTranslate = checked ? 'translateX(20px)' : 'translateX(0)';
+  const knobTranslate = checked ? toggleSize.knobTranslate : 'translateX(0)';
 
   return (
     <div className={`${className} flex items-start gap-3`}>
@@ -79,12 +83,12 @@ export default function Toggle({
               toggle();
             }
           }}
-          className={`relative inline-flex items-center w-12 h-7 rounded-full transition-colors duration-200 focus:outline-none ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} bg-neutral-200 dark:bg-neutral-800`}
+          className={`relative inline-flex items-center ${toggleSize.track} ${ROUND_CLASSES.full} transition-colors duration-200 focus:outline-none ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} bg-neutral-200 dark:bg-neutral-800`}
           style={{ background: checked ? trackColor : undefined, boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)' }}
           {...rest}
         >
           <span
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200"
+            className={`absolute left-0 top-1/2 -translate-y-1/2 ${toggleSize.knob} bg-white ${ROUND_CLASSES.full} shadow-md transform transition-transform duration-200`}
             style={{ transform: knobTranslate }}
           />
         </button>
