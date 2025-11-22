@@ -3,6 +3,7 @@ import path from 'path';
 import ButtonPreview from './button-preview.client';
 import AvatarPreview from './avatar-preview.client';
 import IndicatorPreview from './indicator-preview.client';
+import BadgePreview from './badge-preview.client';
 import DropdownPreview from './dropdown-preview.client';
 import CodePreviewPreview from './code-preview.client';
 import i18n from '@/lib/i18n'
@@ -31,6 +32,9 @@ export default function ComponentsPage() {
 
   function renderPreview(name: string) {
     switch (name) {
+      case 'Badge':
+        return <BadgePreview />;
+      
       case 'Avatar':
         return <AvatarPreview />;
       
