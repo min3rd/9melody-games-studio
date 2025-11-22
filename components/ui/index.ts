@@ -11,3 +11,4 @@ export { PRESET_MAP, type Preset } from './presets';
 export { BUTTON_SIZE_CLASSES, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CLASSES, TOGGLE_SIZE_MAP, AVATAR_SIZE_CLASSES, type UISize, type UIRound, type UIToggleSize, type UIAvatarSize } from './presets';
 export { default as Avatar, AvatarGroup } from './Avatar';
 export { default as Badge } from './Badge';
+export { default as Card, CardHeader, CardBody, CardFooter, CardTitle, CardThumbnail } from './Card';

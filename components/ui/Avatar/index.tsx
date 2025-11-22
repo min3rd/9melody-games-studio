@@ -106,6 +106,8 @@ export function AvatarGroup({
   overlap = true,
   rounded = true,
   withEffects = true,
+  preset: groupPreset,
+  color: groupColor,
   className = '',
 }: {
   avatars: Array<{ src?: string; alt?: string; name?: string; color?: string; preset?: Preset }>; // minimal avatar info
@@ -114,6 +116,8 @@ export function AvatarGroup({
   overlap?: boolean;
   rounded?: boolean;
   withEffects?: boolean;
+  preset?: Preset;
+  color?: string;
   className?: string;
 }) {
   const visible = avatars.slice(0, max);
@@ -125,7 +129,7 @@ export function AvatarGroup({
     <div className={`flex items-center ${className}`.trim()}>
       {visible.map((a, i) => (
         <div key={i} className={`${i !== 0 ? overlapClass : ''}`} style={{ zIndex: 100 + i }}>
-          <Avatar src={a.src} name={a.name} alt={a.alt} preset={a.preset} color={a.color} size={size} rounded={rounded} withEffects={withEffects} />
+          <Avatar src={a.src} name={a.name} alt={a.alt} preset={a.preset ?? groupPreset} color={a.color ?? groupColor} size={size} rounded={rounded} withEffects={withEffects} />
         </div>
       ))}
       {extra > 0 && (
