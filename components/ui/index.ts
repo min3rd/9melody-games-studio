@@ -18,3 +18,4 @@ export { default as List, ListItem } from './List';
 export { default as Timeline, TimelineItem } from './Timeline';
 export { default as TextRotate } from './TextRotate';
 export { default as Breadcrumbs } from './Breadcrumbs';
+export { default as Dock } from './Dock';
