@@ -14,7 +14,7 @@ export function useI18n() {
   }, []);
 
   return {
-    t: (k: string, opt?: Record<string, any>) => i18n.t(k, opt),
+    t: (k: string, opt?: Record<string, unknown>) => i18n.t(k, opt),
     i18n,
     language: lng,
     changeLanguage: (l: string) => i18n.changeLanguage(l),

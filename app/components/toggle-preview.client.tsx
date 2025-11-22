@@ -10,9 +10,9 @@ export default function TogglePreview() {
   const [color, setColor] = useState('#3b82f6');
   type UITogglePreset = Preset | 'custom' | 'none';
   const [preset, setPreset] = useState<UITogglePreset>('primary');
-  const [title, setTitle] = useState('Enable feature');
-  const [description, setDescription] = useState('Toggle this to enable or disable the feature');
-  const [hint, setHint] = useState('Beta');
+  const title = 'Enable feature';
+  const description = 'Toggle this to enable or disable the feature';
+  const hint = 'Beta';
 
   return (
     <div className="space-y-4">

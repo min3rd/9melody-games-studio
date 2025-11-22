@@ -21,7 +21,7 @@ export default function CodePreview({
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch (e) {
+    } catch {
       // ignore silently
     }
   }
@@ -41,7 +41,7 @@ export default function CodePreview({
       )}
 
       <pre className="rounded px-3 py-2 bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-mono text-sm overflow-auto whitespace-pre">
-        <code>{code}</code>
+        <code lang={language}>{code}</code>
       </pre>
     </div>
   );

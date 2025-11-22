@@ -31,13 +31,12 @@ export default function Accordion({
   ...rest
 }: Readonly<AccordionProps>) {
   const isControlled = typeof openProp === 'boolean';
-  const [open, setOpen] = useState<boolean>(isControlled ? !!openProp : !!defaultOpen);
+  const [openState, setOpenState] = useState<boolean>(!!defaultOpen);
+  const open = isControlled ? !!openProp : openState;
   const contentRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (isControlled) setOpen(!!openProp);
-  }, [openProp, isControlled]);
+  // No need to sync state in effect for controlled mode; we derive `open` above
 
   useEffect(() => {
     function onResize() {
@@ -65,7 +64,7 @@ export default function Accordion({
   function toggle() {
     if (disabled) return;
     const next = !open;
-    if (!isControlled) setOpen(next);
+    if (!isControlled) setOpenState(next);
     onOpenChange?.(next);
   }
 

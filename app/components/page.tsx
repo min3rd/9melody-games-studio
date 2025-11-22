@@ -24,7 +24,7 @@ export default function ComponentsPage() {
     components = fs
       .readdirSync(uiDir)
       .filter((name) => fs.statSync(path.join(uiDir, name)).isDirectory());
-  } catch (e) {
+  } catch {
     components = [];
   }
 

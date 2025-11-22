@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { PRESET_MAP, type Preset, TOGGLE_SIZE_MAP, type UIToggleSize, ROUND_CLASSES } from '../presets';
 
 export type TogglePreset = Preset;
@@ -32,22 +32,14 @@ export default function Toggle({
   className = '',
   ...rest
 }: Readonly<ToggleProps>) {
-  const id = useId();
   const isControlled = typeof checkedProp === 'boolean';
-  const [checked, setChecked] = useState<boolean>(
-    isControlled ? !!checkedProp : !!defaultChecked
-  );
-
-  useEffect(() => {
-    if (isControlled) {
-      setChecked(!!checkedProp);
-    }
-  }, [checkedProp, isControlled]);
+  const [checkedState, setCheckedState] = useState<boolean>(!!defaultChecked);
+  const checked = isControlled ? !!checkedProp : checkedState;
 
   const toggle = () => {
     if (disabled) return;
     const next = !checked;
-    if (!isControlled) setChecked(next);
+    if (!isControlled) setCheckedState(next);
     onCheckedChangeProp?.(next);
   };
 

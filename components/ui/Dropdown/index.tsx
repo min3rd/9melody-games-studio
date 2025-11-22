@@ -31,12 +31,12 @@ export default function Dropdown({
   useEffect(() => {
     function onDoc(e: MouseEvent) {
       if (!rootRef.current) return;
-      if (!rootRef.current.contains(e.target as Node)) setOpen(false);
+      if (!rootRef.current.contains(e.target as Node)) { setOpen(false); setActiveIndex(null); }
     }
 
     function onKey(e: KeyboardEvent) {
       if (!open) return;
-      if (e.key === 'Escape') setOpen(false);
+  if (e.key === 'Escape') { setOpen(false); setActiveIndex(null); }
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setActiveIndex((i) => (i === null ? 0 : Math.min(items.length - 1, i + 1)));
@@ -62,9 +62,7 @@ export default function Dropdown({
     };
   }, [open, items, activeIndex]);
 
-  useEffect(() => {
-    if (open) setActiveIndex(null);
-  }, [open]);
+  // Clear activeIndex when opening using direct toggle or external events
 
   useEffect(() => {
     if (activeIndex !== null && listRef.current) {
@@ -87,7 +85,7 @@ export default function Dropdown({
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => setOpen((s) => !s)}
+  onClick={() => setOpen((s) => { const next = !s; if (next) setActiveIndex(null); return next; })}
         className={`inline-flex items-center gap-2 rounded-none px-3 py-2 bg-foreground text-background dark:bg-background dark:text-foreground pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition duration-150 ease-out`}
       >
         {label}
@@ -103,7 +101,7 @@ export default function Dropdown({
           aria-label="Dropdown menu"
           className={`${menuClasses} ${align === 'right' ? 'right-0' : 'left-0'} absolute`}
         >
-          {items.map((it, idx) => (
+          {items.map((it) => (
             <li
               key={it.key}
               role="menuitem"

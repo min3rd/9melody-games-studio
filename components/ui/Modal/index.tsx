@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 
 export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -35,7 +35,16 @@ export default function Modal({
 }: Readonly<ModalProps>) {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const portalRoot = useMemo(() => {
+    if (typeof document === 'undefined') return null;
+    let root = document.getElementById('modal-root');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'modal-root';
+      document.body.appendChild(root);
+    }
+    return root;
+  }, []);
   
   // Position and Size State
   // We use refs for values that change frequently during drag to avoid stale closures in event listeners,
@@ -43,9 +52,18 @@ export default function Modal({
   const posRef = useRef({ x: initialLeft, y: initialTop });
   const sizeRef = useRef({ w: width, h: height });
   
-  // Force update helper
-  const [, setTick] = useState(0);
-  const forceUpdate = () => setTick(t => t + 1);
+  // Modal style state (avoid reading refs in render)
+  const [modalStyleState, setModalStyleState] = useState<React.CSSProperties>(() => ({
+    position: 'absolute',
+    left: initialLeft,
+    top: initialTop,
+    width: width ?? 0,
+    height: height ?? 0,
+    transition: `opacity ${animationDuration}ms ease-out, transform ${animationDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
+    transformOrigin: '50% 50%',
+    opacity: 0,
+    transform: `translate(0, 0) scale(0.95)`,
+  }));
 
   // Drag/Resize Refs
   const isDragging = useRef(false);
@@ -54,16 +72,7 @@ export default function Modal({
   const resizeStart = useRef({ mouseX: 0, mouseY: 0, startW: 0, startH: 0 });
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Portal
-  useEffect(() => {
-    let root = document.getElementById('modal-root');
-    if (!root) {
-      root = document.createElement('div');
-      root.id = 'modal-root';
-      document.body.appendChild(root);
-    }
-    setPortalRoot(root);
-  }, []);
+  // Portals created during render (useMemo) — no effect/async state needed.
 
   // Handle Open/Close Animation Lifecycle
   useEffect(() => {
@@ -71,16 +80,16 @@ export default function Modal({
     let rafId: number;
 
     if (open) {
-      setMounted(true);
-      // Double RAF ensures the browser paints the "mounted" state (opacity 0) 
-      // before applying the "active" state (opacity 1), triggering the transition.
       rafId = requestAnimationFrame(() => {
+        setMounted(true);
         rafId = requestAnimationFrame(() => {
           setActive(true);
         });
       });
+      // Double RAF ensures the browser paints the "mounted" state (opacity 0) 
+      // before applying the "active" state (opacity 1), triggering the transition.
     } else {
-      setActive(false);
+      rafId = requestAnimationFrame(() => setActive(false));
       // Wait for the transition to finish before removing from DOM
       timeoutId = setTimeout(() => {
         setMounted(false);
@@ -106,7 +115,13 @@ export default function Modal({
       } else {
         sizeRef.current.h = height;
       }
-      forceUpdate();
+      setModalStyleState((prev) => ({
+        ...prev,
+        left: posRef.current.x,
+        top: posRef.current.y,
+        width: sizeRef.current.w,
+        height: sizeRef.current.h,
+      }));
     }
   }, [mounted, width, height]);
 
@@ -120,14 +135,22 @@ export default function Modal({
         const dy = e.clientY - dragStart.current.mouseY;
         posRef.current.x = Math.max(0, dragStart.current.startX + dx);
         posRef.current.y = Math.max(0, dragStart.current.startY + dy);
-        forceUpdate();
+        setModalStyleState((prev) => ({
+          ...prev,
+          left: posRef.current.x,
+          top: posRef.current.y,
+        }));
       }
       if (isResizing.current && allowResize) {
         const dx = e.clientX - resizeStart.current.mouseX;
         const dy = e.clientY - resizeStart.current.mouseY;
         sizeRef.current.w = Math.max(200, resizeStart.current.startW + dx);
         sizeRef.current.h = Math.max(100, resizeStart.current.startH + dy);
-        forceUpdate();
+        setModalStyleState((prev) => ({
+          ...prev,
+          width: sizeRef.current.w,
+          height: sizeRef.current.h,
+        }));
       }
     };
 
@@ -196,15 +219,11 @@ export default function Modal({
   const { origin: tOrigin, translate: tTranslate } = getOriginStyles();
 
   // Dynamic Styles
+  // derive the active style from the state and other props
   const modalStyle: React.CSSProperties = {
-    position: 'absolute',
-    left: posRef.current.x,
-    top: posRef.current.y,
-    width: sizeRef.current.w,
-    height: sizeRef.current.h,
-    // Animation properties
-    transition: `opacity ${animationDuration}ms ease-out, transform ${animationDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
+    ...modalStyleState,
     transformOrigin: tOrigin,
+    transition: `opacity ${animationDuration}ms ease-out, transform ${animationDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
     opacity: active ? 1 : 0,
     transform: active ? 'translate(0, 0) scale(1)' : `translate(${tTranslate}) scale(0.95)`,
   };
@@ -267,6 +286,6 @@ export default function Modal({
         )}
       </div>
     </div>,
-    portalRoot
+    portalRoot!
   );
 }

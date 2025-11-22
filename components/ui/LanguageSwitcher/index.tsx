@@ -12,7 +12,7 @@ export default function LanguageSwitcher() {
   useEffect(() => {
     try {
       localStorage.setItem('lang', lang);
-    } catch (e) {}
+    } catch {}
     if (typeof document !== 'undefined') document.documentElement.lang = lang;
     // inform i18n about language change
     if (i18n && i18n.language !== lang) i18n.changeLanguage(lang);
