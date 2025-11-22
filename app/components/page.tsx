@@ -24,6 +24,7 @@ import DockPreview from './dock-preview.client';
 import MenuPreview from './menu-preview.client';
 import NavbarPreview from './navbar-preview.client';
 import PaginationPreview from './pagination-preview.client';
+import StepPreview from './step-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -96,6 +97,8 @@ export default function ComponentsPage() {
         return <NavbarPreview />;
       case "Pagination":
         return <PaginationPreview />;
+      case "Step":
+        return <StepPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
