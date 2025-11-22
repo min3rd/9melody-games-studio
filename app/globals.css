@@ -82,7 +82,7 @@ html.dark, html.dark body {
   position: absolute;
   inset: 0;
   display: grid;
-  gap: 1px;
+  gap: 2px;
   z-index: 0;
   pointer-events: none;
   transform-style: preserve-3d;
@@ -102,7 +102,7 @@ html.dark, html.dark body {
   border-radius: 0.2px; /* keep pixel crisp */
   transform-origin: center center;
   will-change: transform, box-shadow, filter;
-  animation: btn-pattern-hover 0.85s cubic-bezier(.2,.9,.2,1) infinite;
+  animation: btn-pattern-hover 0.95s cubic-bezier(.2,.9,.2,1) infinite;
 }
 
 @keyframes btn-pattern-hover {

@@ -102,7 +102,8 @@ const ButtonImpl: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps>
     if (!rgb) return undefined;
     return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
   };
-  const tileSizeMap = { sm: 4, md: 6, lg: 8 } as const;
+  // Double sizes: sm/md/lg -> 8/12/16px (doubled)
+  const tileSizeMap = { sm: 8, md: 12, lg: 16 } as const;
   const tileSize = tileSizeMap[size] ?? 6;
   const [cols, setCols] = useState(0);
   const [rows, setRows] = useState(0);
@@ -174,7 +175,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps>
             const r = Math.floor(idx / cols);
             const c = idx % cols;
             // Delay small step per column to create a left-to-right ripple; add small row offset
-            const delay = (c * 0.06 + r * 0.01).toFixed(3);
+            const delay = (c * 0.12 + r * 0.015).toFixed(3);
             return <span key={idx} className="btn-pattern-tile" style={{ animationDelay: `${delay}s` }} />;
           })}
         </span>
