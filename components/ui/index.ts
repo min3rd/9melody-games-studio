@@ -16,3 +16,5 @@ export { default as Carousel } from './Carousel';
 export { default as Kbd } from './Kbd';
 export { default as List, ListItem } from './List';
 export { default as Timeline, TimelineItem } from './Timeline';
+export { default as TextRotate } from './TextRotate';
+export { default as Breadcrumbs } from './Breadcrumbs';

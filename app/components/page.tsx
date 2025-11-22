@@ -17,6 +17,8 @@ import AccordionPreview from "./accordion-preview.client";
 import { CodePreview } from "@/components/ui";
 import ListPreview from "./list-preview.client";
 import TimelinePreview from "./timeline-preview.client";
+import TextRotatePreview from "./text-rotate-preview.client";
+import BreadcrumbsPreview from './breadcrumbs-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -75,6 +77,10 @@ export default function ComponentsPage() {
         return <IndicatorPreview />;
       case "Timeline":
         return <TimelinePreview />;
+      case "TextRotate":
+        return <TextRotatePreview />;
+      case "Breadcrumbs":
+        return <BreadcrumbsPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
