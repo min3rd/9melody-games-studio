@@ -6,6 +6,7 @@ export type TimelineSize = UISize; // re-use UISize types (sm|md|lg)
 
 export interface TimelineProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
+  orientation?: 'vertical' | 'horizontal';
 }
 
 export interface TimelineItemProps extends React.LiHTMLAttributes<HTMLLIElement> {
@@ -25,13 +26,14 @@ export interface TimelineItemProps extends React.LiHTMLAttributes<HTMLLIElement>
   connectorBelow?: boolean;
   /* Internal helper: marker index assigned by parent for DOM data attribute */
   markerId?: number;
+  orientation?: 'vertical' | 'horizontal';
 }
 
 // Intentionally define small marker inline in TimelineItem rather than a separate Dot component
 
-export default function Timeline({ className = '', children, ...rest }: Readonly<TimelineProps>) {
+export default function Timeline({ className = '', children, orientation = 'vertical', ...rest }: Readonly<TimelineProps>) {
   const olRef = useRef<HTMLOListElement | null>(null);
-  const [segments, setSegments] = useState<Array<{ top: number; height: number; color?: string; left?: number }>>([]);
+  const [segments, setSegments] = useState<Array<{ top: number; height: number; color?: string; left?: number; width?: number }>>([]);
 
   const childArray = React.Children.toArray(children).filter(Boolean) as React.ReactElement<TimelineItemProps>[];
 
@@ -39,7 +41,7 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
     const status = child.props.status ?? 'pending';
     const connectorBelow = i < childArray.length - 1 && (status === 'done' || status === 'active');
     // pass marker index that the child will use as a data attribute
-    return React.isValidElement(child) ? React.cloneElement(child, { connectorBelow, markerId: i }) : child;
+    return React.isValidElement(child) ? React.cloneElement(child, { connectorBelow, markerId: i, orientation }) : child;
   });
 
   useLayoutEffect(() => {
@@ -52,8 +54,9 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
       return;
     }
 
-    const rect = el.getBoundingClientRect();
-  const newSegments: Array<{ top: number; height: number; color?: string; left?: number } > = [];
+      const rect = el.getBoundingClientRect();
+      const HORIZONTAL_THICKNESS = 4;
+      const newSegments: Array<{ top: number; height: number; color?: string; left?: number; width?: number } > = [];
 
     for (let i = 0; i < nodes.length - 1; i++) {
   const topEl = nodes[i];
@@ -61,14 +64,21 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
       if (!topEl || !bottomEl) continue;
       const topRect = topEl.getBoundingClientRect();
       const bottomRect = bottomEl.getBoundingClientRect();
-  const topCenterY = topRect.top + topRect.height / 2 - rect.top;
-  const bottomCenterY = bottomRect.top + bottomRect.height / 2 - rect.top;
-  const topBottom = topCenterY + topRect.height / 2; // bottom of top dot
-  const bottomTop = bottomCenterY - bottomRect.height / 2; // top of bottom dot
-  const topCenterX = topRect.left + topRect.width / 2 - rect.left;
-  const bottomCenterX = bottomRect.left + bottomRect.width / 2 - rect.left;
-      const topPx = Math.round(topBottom);
-      const heightPx = Math.max(0, Math.round(bottomTop - topBottom));
+      const topCenterY = topRect.top + topRect.height / 2 - rect.top;
+      const bottomCenterY = bottomRect.top + bottomRect.height / 2 - rect.top;
+      const topCenterX = topRect.left + topRect.width / 2 - rect.left;
+      const bottomCenterX = bottomRect.left + bottomRect.width / 2 - rect.left;
+      let topPx = 0;
+      let heightPx = 0;
+      if (orientation === 'horizontal') {
+        topPx = Math.round(topCenterY - HORIZONTAL_THICKNESS / 2);
+        heightPx = HORIZONTAL_THICKNESS;
+      } else {
+        const topBottom = topCenterY + topRect.height / 2; // bottom of top dot
+        const bottomTop = bottomCenterY - bottomRect.height / 2; // top of bottom dot
+        topPx = Math.round(topBottom);
+        heightPx = Math.max(0, Math.round(bottomTop - topBottom));
+      }
 
   // Choose color from top element's status if present (matching index from data attribute)
       const topIndex = Number(topEl.getAttribute('data-timeline-marker')) ?? i;
@@ -86,7 +96,15 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
         const statusPreset = STATUS_PRESET_MAP[statusBottom] ?? 'muted';
         segColor = (bottomChild?.props?.color as string) ?? PRESET_MAP[bottomChild?.props?.preset ?? statusPreset];
       }
-  if (segColor) newSegments.push({ top: topPx, height: heightPx, color: segColor, left: Math.round((topCenterX + bottomCenterX) / 2) - 1 });
+      if (segColor) {
+        if (orientation === 'horizontal') {
+          const leftPx = Math.round(Math.min(topCenterX, bottomCenterX));
+          const widthPx = Math.max(0, Math.round(Math.abs(bottomCenterX - topCenterX)));
+          newSegments.push({ top: topPx, height: heightPx, color: segColor, left: leftPx, width: widthPx });
+        } else {
+          newSegments.push({ top: topPx, height: heightPx, color: segColor, left: Math.round((topCenterX + bottomCenterX) / 2) - 1 });
+        }
+      }
     }
 
   // set async to avoid sync setState inside effect
@@ -94,18 +112,25 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
     const onResize = () => {
       // recompute on resize
       const resizeRect = el.getBoundingClientRect();
-  const newSegs: Array<{ top: number; height: number; color?: string; left?: number } > = [];
+    const newSegs: Array<{ top: number; height: number; color?: string; left?: number; width?: number } > = [];
       for (let i = 0; i < nodes.length - 1; i++) {
         const topRect = nodes[i].getBoundingClientRect();
         const bottomRect = nodes[i + 1].getBoundingClientRect();
-  const topCenterY = topRect.top + topRect.height / 2 - resizeRect.top;
-  const bottomCenterY = bottomRect.top + bottomRect.height / 2 - resizeRect.top;
-  const topBottom = topCenterY + topRect.height / 2;
-  const bottomTop = bottomCenterY - bottomRect.height / 2;
-  const topCenterX = topRect.left + topRect.width / 2 - resizeRect.left;
-  const bottomCenterX = bottomRect.left + bottomRect.width / 2 - resizeRect.left;
-        const topPx = Math.round(topBottom);
-        const heightPx = Math.max(0, Math.round(bottomTop - topBottom));
+        const topCenterY = topRect.top + topRect.height / 2 - resizeRect.top;
+        const bottomCenterY = bottomRect.top + bottomRect.height / 2 - resizeRect.top;
+        const topCenterX = topRect.left + topRect.width / 2 - resizeRect.left;
+        const bottomCenterX = bottomRect.left + bottomRect.width / 2 - resizeRect.left;
+        let topPx = 0;
+        let heightPx = 0;
+        if (orientation === 'horizontal') {
+          topPx = Math.round(topCenterY - HORIZONTAL_THICKNESS / 2);
+          heightPx = HORIZONTAL_THICKNESS;
+        } else {
+          const topBottom = topCenterY + topRect.height / 2;
+          const bottomTop = bottomCenterY - bottomRect.height / 2;
+          topPx = Math.round(topBottom);
+          heightPx = Math.max(0, Math.round(bottomTop - topBottom));
+        }
         const topIndex = Number(nodes[i].getAttribute('data-timeline-marker')) ?? i;
         const bottomIndex = Number(nodes[i + 1].getAttribute('data-timeline-marker')) ?? i + 1;
         const topChild = childArray[topIndex];
@@ -120,14 +145,22 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
           const statusPreset = STATUS_PRESET_MAP[statusBottom] ?? 'muted';
           segColorResize = (bottomChild?.props?.color as string) ?? PRESET_MAP[bottomChild?.props?.preset ?? statusPreset];
         }
-  if (segColorResize) newSegs.push({ top: topPx, height: heightPx, color: segColorResize, left: Math.round((topCenterX + bottomCenterX) / 2) - 1 });
+        if (segColorResize) {
+          if (orientation === 'horizontal') {
+            const leftPx = Math.round(Math.min(topCenterX, bottomCenterX));
+            const widthPx = Math.max(0, Math.round(Math.abs(bottomCenterX - topCenterX)));
+            newSegs.push({ top: topPx, height: heightPx, color: segColorResize, left: leftPx, width: widthPx });
+          } else {
+            newSegs.push({ top: topPx, height: heightPx, color: segColorResize, left: Math.round((topCenterX + bottomCenterX) / 2) - 1 });
+          }
+        }
       }
       setSegments(newSegs);
     };
 
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [children, childArray]);
+  }, [children, childArray, orientation]);
 
   return (
     <ol ref={olRef} {...rest} className={`relative pl-12 space-y-6 ${className}`.trim()}>
@@ -136,8 +169,8 @@ export default function Timeline({ className = '', children, ...rest }: Readonly
         <span
           key={`seg-${i}`}
           aria-hidden
-          className="absolute w-[2px] rounded z-10"
-          style={{ top: s.top, height: s.height, left: s.left, backgroundColor: s.color }}
+          className={s.width ? 'absolute h-1 rounded z-10' : 'absolute w-0.5 rounded z-10'}
+          style={s.width ? { left: s.left, top: s.top, width: s.width, backgroundColor: s.color } : { top: s.top, height: s.height, left: s.left, backgroundColor: s.color }}
         />
       ))}
       {cloned}
