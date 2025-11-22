@@ -51,3 +51,11 @@ export const TOGGLE_SIZE_MAP = {
 
 export type UIToggleSize = keyof typeof TOGGLE_SIZE_MAP;
 
+export const AVATAR_SIZE_CLASSES = {
+  sm: 'w-6 h-6 text-sm',
+  md: 'w-10 h-10 text-base',
+  lg: 'w-16 h-16 text-lg',
+} as const;
+
+export type UIAvatarSize = keyof typeof AVATAR_SIZE_CLASSES;
+

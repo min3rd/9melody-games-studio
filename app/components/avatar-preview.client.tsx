@@ -1,0 +1,83 @@
+"use client";
+import React, { useState } from 'react';
+import { Avatar, AvatarGroup } from '@/components/ui';
+import type { Preset } from '@/components/ui/presets';
+
+type UIPreset = Preset | 'custom' | 'none';
+
+export default function AvatarPreview(): React.ReactElement {
+  const [preset, setPreset] = useState<UIPreset>('muted');
+  const [color, setColor] = useState('#3b82f6');
+  const [size, setSize] = useState<'sm'|'md'|'lg'>('md');
+  const [withEffects, setWithEffects] = useState(true);
+  const [rounded, setRounded] = useState(true);
+  const [showIndicator, setShowIndicator] = useState(true);
+
+  const avatars: Array<{ src?: string; name: string; preset?: Preset; alt?: string; color?: string }> = [
+    { src: '/next.svg', name: 'Next' },
+    { src: undefined, name: 'Elaine', preset: 'success' },
+    { src: undefined, name: 'Minh', preset: 'warning' },
+    { src: undefined, name: 'Tom', preset: 'info' },
+  ];
+
+  const presetProp: Preset | undefined = preset === 'custom' || preset === 'none' ? undefined : (preset as Preset);
+  const colorProp = preset === 'custom' ? color : undefined;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <Avatar src="/next.svg" name="Next" size={size} rounded={rounded} withEffects={withEffects} indicator={showIndicator} />
+        <Avatar name="Elaine K." size={size} rounded={rounded} withEffects={withEffects} preset={presetProp} color={colorProp} indicator={showIndicator} />
+        <Avatar name="Minh Vu" size={size} rounded={rounded} withEffects={withEffects} preset={presetProp} color={colorProp} indicator={showIndicator} />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <label className="text-sm">Size
+          <select className="ml-2 text-sm rounded p-1 border" value={size} onChange={(e) => setSize(e.target.value as 'sm'|'md'|'lg')}>
+            <option value="sm">Small</option>
+            <option value="md">Medium</option>
+            <option value="lg">Large</option>
+          </select>
+        </label>
+
+        <label className="text-sm">Preset
+          <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as UIPreset)}>
+            <option value="primary">Primary</option>
+            <option value="success">Success</option>
+            <option value="danger">Danger</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+            <option value="muted">Muted</option>
+            <option value="custom">Custom</option>
+            <option value="none">None</option>
+          </select>
+        </label>
+
+        {preset === 'custom' && (
+          <label className="text-sm">Custom color
+            <input className="ml-2" type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+          </label>
+        )}
+      </div>
+
+      <div className="flex gap-4 items-center">
+        <label className="text-sm">Rounded
+          <input className="ml-2" type="checkbox" checked={rounded} onChange={(e) => setRounded(e.target.checked)} />
+        </label>
+
+        <label className="text-sm">Effects
+          <input className="ml-2" type="checkbox" checked={withEffects} onChange={(e) => setWithEffects(e.target.checked)} />
+        </label>
+
+        <label className="text-sm">Indicator
+          <input className="ml-2" type="checkbox" checked={showIndicator} onChange={(e) => setShowIndicator(e.target.checked)} />
+        </label>
+      </div>
+
+      <div className="mt-4">
+        <div className="font-medium mb-2">Group Example</div>
+  <AvatarGroup avatars={avatars} size={size} max={3} />
+      </div>
+    </div>
+  );
+}

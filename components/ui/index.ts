@@ -8,4 +8,5 @@ export { default as Toggle } from './Toggle';
 export { default as Accordion } from './Accordion';
 export { default as Indicator } from './Indicator';
 export { PRESET_MAP, type Preset } from './presets';
-export { BUTTON_SIZE_CLASSES, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CLASSES, TOGGLE_SIZE_MAP, type UISize, type UIRound, type UIToggleSize } from './presets';
+export { BUTTON_SIZE_CLASSES, INDICATOR_SIZE_CLASSES, PILL_PADDING_MAP, ROUND_CLASSES, TOGGLE_SIZE_MAP, AVATAR_SIZE_CLASSES, type UISize, type UIRound, type UIToggleSize, type UIAvatarSize } from './presets';
+export { default as Avatar, AvatarGroup } from './Avatar';
