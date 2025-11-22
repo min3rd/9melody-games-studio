@@ -15,3 +15,4 @@ export { default as Card, CardHeader, CardBody, CardFooter, CardTitle, CardThumb
 export { default as Carousel } from './Carousel';
 export { default as Kbd } from './Kbd';
 export { default as List, ListItem } from './List';
+export { default as Timeline, TimelineItem } from './Timeline';

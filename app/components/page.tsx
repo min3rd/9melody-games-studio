@@ -16,6 +16,7 @@ import TogglePreview from "./toggle-preview.client";
 import AccordionPreview from "./accordion-preview.client";
 import { CodePreview } from "@/components/ui";
 import ListPreview from "./list-preview.client";
+import TimelinePreview from "./timeline-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -72,6 +73,8 @@ export default function ComponentsPage() {
         return <TogglePreview />;
       case "Indicator":
         return <IndicatorPreview />;
+      case "Timeline":
+        return <TimelinePreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
