@@ -58,7 +58,7 @@ html.dark, html.dark body {
   background-size: var(--btn-pattern-size) var(--btn-pattern-size), calc(var(--btn-pattern-size) * 2) var(--btn-pattern-size), var(--btn-pattern-size) calc(var(--btn-pattern-size) * 2);
   background-position: 0 0, 0 0, 0 0;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* allow tiles to pop beyond button bounds for stronger 3D effect */
 }
 
 .btn-pattern-pixel::after {
@@ -83,10 +83,10 @@ html.dark, html.dark body {
   inset: 0;
   display: grid;
   gap: 2px;
-  z-index: 0;
+  z-index: 3; /* bring tiles above button content to enhance 3D feel */
   pointer-events: none;
   transform-style: preserve-3d;
-  perspective: 600px;
+  perspective: 900px;
 }
 
 .pixel-btn > *:not(.btn-pattern-overlay) {

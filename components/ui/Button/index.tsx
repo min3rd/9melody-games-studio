@@ -57,7 +57,8 @@ const ButtonImpl: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps>
   const sizeClasses = BUTTON_SIZE_CLASSES as Record<ButtonSize, string>;
 
   const patternClass = pattern === 'pixel' ? 'btn-pattern-pixel' : '';
-  const classes = `${base} ${patternClass} ${roundClass} ${withEffects ? effectsClasses : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
+  // Disable hover transforms when we are in pixel pattern mode (tile animation will run independently)
+  const classes = `${base} ${patternClass} ${roundClass} ${withEffects && pattern !== 'pixel' ? effectsClasses : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
 
   // Use shared PRESET_MAP
 
@@ -103,6 +104,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps>
     return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
   };
   // Double sizes: sm/md/lg -> 8/12/16px (doubled)
+  // Each tile size plus the grid gap should be used to compute how many tiles fit
   const tileSizeMap = { sm: 8, md: 12, lg: 16 } as const;
   const tileSize = tileSizeMap[size] ?? 6;
   const [cols, setCols] = useState(0);
@@ -142,8 +144,11 @@ const ButtonImpl: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps>
 
     const computeGrid = () => {
       const rect = node.getBoundingClientRect();
-      const c = Math.max(2, Math.ceil(rect.width / tileSize));
-      const r = Math.max(1, Math.ceil(rect.height / tileSize));
+      const gap = 2; // must match CSS .btn-pattern-overlay gap
+      const total = tileSize + gap;
+      // Use floor to avoid overshooting; add gap to numerator as per formula
+      const c = Math.max(1, Math.floor((rect.width + gap) / total));
+      const r = Math.max(1, Math.ceil((rect.height + gap) / total));
       setCols(c);
       setRows(r);
     };
