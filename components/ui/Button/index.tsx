@@ -14,17 +14,20 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   rounded?: boolean;
 }
 
-export default function Button({
-  children,
-  className = '',
-  variant = 'primary',
-  size = 'md',
-  color,
-  preset,
-  withEffects = true,
-  rounded = false,
-  ...rest
-}: Readonly<ButtonProps>) {
+const ButtonImpl: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps> = (
+  {
+    children,
+    className = '',
+    variant = 'primary',
+    size = 'md',
+    color,
+    preset,
+    withEffects = true,
+    rounded = false,
+    ...rest
+  }: Readonly<ButtonProps>,
+  ref,
+) => {
   const base = 'font-medium inline-flex items-center justify-center gap-2 pixel-btn';
   const roundClass = rounded ? ROUND_CLASSES.sm : ROUND_CLASSES.none; // keep default `none` to preserve pixel-art look
   const effectsClasses = 'transform transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-1 hover:scale-105 hover:shadow-lg active:translate-y-0 active:scale-95 active:shadow-sm';
@@ -59,6 +62,7 @@ export default function Button({
 
   return (
     <button
+      ref={ref}
       {...rest}
       className={classes}
       style={{ outlineOffset: '2px', fontFamily: 'var(--font-pixel, monospace)', ...styleOverride, ...(rest.style ?? {}) }}
@@ -67,3 +71,7 @@ export default function Button({
     </button>
   );
 }
+export default React.forwardRef<HTMLButtonElement, ButtonProps>(ButtonImpl);
+// Make this name available in React DevTools
+// Assign displayName safely without using `any` type
+(ButtonImpl as unknown as { displayName?: string }).displayName = 'Button';
