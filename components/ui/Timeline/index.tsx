@@ -47,7 +47,8 @@ export default function Timeline({ className = '', children, orientation = 'vert
   useLayoutEffect(() => {
     const el = olRef.current;
     if (!el) return;
-    const nodes = Array.from(el.querySelectorAll('[data-timeline-marker]')) as HTMLElement[];
+  const nodes = Array.from(el.querySelectorAll('[data-timeline-marker]')) as HTMLElement[];
+  const localChildArray = React.Children.toArray(children).filter(Boolean) as React.ReactElement<TimelineItemProps>[];
     if (!nodes.length) {
       // make async to avoid setting state synchronously inside effect body
       window.requestAnimationFrame(() => setSegments([]));
@@ -83,8 +84,8 @@ export default function Timeline({ className = '', children, orientation = 'vert
   // Choose color from top element's status if present (matching index from data attribute)
       const topIndex = Number(topEl.getAttribute('data-timeline-marker')) ?? i;
       const bottomIndex = Number(bottomEl.getAttribute('data-timeline-marker')) ?? i + 1;
-      const topChild = childArray[topIndex];
-      const bottomChild = childArray[bottomIndex];
+  const topChild = localChildArray[topIndex];
+  const bottomChild = localChildArray[bottomIndex];
       const statusTop = topChild?.props?.status ?? 'pending';
       const statusBottom = bottomChild?.props?.status ?? 'pending';
       // decide coloring: prefer completed/active status from top, otherwise bottom
@@ -133,8 +134,8 @@ export default function Timeline({ className = '', children, orientation = 'vert
         }
         const topIndex = Number(nodes[i].getAttribute('data-timeline-marker')) ?? i;
         const bottomIndex = Number(nodes[i + 1].getAttribute('data-timeline-marker')) ?? i + 1;
-        const topChild = childArray[topIndex];
-        const bottomChild = childArray[bottomIndex];
+          const topChild = localChildArray[topIndex];
+          const bottomChild = localChildArray[bottomIndex];
         const statusTop = topChild?.props?.status ?? 'pending';
         const statusBottom = bottomChild?.props?.status ?? 'pending';
         let segColorResize: string | undefined;
@@ -160,7 +161,7 @@ export default function Timeline({ className = '', children, orientation = 'vert
 
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [children, childArray, orientation]);
+  }, [children, orientation]);
 
   return (
     <ol ref={olRef} {...rest} className={`relative pl-12 space-y-6 ${className}`.trim()}>
