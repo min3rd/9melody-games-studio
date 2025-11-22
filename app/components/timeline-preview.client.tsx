@@ -15,6 +15,11 @@ export default function TimelinePreview(): React.ReactElement {
   const presetProp: Preset | undefined = preset === 'custom' || preset === 'none' ? undefined : (preset as Preset);
   const colorProp = preset === 'custom' ? color : undefined;
 
+  type TimelineStatus = 'pending' | 'active' | 'done' | 'warning' | 'danger' | 'info';
+  const [statusOne, setStatusOne] = useState<TimelineStatus>('done');
+  const [statusTwo, setStatusTwo] = useState<TimelineStatus>('active');
+  const [statusThree, setStatusThree] = useState<TimelineStatus>('pending');
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
@@ -49,10 +54,43 @@ export default function TimelinePreview(): React.ReactElement {
         </label>
       </div>
 
+      <div className="flex gap-4 items-center">
+        <label className="text-sm">Item 1
+          <select className="ml-2 text-sm rounded p-1 border" value={statusOne} onChange={(e) => setStatusOne(e.target.value as TimelineStatus)}>
+            <option value="done">Done</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="warning">Warning</option>
+            <option value="danger">Danger</option>
+            <option value="info">Info</option>
+          </select>
+        </label>
+        <label className="text-sm">Item 2
+          <select className="ml-2 text-sm rounded p-1 border" value={statusTwo} onChange={(e) => setStatusTwo(e.target.value as TimelineStatus)}>
+            <option value="done">Done</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="warning">Warning</option>
+            <option value="danger">Danger</option>
+            <option value="info">Info</option>
+          </select>
+        </label>
+        <label className="text-sm">Item 3
+          <select className="ml-2 text-sm rounded p-1 border" value={statusThree} onChange={(e) => setStatusThree(e.target.value as TimelineStatus)}>
+            <option value="done">Done</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="warning">Warning</option>
+            <option value="danger">Danger</option>
+            <option value="info">Info</option>
+          </select>
+        </label>
+      </div>
+
       <Timeline>
-        <TimelineItem heading="Project kickoff" short="Initial planning" description="We held a kickoff meeting to align stakeholders, goals and timing." size={size} preset={presetProp} color={colorProp} rounded={rounded} />
-        <TimelineItem heading="Design phase" short="Wireframes and mocks" description="UX and UI designs were created and reviewed by the team." size={size} preset={presetProp} color={colorProp} rounded={rounded} />
-        <TimelineItem heading="Development" short="Implement features" description="Development sprint work started, initial features implemented." size={size} preset={presetProp} color={colorProp} rounded={rounded} />
+        <TimelineItem heading="Project kickoff" short="Initial planning" description="We held a kickoff meeting to align stakeholders, goals and timing." size={size} preset={presetProp} color={colorProp} rounded={rounded} status={statusOne} />
+        <TimelineItem heading="Design phase" short="Wireframes and mocks" description="UX and UI designs were created and reviewed by the team." size={size} preset={presetProp} color={colorProp} rounded={rounded} status={statusTwo} />
+        <TimelineItem heading="Development" short="Implement features" description="Development sprint work started, initial features implemented." size={size} preset={presetProp} color={colorProp} rounded={rounded} status={statusThree} />
       </Timeline>
     </div>
   );
