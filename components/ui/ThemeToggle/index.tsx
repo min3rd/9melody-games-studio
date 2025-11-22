@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { PRESET_MAP, type Preset } from '../presets';
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ preset, color }: { preset?: Preset; color?: string } = {}) {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window === 'undefined') return 'light';
     const stored = localStorage.getItem('theme');
@@ -25,12 +26,14 @@ export default function ThemeToggle() {
     setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
   }
 
+  const themeColor = color ?? (preset ? PRESET_MAP[preset] : undefined);
   return (
     <button
       aria-label="Toggle theme"
       title="Toggle theme"
       onClick={toggle}
-      className="inline-flex items-center justify-center w-10 h-10 rounded-sm bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-100 pixel-btn transition-shadow hover:shadow-sm"
+      className="inline-flex items-center justify-center w-10 h-10 rounded-sm border border-neutral-200 dark:border-neutral-800 pixel-btn transition-shadow hover:shadow-sm"
+      style={themeColor ? { background: themeColor, color: '#fff' } : undefined}
     >
       {theme === 'dark' ? (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

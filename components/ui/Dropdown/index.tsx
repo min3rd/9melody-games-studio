@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
+import { PRESET_MAP, type Preset } from '../presets';
 
 export interface DropdownItem {
   key: string;
@@ -14,6 +15,8 @@ export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   items: DropdownItem[];
   align?: 'left' | 'right';
   className?: string;
+  preset?: Preset;
+  color?: string;
 }
 
 export default function Dropdown({
@@ -21,6 +24,8 @@ export default function Dropdown({
   items,
   align = 'left',
   className = '',
+  preset,
+  color,
   ...rest
 }: Readonly<DropdownProps>) {
   const [open, setOpen] = useState(false);
@@ -85,8 +90,9 @@ export default function Dropdown({
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
-  onClick={() => setOpen((s) => { const next = !s; if (next) setActiveIndex(null); return next; })}
-        className={`inline-flex items-center gap-2 rounded-none px-3 py-2 bg-foreground text-background dark:bg-background dark:text-foreground pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition duration-150 ease-out`}
+        onClick={() => setOpen((s) => { const next = !s; if (next) setActiveIndex(null); return next; })}
+        className={`inline-flex items-center gap-2 rounded-none px-3 py-2 pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition duration-150 ease-out`}
+        style={{ color: color ?? (preset ? PRESET_MAP[preset] : undefined) }}
       >
         {label}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="opacity-80">

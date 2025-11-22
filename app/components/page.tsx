@@ -13,6 +13,7 @@ import i18n from "@/lib/i18n";
 import LanguageSwitcherPreview from "./language-switcher-preview.client";
 import ModalPreview from "./modal-preview.client";
 import TogglePreview from "./toggle-preview.client";
+import ThemeTogglePreviewCustom from './theme-toggle-preview.client';
 import AccordionPreview from "./accordion-preview.client";
 import { CodePreview } from "@/components/ui";
 import ListPreview from "./list-preview.client";
@@ -22,6 +23,7 @@ import BreadcrumbsPreview from './breadcrumbs-preview.client';
 import DockPreview from './dock-preview.client';
 import MenuPreview from './menu-preview.client';
 import NavbarPreview from './navbar-preview.client';
+import PaginationPreview from './pagination-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -78,6 +80,8 @@ export default function ComponentsPage() {
         return <TogglePreview />;
       case "Indicator":
         return <IndicatorPreview />;
+      case "ThemeToggle":
+        return <ThemeTogglePreviewCustom />;
       case "Timeline":
         return <TimelinePreview />;
       case "TextRotate":
@@ -90,6 +94,8 @@ export default function ComponentsPage() {
         return <MenuPreview />;
       case "Navbar":
         return <NavbarPreview />;
+      case "Pagination":
+        return <PaginationPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { type Preset } from '@/components/ui/presets';
 import { Modal } from '@/components/ui';
 import { CodePreview } from '@/components/ui';
 
@@ -12,11 +13,30 @@ export default function ModalPreview(): React.ReactElement {
   type ModalOrigin = 'top-left'|'top-right'|'bottom-left'|'bottom-right'|'center';
   const [origin, setOrigin] = useState<ModalOrigin>('center');
   const [autoSize, setAutoSize] = useState(false);
+  const [useCustom, setUseCustom] = useState(false);
+  const [preset, setPreset] = useState<Preset>('muted');
+  const [color, setColor] = useState('#3b82f6');
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 items-center">
         <button className="px-3 py-2 rounded bg-foreground text-background" onClick={() => setOpen(true)}>Open Modal</button>
+        <label className="text-sm">Use custom color
+          <input className="ml-2" type="checkbox" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} />
+        </label>
+        <label className="text-sm">Preset
+          <select value={preset} onChange={(e) => setPreset(e.target.value as Preset)} className="ml-2 text-sm">
+            <option value="muted">muted</option>
+            <option value="primary">primary</option>
+            <option value="success">success</option>
+            <option value="danger">danger</option>
+            <option value="warning">warning</option>
+            <option value="info">info</option>
+          </select>
+        </label>
+        {useCustom && (
+          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+        )}
         <label className="text-sm"><input type="checkbox" checked={backdrop} onChange={(e) => setBackdrop(e.target.checked)} /> Backdrop</label>
         <label className="text-sm"><input type="checkbox" checked={allowMove} onChange={(e) => setAllowMove(e.target.checked)} /> Movable</label>
         <label className="text-sm"><input type="checkbox" checked={allowResize} onChange={(e) => setAllowResize(e.target.checked)} /> Resizable</label>
@@ -45,7 +65,9 @@ export default function ModalPreview(): React.ReactElement {
         origin={origin}
         width={autoSize ? undefined : 520}
         height={autoSize ? undefined : 180}
-        animationDuration={animationDuration}
+  animationDuration={animationDuration}
+  preset={useCustom ? undefined : preset}
+  color={useCustom ? color : undefined}
       >
         <div className="space-y-2">
           <div className="text-sm text-neutral-700 dark:text-neutral-300">This is a preview of the modal content. Try moving or resizing it with the options enabled.</div>

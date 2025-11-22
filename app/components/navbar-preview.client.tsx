@@ -8,7 +8,7 @@ export default function NavbarPreview(): React.ReactElement {
   const [placement, setPlacement] = useState<NavbarPlacement>('left');
   const [display, setDisplay] = useState<NavbarDisplay>('side');
   const [size, setSize] = useState<UISize>('md');
-  const [preset] = useState<Preset>('muted');
+  const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
   const [color, setColor] = useState('#3b82f6');
   const [withEffects, setWithEffects] = useState(true);
@@ -77,6 +77,16 @@ export default function NavbarPreview(): React.ReactElement {
             <input className="ml-2" type="color" value={color} onChange={(e) => setColor(e.target.value)} />
           </label>
         )}
+        <label className="text-sm">Preset
+          <select className="ml-2 rounded p-1 border text-sm" value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
+            <option value="muted">muted</option>
+            <option value="primary">primary</option>
+            <option value="success">success</option>
+            <option value="danger">danger</option>
+            <option value="warning">warning</option>
+            <option value="info">info</option>
+          </select>
+        </label>
       </div>
 
       <div className="mt-4 bg-neutral-50 dark:bg-neutral-900 border rounded p-3">

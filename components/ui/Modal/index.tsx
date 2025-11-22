@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { PRESET_MAP, type Preset } from '../presets';
 import ReactDOM from 'react-dom';
 
 export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -15,6 +16,8 @@ export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   initialTop?: number;
   initialLeft?: number;
   title?: React.ReactNode;
+  preset?: Preset;
+  color?: string;
 }
 
 export default function Modal({
@@ -30,6 +33,8 @@ export default function Modal({
   origin = 'center',
   animationDuration = 200,
   title,
+  preset,
+  color,
   children,
   ...rest
 }: Readonly<ModalProps>) {
@@ -233,6 +238,8 @@ export default function Modal({
     opacity: active ? 1 : 0,
   };
 
+  const themeColor = color ?? (preset ? PRESET_MAP[preset] : undefined);
+
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-start justify-center" role="presentation">
       {/* Backdrop */}
@@ -262,7 +269,8 @@ export default function Modal({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="px-2 py-1 rounded text-xs bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors"
+            className="px-2 py-1 rounded text-xs transition-colors"
+            style={{ background: themeColor ?? undefined, color: themeColor ? '#fff' : undefined }}
           >
             ✕
           </button>
