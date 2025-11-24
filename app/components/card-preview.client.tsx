@@ -7,7 +7,7 @@ import type { Preset, UICardSize } from '@/components/ui/presets';
 export default function CardPreview() {
   const [size, setSize] = useState<UICardSize>('md');
   const [preset, setPreset] = useState<Preset | 'custom' | 'none'>('muted');
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [rounded, setRounded] = useState(true);
   const [withEffects, setWithEffects] = useState(true);
   const [elevation, setElevation] = useState<'none'|'sm'|'md'|'lg'>('sm');

@@ -7,7 +7,7 @@ export default function FileInputPreview(): React.ReactElement {
   const [files, setFiles] = useState<FileList | null>(null);
   const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
-  const [color, setColor] = useState('#06b6d4');
+  const [color, setColor] = useState<string>('#06b6d4');
   const [multiple, setMultiple] = useState(false);
   const [accept, setAccept] = useState('');
   const [showPreview, setShowPreview] = useState(true);

@@ -8,7 +8,7 @@ export default function TabPreview(): React.ReactElement {
   const [size, setSize] = useState<UISize>('md');
   const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [variant, setVariant] = useState<'solid'|'ghost'|'outline'>('ghost');
   const [rounded, setRounded] = useState<'sm'|'full'|'none'>('sm');
   const [withEffects, setWithEffects] = useState(true);

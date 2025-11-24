@@ -7,7 +7,7 @@ type UIPreset = Preset | 'custom' | 'none';
 
 export default function ListPreview(): React.ReactElement {
   const [preset, setPreset] = useState<UIPreset>('muted');
-  const [color, setColor] = useState('#f59e0b');
+  const [color, setColor] = useState<string>('#f59e0b');
   const [size, setSize] = useState<'sm'|'md'|'lg'>('md');
   const [rounded, setRounded] = useState(true);
   const [divided, setDivided] = useState(true);

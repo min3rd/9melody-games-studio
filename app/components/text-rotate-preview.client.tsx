@@ -6,7 +6,7 @@ import type { UISize } from "@/components/ui/presets";
 
 export default function TextRotatePreview(): React.ReactElement {
   const [preset] = useState<Preset>("muted");
-  const [color, setColor] = useState("#3b82f6");
+  const [color, setColor] = useState<string>("#3b82f6");
   const [size, setSize] = useState<UISize>("md");
   const [interval, setIntervalMs] = useState<number>(2000);
   const [animation, setAnimation] = useState<"slide" | "fade" | "flip">(

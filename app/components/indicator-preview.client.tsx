@@ -1,13 +1,14 @@
 "use client";
 import React, { useState } from 'react';
-import { Indicator } from '@/components/ui';
+import { Indicator, CodePreview } from '@/components/ui';
 import type { IndicatorPreset } from '@/components/ui/Indicator';
+import PreviewLayout from '@/components/preview/PreviewLayout';
 
 type UIIndicatorPreset = 'primary'|'success'|'danger'|'warning'|'info'|'muted'|'custom'|'none';
 
 export default function IndicatorPreview(): React.ReactElement {
   const [preset, setPreset] = useState<UIIndicatorPreset>('primary');
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [rounded, setRounded] = useState(true);
   const [withEffects, setWithEffects] = useState(true);
   const [content, setContent] = useState('');
@@ -17,14 +18,16 @@ export default function IndicatorPreview(): React.ReactElement {
   else presetProp = preset as IndicatorPreset;
   const colorProp = preset === 'custom' ? color : undefined;
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Indicator preset={presetProp} color={colorProp} size="sm" rounded={rounded} withEffects={withEffects}>{content || undefined}</Indicator>
-        <Indicator preset={presetProp} color={colorProp} size="md" rounded={rounded} withEffects={withEffects}>{content || undefined}</Indicator>
-        <Indicator preset={presetProp} color={colorProp} size="lg" rounded={rounded} withEffects={withEffects}>{content || undefined}</Indicator>
-      </div>
+  const preview = (
+    <div className="flex items-center gap-3">
+      <Indicator preset={presetProp} color={colorProp} size="sm" rounded={rounded} withEffects={withEffects}>{content || undefined}</Indicator>
+      <Indicator preset={presetProp} color={colorProp} size="md" rounded={rounded} withEffects={withEffects}>{content || undefined}</Indicator>
+      <Indicator preset={presetProp} color={colorProp} size="lg" rounded={rounded} withEffects={withEffects}>{content || undefined}</Indicator>
+    </div>
+  );
 
+  const controls = (
+    <div>
       <div className="flex gap-4 items-center">
         <label className="text-sm">Preset
           <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as UIIndicatorPreset)}>
@@ -44,10 +47,9 @@ export default function IndicatorPreview(): React.ReactElement {
             <input className="ml-2" type="color" value={color} onChange={(e) => setColor(e.target.value)} />
           </label>
         )}
-
       </div>
 
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center mt-2">
         <label className="text-sm">Rounded
           <input className="ml-2" type="checkbox" checked={rounded} onChange={(e) => setRounded(e.target.checked)} />
         </label>
@@ -57,18 +59,19 @@ export default function IndicatorPreview(): React.ReactElement {
         </label>
       </div>
 
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center mt-2">
         <label className="text-sm">Content
           <input className="ml-2 p-1 border rounded text-sm" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Optional content" />
         </label>
       </div>
-
-      <div className="text-sm">
-        <div className="font-medium mb-2">Usage</div>
-        <pre className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded text-xs">
-{`<Indicator preset="${preset === 'custom' ? 'primary' : preset}" ${preset === 'custom' ? `color="${color}" ` : ''}${`rounded={${rounded}} withEffects={${withEffects}}`}>${content}</Indicator>`}
-        </pre>
-      </div>
     </div>
+  );
+
+  const snippet = (
+    <CodePreview code={`<Indicator ${preset !== 'none' ? (preset === 'custom' ? `color="${color}"` : `preset="${preset}"`) : ''} rounded={${rounded}} withEffects={${withEffects}}>${content}</Indicator>`} />
+  );
+
+  return (
+    <PreviewLayout title="Indicator" preview={preview} controls={controls} snippet={snippet} />
   );
 }

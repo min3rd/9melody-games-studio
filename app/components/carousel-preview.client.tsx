@@ -7,7 +7,7 @@ type UIPreset = Preset | 'custom' | 'none';
 
 export default function CarouselPreview(): React.ReactElement {
   const [preset, setPreset] = useState<UIPreset>('muted');
-  const [color, setColor] = useState('#ffffff');
+  const [color, setColor] = useState<string>('#ffffff');
   const [size, setSize] = useState<'sm'|'md'|'lg'>('md');
   const [round, setRound] = useState(true);
   const [autoNext, setAutoNext] = useState(true);

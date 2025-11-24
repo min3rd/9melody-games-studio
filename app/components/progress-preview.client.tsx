@@ -12,7 +12,7 @@ export default function ProgressPreview(): React.ReactElement {
   const [size, setSize] = useState<UISize>('md');
   const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
-  const [color, setColor] = useState('#06b6d4');
+  const [color, setColor] = useState<string>('#06b6d4');
   const [labelPosition, setLabelPosition] = useState<LabelPosition>('inside');
   const [rounded, setRounded] = useState<'sm'|'full'|'none'>('sm');
   const [withEffects, setWithEffects] = useState(true);

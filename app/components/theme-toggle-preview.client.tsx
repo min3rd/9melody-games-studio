@@ -6,7 +6,7 @@ import { type Preset } from '@/components/ui/presets';
 export default function ThemeTogglePreview(): React.ReactElement {
   const [preset, setPreset] = useState<Preset | null>('muted');
   const [useCustom, setUseCustom] = useState(false);
-  const [color, setColor] = useState('#06b6d4');
+  const [color, setColor] = useState<string>('#06b6d4');
 
   return (
     <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">

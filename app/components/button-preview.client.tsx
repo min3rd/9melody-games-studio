@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { Button } from '@/components/ui';
+import { Button, CodePreview } from '@/components/ui';
+import PreviewLayout from '@/components/preview/PreviewLayout';
 import type { Preset } from '@/components/ui/presets';
 import { useI18n } from '@/hooks/useI18n';
 
@@ -8,15 +9,18 @@ export default function ButtonPreview(): React.ReactElement {
   const [count, setCount] = useState(0);
   type UIButtonPreset = Preset | 'custom' | 'none';
   const [preset, setPreset] = useState<UIButtonPreset>('primary');
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [withEffects, setWithEffects] = useState(true);
   const [rounded, setRounded] = useState(false);
   const [pattern, setPattern] = useState<'none' | 'pixel'>('none');
+  const [waveDirection, setWaveDirection] = useState<'ltr'|'rtl'|'ttb'|'btt'|'diag'>('ltr');
   const { t } = useI18n();
 
   return (
-    <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
+    <PreviewLayout
+      title="Button"
+      preview={(
+        <div className="flex flex-wrap items-center gap-3">
       <Button
         onClick={() => setCount((c) => c + 1)}
         preset={preset !== 'none' && preset !== 'custom' ? (preset as Preset) : undefined}
@@ -29,7 +33,10 @@ export default function ButtonPreview(): React.ReactElement {
         <Button variant="danger">Danger</Button>
         <Button size="sm">Small</Button>
         <Button size="lg">Large</Button>
-      </div>
+        </div>
+      )}
+      controls={(
+        <div className="space-y-3">
 
       <div className="flex gap-2 items-center mt-2">
         <label className="text-sm">Preset
@@ -66,13 +73,11 @@ export default function ButtonPreview(): React.ReactElement {
         </label>
       </div>
 
-      <div className="text-sm text-neutral-600 dark:text-neutral-300">{t('clicked')}: {count}</div>
-      <div className="text-sm">
-        <div className="font-medium mb-2">Usage</div>
-        <pre className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded text-xs">
-{`<Button preset="${preset === 'custom' ? 'primary' : preset}" ${preset === 'custom' ? `color="${color}" ` : ''}${`withEffects={${withEffects}} rounded={${rounded}} ${pattern !== 'none' ? `pattern="${pattern}"` : ''}`}>Primary</Button>`}
-        </pre>
-      </div>
-    </div>
+        </div>
+      )}
+      snippet={(
+        <CodePreview code={`<Button ${preset !== 'none' ? (preset === 'custom' ? `color="${color}"` : `preset="${preset}"`) : ''} withEffects={${withEffects}} rounded={${rounded}} ${pattern !== 'none' ? `pattern="${pattern}"` : ''}>Primary</Button>`} />
+      )}
+    />
   );
 }

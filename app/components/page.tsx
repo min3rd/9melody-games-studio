@@ -152,15 +152,7 @@ export default function ComponentsPage() {
               key={c}
               className="scroll-mt-20 p-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
             >
-              <h2 className="text-lg font-semibold mb-2">{c}</h2>
               <div className="mb-4">{renderPreview(c)}</div>
-
-              <div className="text-sm">
-                <div className="font-medium mb-2">{i18n.t("usage")}</div>
-                <CodePreview
-                  code={`import { ${c} } from '@/components/ui'\n\n<${c} />`}
-                />
-              </div>
             </section>
           ))}
         </main>

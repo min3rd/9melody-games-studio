@@ -9,7 +9,7 @@ export default function DockPreview(): React.ReactElement {
   const [size, setSize] = useState<UISize>('md');
   const [preset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [showLabels, setShowLabels] = useState(false);
   const [hoverEffect, setHoverEffect] = useState<'scale'|'glow'|'bounce'|'highlight'|'none'>('scale');
 

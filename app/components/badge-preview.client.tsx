@@ -7,7 +7,7 @@ type UIPreset = Preset | 'custom' | 'none';
 
 export default function BadgePreview(): React.ReactElement {
   const [preset, setPreset] = useState<UIPreset>('muted');
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [size, setSize] = useState<'sm'|'md'|'lg'>('md');
   const [rounded, setRounded] = useState(true);
   const [withEffects, setWithEffects] = useState(true);

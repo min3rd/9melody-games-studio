@@ -8,7 +8,7 @@ type UIPreset = Preset | 'custom' | 'none';
 
 export default function TimelinePreview(): React.ReactElement {
   const [preset, setPreset] = useState<UIPreset>('muted');
-  const [color, setColor] = useState('#06b6d4');
+  const [color, setColor] = useState<string>('#06b6d4');
   const [size, setSize] = useState<UISize>('md');
   const [rounded, setRounded] = useState(true);
 

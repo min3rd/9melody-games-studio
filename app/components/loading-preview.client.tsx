@@ -8,7 +8,7 @@ export default function LoadingPreview(): React.ReactElement {
   const [size, setSize] = useState<UISize>('md');
   const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
-  const [color, setColor] = useState('#06b6d4');
+  const [color, setColor] = useState<string>('#06b6d4');
   const [inline, setInline] = useState(false);
   const [overlay, setOverlay] = useState(false);
   // Keep `text` for backward-compat if needed by component API; not used in preview

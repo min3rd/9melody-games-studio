@@ -1,19 +1,20 @@
 "use client";
 import React, { useState } from 'react';
 import { Avatar, AvatarGroup } from '@/components/ui';
+import PreviewLayout from '@/components/preview/PreviewLayout';
 import type { Preset } from '@/components/ui/presets';
 
 type UIPreset = Preset | 'custom' | 'none';
 
 export default function AvatarPreview(): React.ReactElement {
   const [preset, setPreset] = useState<UIPreset>('muted');
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState<string>('#3b82f6');
   const [size, setSize] = useState<'sm'|'md'|'lg'>('md');
   const [withEffects, setWithEffects] = useState(true);
   const [rounded, setRounded] = useState(true);
   const [showIndicator, setShowIndicator] = useState(true);
   const [groupPreset, setGroupPreset] = useState<UIPreset>('muted');
-  const [groupColor, setGroupColor] = useState('#3b82f6');
+  const [groupColor, setGroupColor] = useState<string>('#3b82f6');
   const [groupRounded, setGroupRounded] = useState(true);
   const groupPresetProp: Preset | undefined = groupPreset === 'custom' || groupPreset === 'none' ? undefined : (groupPreset as Preset);
 
@@ -28,14 +29,18 @@ export default function AvatarPreview(): React.ReactElement {
   const colorProp = preset === 'custom' ? color : undefined;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Avatar src="/next.svg" name="Next" size={size} rounded={rounded} withEffects={withEffects} indicator={showIndicator} />
-        <Avatar name="Elaine K." size={size} rounded={rounded} withEffects={withEffects} preset={presetProp} color={colorProp} indicator={showIndicator} />
-        <Avatar name="Minh Vu" size={size} rounded={rounded} withEffects={withEffects} preset={presetProp} color={colorProp} indicator={showIndicator} />
-      </div>
-
-      <div className="flex items-center gap-2">
+    <PreviewLayout
+      title="Avatar"
+      preview={(
+        <div className="flex items-center gap-3">
+          <Avatar src="/next.svg" name="Next" size={size} rounded={rounded} withEffects={withEffects} indicator={showIndicator} />
+          <Avatar name="Elaine K." size={size} rounded={rounded} withEffects={withEffects} preset={presetProp} color={colorProp} indicator={showIndicator} />
+          <Avatar name="Minh Vu" size={size} rounded={rounded} withEffects={withEffects} preset={presetProp} color={colorProp} indicator={showIndicator} />
+        </div>
+      )}
+      controls={(
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
         <label className="text-sm">Size
           <select className="ml-2 text-sm rounded p-1 border" value={size} onChange={(e) => setSize(e.target.value as 'sm'|'md'|'lg')}>
             <option value="sm">Small</option>
@@ -105,7 +110,12 @@ export default function AvatarPreview(): React.ReactElement {
       </label>
     </div>
   </div>
-      </div>
-    </div>
+          </div>
+        </div>
+      )}
+      snippet={(
+        <pre className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded text-xs">{`<Avatar name="Minh Vu" size="${size}" preset="${presetProp ?? 'muted'}" color="${colorProp ?? ''}" rounded={${rounded}} indicator={${showIndicator}} />`}</pre>
+      )}
+    />
   );
 }
