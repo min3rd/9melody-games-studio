@@ -40,7 +40,7 @@ export default function CodePreview({
         </button>
       )}
 
-      <pre className="rounded px-3 py-2 bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-mono text-sm overflow-auto whitespace-pre">
+      <pre className="rounded px-3 py-2 bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-mono text-sm overflow-auto whitespace-pre custom-scrollbar">
         <code lang={language}>{code}</code>
       </pre>
     </div>

@@ -277,7 +277,7 @@ export default function Modal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 overflow-auto">
+            <div className="flex-1 p-4 overflow-auto custom-scrollbar">
           {children}
         </div>
 

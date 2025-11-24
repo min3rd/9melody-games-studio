@@ -19,6 +19,10 @@ consistent and maintainable.
 :root {
   --font-pixel: "Press Start 2P", "PixelOperatorMono", ui-monospace,
     SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+  /* Scrollbar tokens (light) */
+  --scrollbar-track: rgba(15, 23, 42, 0.03); /* zinc-900/5 */
+  --scrollbar-thumb: rgba(15, 23, 42, 0.16); /* zinc-900/16 */
+  --scrollbar-thumb-hover: rgba(15, 23, 42, 0.24);
 }
 
 /* Default app background & text color setup so pages inherit the correct
@@ -29,11 +33,37 @@ html,
 body {
   @apply bg-zinc-50 text-neutral-900;
 }
+/* Global scrollbar for body (page level). Use theme tokens defined above */
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
 
 /* When `html` has the `.dark` class (our ThemeToggle sets this on documentElement) */
 html.dark,
 html.dark body {
   @apply bg-neutral-900 text-neutral-100;
+  /* Scrollbar tokens (dark) */
+  --scrollbar-track: rgba(255, 255, 255, 0.02);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.14);
 }
 
 /* Indeterminate progress animation for Progress component */
@@ -129,6 +159,36 @@ html.dark body {
   transform-origin: center center;
   will-change: transform, box-shadow, filter;
   animation: btn-pattern-hover 0.95s cubic-bezier(0.2, 0.9, 0.2, 1) infinite;
+}
+
+/* Themed custom scrollbar for scrollable areas */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
+  scrollbar-gutter: stable; /* reduce layout shifts when scrollbar appears */
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent; /* spacing so rounded corners look good */
+  background-clip: padding-box;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Small visual polish for the nav scroll to avoid overlaying content */
+.custom-scrollbar:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.12);
 }
 
 @keyframes btn-pattern-hover {

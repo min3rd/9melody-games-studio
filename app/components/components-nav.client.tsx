@@ -76,7 +76,7 @@ export default function ComponentsNav({ items }: Props) {
       {items.length === 0 && (
         <div className="text-sm text-neutral-500">No components</div>
       )}
-      <div ref={navRef} className="flex flex-col gap-1 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2">
+      <div ref={navRef} className="flex flex-col gap-1 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2 custom-scrollbar">
         {items.map((c) => {
           const id = c.toLowerCase();
           const isActive = active === id;
