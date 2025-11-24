@@ -11,4 +11,12 @@
   "selected_lang": "Selected: {{lang}}",
   "example_text": "This is an example text in English.",
   "actions": "Actions"
+  ,
+  "fileInput": {
+    "chooseFile": "Choose file",
+    "noFileSelected": "No file selected",
+    "clear": "Clear",
+    "filesSelectedOne": "Selected file: {{name}}",
+    "filesSelectedMultiple": "{{count}} files selected"
+  }
 }

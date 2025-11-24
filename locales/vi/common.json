@@ -11,4 +11,12 @@
   "selected_lang": "Đã chọn: {{lang}}",
   "example_text": "Đây là đoạn văn ví dụ bằng tiếng Việt.",
   "actions": "Hành động"
+  ,
+  "fileInput": {
+    "chooseFile": "Chọn tệp",
+    "noFileSelected": "Chưa chọn tệp",
+    "clear": "Xóa",
+    "filesSelectedOne": "Đã chọn: {{name}}",
+    "filesSelectedMultiple": "Đã chọn {{count}} tệp"
+  }
 }

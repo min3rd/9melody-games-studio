@@ -32,6 +32,7 @@ import LoadingPreview from "./loading-preview.client";
 import ProgressPreview from "./progress-preview.client";
 import RadialProgressPreview from './radial-progress-preview.client';
 import CheckboxPreview from './checkbox-preview.client';
+import FileInputPreview from './fileinput-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -113,6 +114,8 @@ export default function ComponentsPage() {
         return <RadialProgressPreview />;
       case "Checkbox":
         return <CheckboxPreview />;
+      case "FileInput":
+        return <FileInputPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
