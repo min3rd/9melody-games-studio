@@ -30,13 +30,12 @@ import TabPreview from "./tab-preview.client";
 import AlertPreview from "./alert-preview.client";
 import LoadingPreview from "./loading-preview.client";
 import ProgressPreview from "./progress-preview.client";
-import RadialProgressPreview from './radial-progress-preview.client';
-import CheckboxPreview from './checkbox-preview.client';
-import FileInputPreview from './fileinput-preview.client';
-import RadioPreview from './radio-preview.client';
-import RangePreview from './range-preview.client';
+import RadialProgressPreview from "./radial-progress-preview.client";
+import CheckboxPreview from "./checkbox-preview.client";
+import FileInputPreview from "./fileinput-preview.client";
+import RadioPreview from "./radio-preview.client";
+import RangePreview from "./range-preview.client";
 import RatingPreview from "./rating-preview.client";
-import SelectPreview from "./select-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -126,8 +125,6 @@ export default function ComponentsPage() {
         return <RangePreview />;
       case "Rating":
         return <RatingPreview />;
-      case "Select":
-        return <SelectPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
@@ -148,9 +145,9 @@ export default function ComponentsPage() {
           {components.map((c) => (
             <section
               id={c.toLowerCase()}
-                // ensure the header is not hidden by the sticky top navbar or other sticky elements
-                key={c}
-                className="scroll-mt-20 p-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
+              // ensure the header is not hidden by the sticky top navbar or other sticky elements
+              key={c}
+              className="scroll-mt-20 p-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
             >
               <h2 className="text-lg font-semibold mb-2">{c}</h2>
               <div className="mb-4">{renderPreview(c)}</div>
