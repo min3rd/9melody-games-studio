@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useI18n } from '@/hooks/useI18n';
 import { Toggle } from '@/components/ui';
 import type { Preset } from '@/components/ui/presets';
 import { CodePreview } from '@/components/ui';
@@ -10,27 +11,28 @@ export default function TogglePreview() {
   const [color, setColor] = useState('#3b82f6');
   type UITogglePreset = Preset | 'custom' | 'none';
   const [preset, setPreset] = useState<UITogglePreset>('primary');
-  const title = 'Enable feature';
-  const description = 'Toggle this to enable or disable the feature';
-  const hint = 'Beta';
+  const { t } = useI18n();
+  const title = t('preview.toggle.title');
+  const description = t('preview.toggle.description');
+  const hint = t('preview.toggle.hint');
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 items-center">
         <button className="px-3 py-2 rounded bg-foreground text-background" onClick={() => setChecked((c) => !c)}>
-          Toggle controlled
+          {t('preview.toggle.toggleControlled')}
         </button>
-        <label className="text-sm"><input type="checkbox" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} /> Disabled</label>
-        <label className="text-sm ml-2">Preset
+        <label className="text-sm"><input type="checkbox" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} /> {t('preview.toggle.disabled')}</label>
+        <label className="text-sm ml-2">{t('preview.toggle.preset')}
           <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as UITogglePreset)}>
-            <option value="primary">Primary</option>
-            <option value="success">Success</option>
-            <option value="danger">Danger</option>
-            <option value="warning">Warning</option>
-            <option value="info">Info</option>
-            <option value="muted">Muted</option>
-            <option value="custom">Custom</option>
-            <option value="none">None</option>
+            <option value="primary">{t('preset.primary')}</option>
+            <option value="success">{t('preset.success')}</option>
+            <option value="danger">{t('preset.danger')}</option>
+            <option value="warning">{t('preset.warning')}</option>
+            <option value="info">{t('preset.info')}</option>
+            <option value="muted">{t('preset.muted')}</option>
+            <option value="custom">{t('preview.common.custom')}</option>
+            <option value="none">{t('preview.common.none')}</option>
           </select>
         </label>
         {preset === 'custom' && (

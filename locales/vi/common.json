@@ -1,22 +1,30 @@
 {
-  "components": "Các thành phần",
-  "noComponents": "Không tìm thấy thành phần",
-  "noPreview": "Chưa có bản xem trước.",
-  "usage": "Sử dụng",
-  "code": "Mã",
-  "copy": "Sao chép",
+  "actions": "hành động",
+  "clicked": "Đã nhấp vào",
+  "code": "Mã số",
+  "components": "Linh kiện",
   "copied": "Đã sao chép",
-  "clicked": "Đã nhấn",
+  "copy": "Sao chép",
+  "example_text": "Đây là một văn bản mẫu bằng tiếng Anh.",
+  "fileInput": {
+    "chooseFile": "Chọn tập tin",
+    "clear": "Thông thoáng",
+    "filesSelectedMultiple": "Đã chọn {{count}} tệp",
+    "filesSelectedOne": "Tệp đã chọn: {{name}}",
+    "noFileSelected": "Không có tập tin nào được chọn"
+  },
+  "noComponents": "Không tìm thấy thành phần nào",
+  "noPreview": "Chưa có bản xem trước nào.",
+  "preview": {
+    "progress": {
+      "indeterminate": "không xác định",
+      "labelPosition": "Vị trí nhãn",
+      "rounded": "làm tròn",
+      "value": "Giá trị",
+      "withEffects": "Có hiệu ứng"
+    }
+  },
   "selected": "Đã chọn",
   "selected_lang": "Đã chọn: {{lang}}",
-  "example_text": "Đây là đoạn văn ví dụ bằng tiếng Việt.",
-  "actions": "Hành động"
-  ,
-  "fileInput": {
-    "chooseFile": "Chọn tệp",
-    "noFileSelected": "Chưa chọn tệp",
-    "clear": "Xóa",
-    "filesSelectedOne": "Đã chọn: {{name}}",
-    "filesSelectedMultiple": "Đã chọn {{count}} tệp"
-  }
+  "usage": "Cách sử dụng"
 }

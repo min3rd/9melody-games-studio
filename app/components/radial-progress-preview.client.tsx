@@ -1,10 +1,12 @@
 "use client";
 import React, { useState } from 'react';
+import { useI18n } from '@/hooks/useI18n';
 import RadialProgress from '@/components/ui/RadialProgress';
 import { type Preset } from '@/components/ui/presets';
 import type { UISize } from '@/components/ui/presets';
 
 export default function RadialProgressPreview(): React.ReactElement {
+  const { t } = useI18n();
   const [value, setValue] = useState(65);
   const [indeterminate, setIndeterminate] = useState(false);
   const [size, setSize] = useState<UISize>('md');
@@ -15,20 +17,20 @@ export default function RadialProgressPreview(): React.ReactElement {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4 flex-wrap">
-        <label className="text-sm">Value
+        <label className="text-sm">{t('preview.progress.value')}
           <input type="range" min={0} max={100} value={value} onChange={(e) => setValue(Number(e.target.value))} className="ml-2" />
         </label>
-        <label className="text-sm">Indeterminate
+        <label className="text-sm">{t('preview.progress.indeterminate')}
           <input className="ml-2" type="checkbox" checked={indeterminate} onChange={(e) => setIndeterminate(e.target.checked)} />
         </label>
-        <label className="text-sm">Size
+        <label className="text-sm">{t('preview.common.size')}
           <select className="ml-2 rounded p-1 border text-sm" value={size} onChange={(e) => setSize(e.target.value as UISize)}>
             <option value="sm">Small</option>
             <option value="md">Medium</option>
             <option value="lg">Large</option>
           </select>
         </label>
-        <label className="text-sm">Preset
+        <label className="text-sm">{t('preview.common.preset')}
           <select className="ml-2 rounded p-1 border text-sm" value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
             <option value="muted">muted</option>
             <option value="primary">primary</option>
@@ -38,7 +40,7 @@ export default function RadialProgressPreview(): React.ReactElement {
             <option value="info">info</option>
           </select>
         </label>
-        <label className="text-sm">Custom Color
+        <label className="text-sm">{t('preview.common.customColor')}
           <input className="ml-2" type="checkbox" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} />
         </label>
         {useCustom && <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />}
