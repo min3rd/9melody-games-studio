@@ -10,26 +10,26 @@ import BadgePreview from "./badge-preview.client";
 import DropdownPreview from "./dropdown-preview.client";
 import CodePreviewPreview from "./code-preview.client";
 import i18n from "@/lib/i18n";
-import ComponentsNav from './components-nav.client';
+import ComponentsNav from "./components-nav.client";
 import LanguageSwitcherPreview from "./language-switcher-preview.client";
 import ModalPreview from "./modal-preview.client";
 import TogglePreview from "./toggle-preview.client";
-import ThemeTogglePreviewCustom from './theme-toggle-preview.client';
+import ThemeTogglePreviewCustom from "./theme-toggle-preview.client";
 import AccordionPreview from "./accordion-preview.client";
 import { CodePreview } from "@/components/ui";
 import ListPreview from "./list-preview.client";
 import TimelinePreview from "./timeline-preview.client";
 import TextRotatePreview from "./text-rotate-preview.client";
-import BreadcrumbsPreview from './breadcrumbs-preview.client';
-import DockPreview from './dock-preview.client';
-import MenuPreview from './menu-preview.client';
-import NavbarPreview from './navbar-preview.client';
-import PaginationPreview from './pagination-preview.client';
-import StepPreview from './step-preview.client';
-import TabPreview from './tab-preview.client';
-import AlertPreview from './alert-preview.client';
-import LoadingPreview from './loading-preview.client';
-import ProgressPreview from './progress-preview.client';
+import BreadcrumbsPreview from "./breadcrumbs-preview.client";
+import DockPreview from "./dock-preview.client";
+import MenuPreview from "./menu-preview.client";
+import NavbarPreview from "./navbar-preview.client";
+import PaginationPreview from "./pagination-preview.client";
+import StepPreview from "./step-preview.client";
+import TabPreview from "./tab-preview.client";
+import AlertPreview from "./alert-preview.client";
+import LoadingPreview from "./loading-preview.client";
+import ProgressPreview from "./progress-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -52,19 +52,14 @@ export default function ComponentsPage() {
     switch (name) {
       case "Kbd":
         return <KbdPreview />;
-
       case "Carousel":
         return <CarouselPreview />;
-
       case "Card":
         return <CardPreview />;
-
       case "Badge":
         return <BadgePreview />;
-
       case "Avatar":
         return <AvatarPreview />;
-
       case "Button":
         return <ButtonPreview />;
       case "Dropdown":
@@ -126,17 +121,15 @@ export default function ComponentsPage() {
       <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
         <aside className="col-span-1">
           <ComponentsNav items={components} />
-          
         </aside>
 
         <main className="col-span-3 space-y-8">
           {components.map((c) => (
             <section
               id={c.toLowerCase()}
-              // ensure the header is not hidden by the sticky top navbar or other sticky elements
-              className="scroll-mt-20"
-              key={c}
-              className="p-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
+                // ensure the header is not hidden by the sticky top navbar or other sticky elements
+                key={c}
+                className="scroll-mt-20 p-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
             >
               <h2 className="text-lg font-semibold mb-2">{c}</h2>
               <div className="mb-4">{renderPreview(c)}</div>

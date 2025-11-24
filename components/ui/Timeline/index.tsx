@@ -188,7 +188,7 @@ const STATUS_PRESET_MAP: Record<'pending' | 'active' | 'done' | 'warning' | 'dan
   info: 'info',
 };
 
-export function TimelineItem({ preset = 'muted', color, size = 'md', rounded = true, withEffects = true, status = 'pending', markerId, icon, image, heading, short, description, date, className = '', ...rest }: Readonly<TimelineItemProps>) {
+export function TimelineItem({ preset = 'muted', color, size = 'md', rounded = true, withEffects = true, status = 'pending', markerId, icon, image, heading, short, description, date, className = '', connectorBelow, orientation, ...rest }: Readonly<TimelineItemProps>) {
   // NOTE: `statusColor` is used for indicators; fall back to preset if needed
   // status color takes precedence if no explicit color set
   const statusPreset: Preset = STATUS_PRESET_MAP[status] ?? 'muted';
