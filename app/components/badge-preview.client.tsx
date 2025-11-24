@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import { Badge } from '@/components/ui';
+import { Badge, CodePreview } from '@/components/ui';
 import type { Preset } from '@/components/ui/presets';
+import PreviewLayout from '@/components/preview/PreviewLayout';
 
 type UIPreset = Preset | 'custom' | 'none';
 
@@ -17,14 +18,16 @@ export default function BadgePreview(): React.ReactElement {
   const presetProp: Preset | undefined = preset === 'custom' || preset === 'none' ? undefined : (preset as Preset);
   const colorProp = preset === 'custom' ? color : undefined;
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <Badge preset={presetProp} color={colorProp} size={size} rounded={rounded} withEffects={withEffects}>{value}</Badge>
-        <Badge preset={presetProp} color={colorProp} size={size} rounded={rounded} withEffects={withEffects}>{'New'}</Badge>
-        <Badge preset={presetProp} color={colorProp} size={size} rounded={rounded} withEffects={withEffects} asDot={true} />
-      </div>
+  const preview = (
+    <div className="flex items-center gap-4">
+      <Badge preset={presetProp} color={colorProp} size={size} rounded={rounded} withEffects={withEffects}>{value}</Badge>
+      <Badge preset={presetProp} color={colorProp} size={size} rounded={rounded} withEffects={withEffects}>{'New'}</Badge>
+      <Badge preset={presetProp} color={colorProp} size={size} rounded={rounded} withEffects={withEffects} asDot={asDot} />
+    </div>
+  );
 
+  const controls = (
+    <div className="space-y-3">
       <div className="flex items-center gap-3">
         <label className="text-sm">Size
           <select className="ml-2 text-sm rounded p-1 border" value={size} onChange={(e) => setSize(e.target.value as 'sm'|'md'|'lg')}>
@@ -72,5 +75,13 @@ export default function BadgePreview(): React.ReactElement {
         </label>
       </div>
     </div>
+  );
+
+  const snippet = (
+    <CodePreview code={`<Badge ${preset !== 'none' ? (preset === 'custom' ? `color="${color}"` : `preset="${preset}"`) : ''} size="${size}" rounded={${rounded}} withEffects={${withEffects}} ${asDot ? 'asDot ' : ''}>${asDot ? '' : value}</Badge>`} />
+  );
+
+  return (
+    <PreviewLayout title="Badge" preview={preview} controls={controls} snippet={snippet} />
   );
 }
