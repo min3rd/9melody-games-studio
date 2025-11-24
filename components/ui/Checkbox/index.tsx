@@ -67,7 +67,11 @@ export default function Checkbox({
 
   return (
     <label
-      className={clsx("select-none flex items-start gap-3", className)}
+      className={clsx(
+        "select-none flex items-start gap-3",
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+        className
+      )}
       style={{ WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none', userSelect: 'none' }}
     >
       <input
