@@ -16,7 +16,7 @@ export default function AlertPreview(): React.ReactElement {
   const [showAction] = useState(true);
 
   return (
-    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-lg shadow text-neutral-900 dark:text-neutral-100 p-4">
       <div className="flex items-center gap-4">
         <label className="text-sm">Preset
           <select className="ml-2 rounded p-1 border text-sm" value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
