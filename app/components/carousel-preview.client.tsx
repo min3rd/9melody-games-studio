@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { Carousel } from '@/components/ui';
+import { Carousel, CodePreview } from '@/components/ui';
+import PreviewLayout from '@/components/preview/PreviewLayout';
 import type { Preset } from '@/components/ui/presets';
 
 type UIPreset = Preset | 'custom' | 'none';
@@ -18,8 +19,18 @@ export default function CarouselPreview(): React.ReactElement {
   const presetProp: Preset | undefined = preset === 'custom' || preset === 'none' ? undefined : (preset as Preset);
   const colorProp = preset === 'custom' ? color : undefined;
 
-  return (
-    <div className="space-y-4">
+  const preview = (
+    <div className="mt-6">
+      <Carousel size={size} preset={presetProp} color={colorProp} round={round} autoNext={autoNext} autoDelay={autoDelay} pagination={pagination} showControls={showControls} className="max-w-3xl mx-auto">
+  <div className="flex items-center justify-center h-full bg-linear-to-r from-purple-400 via-pink-400 to-red-400 text-white">Slide 1</div>
+  <div className="flex items-center justify-center h-full bg-linear-to-r from-green-400 via-teal-400 to-blue-400 text-white">Slide 2</div>
+  <div className="flex items-center justify-center h-full bg-linear-to-r from-yellow-400 via-orange-400 to-red-400 text-white">Slide 3</div>
+      </Carousel>
+    </div>
+  );
+
+  const controls = (
+    <div>
       <div className="flex items-center gap-3">
         <label className="text-sm">Preset
           <select className="ml-2 text-sm rounded p-1 border" value={preset} onChange={(e) => setPreset(e.target.value as UIPreset)}>
@@ -53,7 +64,7 @@ export default function CarouselPreview(): React.ReactElement {
         </label>
       </div>
 
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center mt-3">
         <label className="text-sm">Auto Next
           <input className="ml-2" type="checkbox" checked={autoNext} onChange={(e) => setAutoNext(e.target.checked)} />
         </label>
@@ -67,14 +78,14 @@ export default function CarouselPreview(): React.ReactElement {
           <input className="ml-2" type="checkbox" checked={showControls} onChange={(e) => setShowControls(e.target.checked)} />
         </label>
       </div>
-
-      <div className="mt-6">
-        <Carousel size={size} preset={presetProp} color={colorProp} round={round} autoNext={autoNext} autoDelay={autoDelay} pagination={pagination} showControls={showControls} className="max-w-3xl mx-auto">
-          <div className="flex items-center justify-center h-full bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 text-white">Slide 1</div>
-          <div className="flex items-center justify-center h-full bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 text-white">Slide 2</div>
-          <div className="flex items-center justify-center h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white">Slide 3</div>
-        </Carousel>
-      </div>
     </div>
+  );
+
+  const snippet = (
+    <CodePreview code={`<Carousel size="${size}" ${preset !== 'none' ? (preset === 'custom' ? `color="${color}"` : `preset="${preset}"`) : ''} round={${round}} autoNext={${autoNext}} autoDelay={${autoDelay}} pagination={${pagination}} showControls={${showControls}}>...</Carousel>`} />
+  );
+
+  return (
+    <PreviewLayout title="Carousel" preview={preview} controls={controls} snippet={snippet} />
   );
 }
