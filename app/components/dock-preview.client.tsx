@@ -20,7 +20,7 @@ export default function DockPreview(): React.ReactElement {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4 flex-wrap">
         <label className="text-sm">Placement
           <select className="ml-2 p-1 border rounded" value={placement} onChange={e => setPlacement(e.target.value as 'bottom'|'top'|'left'|'right')}>

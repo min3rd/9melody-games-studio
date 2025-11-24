@@ -9,7 +9,7 @@ export default function ThemeTogglePreview(): React.ReactElement {
   const [color, setColor] = useState('#06b6d4');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4">
         <label className="text-sm">Preset
           <select className="ml-2 rounded p-1 border text-sm" value={preset ?? 'muted'} onChange={(e) => setPreset(e.target.value as Preset)}>
@@ -28,7 +28,7 @@ export default function ThemeTogglePreview(): React.ReactElement {
           <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
         )}
       </div>
-      <div className="p-4 bg-white border rounded flex items-center gap-2">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded flex items-center gap-2">
         <ThemeToggle preset={useCustom ? undefined : (preset ?? 'muted')} color={useCustom ? color : undefined} />
         <span className="text-sm">Toggle theme color</span>
       </div>

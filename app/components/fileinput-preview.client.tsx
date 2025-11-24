@@ -13,7 +13,7 @@ export default function FileInputPreview(): React.ReactElement {
   const [showPreview, setShowPreview] = useState(true);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex gap-4 items-center flex-wrap">
         <label className="text-sm">Multiple
           <input className="ml-2" type="checkbox" checked={multiple} onChange={(e) => setMultiple(e.target.checked)} />
@@ -37,7 +37,7 @@ export default function FileInputPreview(): React.ReactElement {
         {useCustom && <input className="ml-2" type="color" value={color} onChange={(e) => setColor(e.target.value)} />}
       </div>
 
-      <div className="p-4 bg-white border rounded">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded">
         <FileInput
           multiple={multiple}
           accept={accept || undefined}

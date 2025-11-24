@@ -15,7 +15,7 @@ export default function RadialProgressPreview(): React.ReactElement {
   const [color, setColor] = useState('#06b6d4');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4 flex-wrap">
         <label className="text-sm">{t('preview.progress.value')}
           <input type="range" min={0} max={100} value={value} onChange={(e) => setValue(Number(e.target.value))} className="ml-2" />
@@ -46,7 +46,7 @@ export default function RadialProgressPreview(): React.ReactElement {
         {useCustom && <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />}
       </div>
 
-      <div className="p-4 bg-white border rounded flex items-center gap-6">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded flex items-center gap-6">
         <RadialProgress value={value} indeterminate={indeterminate} size={size} preset={preset} color={useCustom ? color : undefined} />
         <div className="flex gap-6 items-center">
           <div className="flex flex-col items-center">

@@ -15,7 +15,7 @@ export default function CheckboxPreview(): React.ReactElement {
   const { t } = useI18n();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4 flex-wrap">
         <label className="text-sm">{t('preview.checkbox.checked')}
           <input className="ml-2" type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
@@ -46,7 +46,7 @@ export default function CheckboxPreview(): React.ReactElement {
         {useCustom && <input className="ml-2" type="color" value={color} onChange={(e) => setColor(e.target.value)} />}
       </div>
 
-      <div className="p-4 bg-white border rounded">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded">
         <Checkbox
           checked={checked}
           onCheckedChange={setChecked}

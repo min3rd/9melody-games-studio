@@ -14,7 +14,7 @@ export default function PaginationPreview(): React.ReactElement {
   const [totalPages, setTotalPages] = useState(12);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4">
         <label className="text-sm">Size
           <select className="ml-2 rounded p-1 border text-sm" value={size} onChange={(e) => setSize(e.target.value as UISize)}>
@@ -53,7 +53,7 @@ export default function PaginationPreview(): React.ReactElement {
         </label>
       </div>
 
-      <div className="p-4 bg-white border rounded">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded">
         <p className="mb-2 text-sm">Current page: {currentPage}</p>
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => setCurrentPage(p)} size={size} preset={preset} color={useCustom ? color : undefined} withEffects={withEffects} />
       </div>

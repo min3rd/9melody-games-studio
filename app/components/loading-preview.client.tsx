@@ -16,7 +16,7 @@ export default function LoadingPreview(): React.ReactElement {
   const [label, setLabel] = useState('Loading...');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4">
         <label className="text-sm">Size
           <select className="ml-2 rounded p-1 border text-sm" value={size} onChange={(e) => setSize(e.target.value as UISize)}>
@@ -52,7 +52,7 @@ export default function LoadingPreview(): React.ReactElement {
         </label>
       </div>
 
-      <div className="p-4 bg-white border rounded">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded">
         <div className={`p-6 ${overlay ? 'relative' : ''}`}>
           <Loading size={size} preset={preset} color={useCustom ? color : undefined} label={label} inline={inline} overlay={overlay} />
         </div>

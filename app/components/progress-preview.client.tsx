@@ -18,7 +18,7 @@ export default function ProgressPreview(): React.ReactElement {
   const [withEffects, setWithEffects] = useState(true);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
       <div className="flex items-center gap-4">
         <label className="text-sm">{t('preview.progress.value')}
           <input type="range" min={0} max={100} value={value} onChange={(e) => setValue(Number(e.target.value))} className="ml-2" />
@@ -69,7 +69,7 @@ export default function ProgressPreview(): React.ReactElement {
         </label>
       </div>
 
-      <div className="p-4 bg-white border rounded">
+      <div className="p-4 bg-white dark:bg-neutral-800 rounded">
         <Progress value={value} indeterminate={indeterminate} size={size} preset={preset} color={useCustom ? color : undefined} rounded={rounded} withEffects={withEffects} labelPosition={labelPosition} />
       </div>
     </div>
