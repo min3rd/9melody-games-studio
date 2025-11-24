@@ -66,7 +66,10 @@ export default function Checkbox({
   const effectClass = withEffects ? "transition duration-150 ease-in-out" : "";
 
   return (
-    <label className={clsx("flex items-start gap-3", className)}>
+    <label
+      className={clsx("select-none flex items-start gap-3", className)}
+      style={{ WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none', userSelect: 'none' }}
+    >
       <input
         type="checkbox"
         checked={checked}
