@@ -30,6 +30,7 @@ import TabPreview from "./tab-preview.client";
 import AlertPreview from "./alert-preview.client";
 import LoadingPreview from "./loading-preview.client";
 import ProgressPreview from "./progress-preview.client";
+import RadialProgressPreview from './radial-progress-preview.client';
 
 export const metadata = {
   title: "Components",
@@ -107,6 +108,8 @@ export default function ComponentsPage() {
         return <LoadingPreview />;
       case "Progress":
         return <ProgressPreview />;
+      case "RadialProgress":
+        return <RadialProgressPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
