@@ -25,23 +25,34 @@ consistent and maintainable.
    background in both light and dark modes — avoids forgetting dark variants
    on individual pages. Use Tailwind utility @apply to remain consistent.
 */
-html, body {
+html,
+body {
   @apply bg-zinc-50 text-neutral-900;
 }
 
 /* When `html` has the `.dark` class (our ThemeToggle sets this on documentElement) */
-html.dark, html.dark body {
+html.dark,
+html.dark body {
   @apply bg-neutral-900 text-neutral-100;
 }
 
 /* Indeterminate progress animation for Progress component */
 @keyframes pi-indeterminate {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .pi-indeterminate {
-  background-image: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.15) 100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
   background-size: 200% 100%;
   animation: pi-indeterminate 1.2s linear infinite;
   background-repeat: no-repeat;
@@ -50,22 +61,33 @@ html.dark, html.dark body {
 /* Pixel-pattern background for buttons with a 3D wave overlay */
 .btn-pattern-pixel {
   --btn-pattern-size: 6px; /* size of the pixel grid */
-  --btn-pattern-shine: rgba(255,255,255,0.18);
-  --btn-pattern-overlay: rgba(0,0,0,0.06);
-  background-image: linear-gradient(0deg, var(--btn-pattern-overlay), var(--btn-pattern-overlay)),
-    linear-gradient(90deg, rgba(0,0,0,0.08) 10%, transparent 10%),
-    linear-gradient(0deg, rgba(0,0,0,0.08) 10%, transparent 10%);
-  background-size: var(--btn-pattern-size) var(--btn-pattern-size), calc(var(--btn-pattern-size) * 2) var(--btn-pattern-size), var(--btn-pattern-size) calc(var(--btn-pattern-size) * 2);
+  --btn-pattern-shine: rgba(255, 255, 255, 0.18);
+  --btn-pattern-overlay: rgba(0, 0, 0, 0.06);
+  background-image: linear-gradient(
+      0deg,
+      var(--btn-pattern-overlay),
+      var(--btn-pattern-overlay)
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 10%, transparent 10%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.08) 10%, transparent 10%);
+  background-size: var(--btn-pattern-size) var(--btn-pattern-size),
+    calc(var(--btn-pattern-size) * 2) var(--btn-pattern-size),
+    var(--btn-pattern-size) calc(var(--btn-pattern-size) * 2);
   background-position: 0 0, 0 0, 0 0;
   position: relative;
-  overflow: visible; /* allow tiles to pop beyond button bounds for stronger 3D effect */
+  overflow: hidden;
 }
 
 .btn-pattern-pixel::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0.0), var(--btn-pattern-shine), rgba(255,255,255,0.0));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    var(--btn-pattern-shine),
+    rgba(255, 255, 255, 0)
+  );
   mix-blend-mode: overlay;
   transform: translateX(-120%);
   animation: btn-pattern-wave 2.2s linear infinite;
@@ -73,8 +95,12 @@ html.dark, html.dark body {
 }
 
 @keyframes btn-pattern-wave {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(120%); }
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
 }
 
 /* Grid overlay with per-tile pop (3D-ish) animation */
@@ -102,18 +128,33 @@ html.dark, html.dark body {
   border-radius: 0.2px; /* keep pixel crisp */
   transform-origin: center center;
   will-change: transform, box-shadow, filter;
-  animation: btn-pattern-hover 0.95s cubic-bezier(.2,.9,.2,1) infinite;
+  animation: btn-pattern-hover 0.95s cubic-bezier(0.2, 0.9, 0.2, 1) infinite;
 }
 
 @keyframes btn-pattern-hover {
-  0% { transform: translateY(0) scale(1); box-shadow: none; background-color: var(--btn-pattern-overlay); }
-  50% { transform: translateY(-4px) scale(1.05); box-shadow: 0 8px 14px rgba(0,0,0,0.18); background-color: var(--btn-pattern-shine); }
-  100% { transform: translateY(0) scale(1); box-shadow: none; background-color: var(--btn-pattern-overlay); }
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: none;
+    background-color: var(--btn-pattern-overlay);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 14px rgba(0, 0, 0, 0.18);
+    background-color: var(--btn-pattern-shine);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: none;
+    background-color: var(--btn-pattern-overlay);
+  }
 }
 
 /* Prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .btn-pattern-tile { animation: none; }
-  .btn-pattern-pixel::after { animation: none; }
+  .btn-pattern-tile {
+    animation: none;
+  }
+  .btn-pattern-pixel::after {
+    animation: none;
+  }
 }
-

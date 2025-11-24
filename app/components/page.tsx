@@ -10,6 +10,7 @@ import BadgePreview from "./badge-preview.client";
 import DropdownPreview from "./dropdown-preview.client";
 import CodePreviewPreview from "./code-preview.client";
 import i18n from "@/lib/i18n";
+import ComponentsNav from './components-nav.client';
 import LanguageSwitcherPreview from "./language-switcher-preview.client";
 import ModalPreview from "./modal-preview.client";
 import TogglePreview from "./toggle-preview.client";
@@ -124,31 +125,16 @@ export default function ComponentsPage() {
     <div className="min-h-screen p-6 bg-zinc-50 dark:bg-neutral-900">
       <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
         <aside className="col-span-1">
-          <nav className="sticky top-6 space-y-2">
-            <h3 className="text-sm font-semibold mb-2 text-neutral-900 dark:text-neutral-100">
-              {i18n.t("components")}
-            </h3>
-            {components.length === 0 && (
-              <div className="text-sm text-neutral-500">
-                {i18n.t("noComponents")}
-              </div>
-            )}
-            {components.map((c) => (
-              <a
-                key={c}
-                href={`#${c.toLowerCase()}`}
-                className="block p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-100"
-              >
-                {c}
-              </a>
-            ))}
-          </nav>
+          <ComponentsNav items={components} />
+          
         </aside>
 
         <main className="col-span-3 space-y-8">
           {components.map((c) => (
             <section
               id={c.toLowerCase()}
+              // ensure the header is not hidden by the sticky top navbar or other sticky elements
+              className="scroll-mt-20"
               key={c}
               className="p-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
             >

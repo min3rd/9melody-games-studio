@@ -30,6 +30,7 @@ export default function ThemeToggle({ preset, color }: { preset?: Preset; color?
   return (
     <button
       aria-label="Toggle theme"
+      suppressHydrationWarning
       title="Toggle theme"
       onClick={toggle}
       className="inline-flex items-center justify-center w-10 h-10 rounded-sm border border-neutral-200 dark:border-neutral-800 pixel-btn transition-shadow hover:shadow-sm"

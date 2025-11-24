@@ -12,12 +12,25 @@ const resources = {
 if (!i18n.isInitialized) {
   i18n.init({
     resources,
-    lng: typeof window !== 'undefined' ? (localStorage.getItem('lang') || 'en') : 'en',
+    // Use a server-safe default here. Client code should call `setClientLanguage`
+    // to harmonize the runtime language with localStorage or user preferences.
+    lng: 'en',
     fallbackLng: 'en',
     ns: ['common'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },
   });
+}
+
+// Helper to call on the client to set the runtime language from client-only sources
+export function setClientLanguage(lang?: string) {
+  if (typeof window === 'undefined') return;
+  const resolved = lang ?? (localStorage.getItem('lang') as string | null) ?? 'en';
+  try {
+    i18n.changeLanguage(resolved);
+  } catch (error) {
+    // ignore errors
+  }
 }
 
 export default i18n;

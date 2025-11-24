@@ -24,7 +24,7 @@ export default function LanguageSwitcher({ preset, color }: { preset?: Preset; c
   }
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-sm border border-neutral-200 dark:border-neutral-800 p-1 bg-white dark:bg-neutral-900">
+    <div suppressHydrationWarning className="inline-flex items-center gap-2 rounded-sm border border-neutral-200 dark:border-neutral-800 p-1 bg-white dark:bg-neutral-900">
       <button
         onClick={() => setLanguage('en')}
         className={`px-2 py-1 text-xs rounded-sm ${lang === 'en' ? 'text-background' : 'text-neutral-700 dark:text-neutral-300'}`}
