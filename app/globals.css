@@ -34,25 +34,30 @@ body {
   @apply bg-zinc-50 text-neutral-900;
 }
 /* Global scrollbar for body (page level). Use theme tokens defined above */
-html, body {
+html,
+body {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
-html::-webkit-scrollbar, body::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
-html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }
-html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
-html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
 
@@ -112,8 +117,8 @@ html.dark body {
   border-radius: inherit;
   background-color: var(--progress-shuttle-color, rgba(59, 130, 246, 1));
   will-change: left, opacity;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-  animation: pi-shuttle 1400ms cubic-bezier(.2,.9,.2,1) infinite;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  animation: pi-shuttle 1400ms cubic-bezier(0.2, 0.9, 0.2, 1) infinite;
 }
 
 /* Pixel-pattern background for buttons with a 3D wave overlay */
@@ -217,6 +222,72 @@ html.dark body {
 /* Small visual polish for the nav scroll to avoid overlaying content */
 .custom-scrollbar:focus {
   outline: 2px solid rgba(59, 130, 246, 0.12);
+}
+
+/* Checkbox 'sonic' check effect */
+@keyframes pi-checkbox-shine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.pi-checkbox-indicator {
+  position: relative; /* ensure overlay and tick position correctly */
+  overflow: hidden;
+}
+.pi-checkbox-indicator .pi-checkbox-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transform: translateX(-100%);
+  opacity: 0;
+  z-index: 1;
+}
+.pi-checkbox-indicator.anim .pi-checkbox-shine {
+  animation: pi-checkbox-shine 420ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+.pi-checkbox-indicator .pi-checkbox-tick {
+  display: inline-flex;
+  transform-origin: center center;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1) 60ms,
+    opacity 160ms linear 60ms;
+  z-index: 2;
+}
+.pi-checkbox-indicator.anim .pi-checkbox-tick {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pi-checkbox-indicator .pi-checkbox-shine,
+  .pi-checkbox-indicator .pi-checkbox-tick,
+  .pi-checkbox-indicator.anim .pi-checkbox-shine,
+  .pi-checkbox-indicator.anim .pi-checkbox-tick {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }
 
 @keyframes btn-pattern-hover {
