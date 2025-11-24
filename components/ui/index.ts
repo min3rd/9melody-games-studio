@@ -53,3 +53,4 @@ export { default as FileInput } from "./FileInput";
 export { default as Radio } from "./Radio";
 export { default as Range } from "./Range";
 export { default as Rating } from "./Rating";
+export { default as Select } from "./Select";
