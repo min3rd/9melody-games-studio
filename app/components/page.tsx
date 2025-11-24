@@ -35,6 +35,7 @@ import CheckboxPreview from './checkbox-preview.client';
 import FileInputPreview from './fileinput-preview.client';
 import RadioPreview from './radio-preview.client';
 import RangePreview from './range-preview.client';
+import RatingPreview from "./rating-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -122,6 +123,8 @@ export default function ComponentsPage() {
         return <RadioPreview />;
       case "Range":
         return <RangePreview />;
+      case "Rating":
+        return <RatingPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
