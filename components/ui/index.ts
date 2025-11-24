@@ -31,3 +31,4 @@ export { default as RadialProgress } from './RadialProgress';
 export { default as Checkbox } from './Checkbox';
 export { default as FileInput } from './FileInput';
 export { default as Radio } from './Radio';
+export { default as Range } from './Range';
