@@ -1,5 +1,11 @@
 "use client";
-import React, { useEffect, useId, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useId,
+  useState,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import clsx from "clsx";
 import { PRESET_MAP, type Preset } from "../presets";
 
@@ -70,10 +76,11 @@ export default function Range({
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [hoveredTick, setHoveredTick] = useState<{
-    left: string;
+    left: number;
     value: number;
   } | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const [trackWidth, setTrackWidth] = useState(0);
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = Number(e.target.value);
@@ -100,16 +107,18 @@ export default function Range({
     ["--pi-range-base-color" as any]: "rgba(0,0,0,0.12)",
   };
 
-  // Build tick marks positions
-  const ticks: { left: string; active: boolean; value: number }[] = [];
+  // Build tick marks positions (pixel-perfect)
+  const ticks: { left: number; active: boolean; value: number }[] = [];
   const maxTicks = 120; // safety bound — prevents rendering thousands of ticks
   const totalSteps = step > 0 ? Math.floor((max - min) / step) : 0;
+  const usableTrack = Math.max(0, trackWidth - thumbSize);
   if (showTicks && totalSteps >= 0 && totalSteps <= maxTicks) {
     for (let i = 0; i <= totalSteps; i++) {
       const tickVal = min + i * step;
-      const left = `${((tickVal - min) / (max - min)) * 100}%`;
-      const active = ((tickVal - min) / (max - min)) * 100 <= percent + 0.0001;
-      ticks.push({ left, active, value: tickVal });
+      const percentVal = (tickVal - min) / (max - min);
+      const px = percentVal * usableTrack + thumbSize / 2;
+      const active = percentVal * 100 <= percent + 0.0001;
+      ticks.push({ left: px, active, value: tickVal });
     }
   }
 
@@ -118,15 +127,12 @@ export default function Range({
     const rect = trackRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = e.clientX - rect.left;
-    const pct = (x / rect.width) * 100;
     // find nearest tick
-    let nearest: { left: string; value: number } | null = null;
+    let nearest: { left: number; value: number } | null = null;
     let nearestDist = Infinity;
     const hitPx = 12; // px distance allowance
     for (const t of ticks) {
-      const leftPct = Number(t.left.replace("%", ""));
-      const px = (leftPct / 100) * rect.width;
-      const dist = Math.abs(px - x);
+      const dist = Math.abs(t.left - x);
       if (dist < nearestDist) {
         nearestDist = dist;
         nearest = t;
@@ -138,6 +144,18 @@ export default function Range({
       setHoveredTick(null);
     }
   }
+
+  // Measure track width for pixel-perfect alignment
+  useLayoutEffect(() => {
+    function measure() {
+      if (trackRef.current) {
+        setTrackWidth(trackRef.current.offsetWidth);
+      }
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
 
   return (
     <div
@@ -160,9 +178,10 @@ export default function Range({
             {ticks.map((t, i) => (
               <span
                 key={i}
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-px"
+                className="absolute top-1/2 -translate-y-1/2 w-px"
                 style={{
                   left: t.left,
+                  transform: `translateX(-0.5px) translateY(-50%)`,
                   background: t.active
                     ? "var(--pi-range-active-color)"
                     : "var(--pi-range-base-color)",
@@ -203,9 +222,13 @@ export default function Range({
         {showTooltip &&
           (isDragging || isHovered || isFocused || hoveredTick) && (
             <div
-              className="pi-range-tooltip pointer-events-none absolute w-max -translate-x-1/2"
+              className="pi-range-tooltip pointer-events-none absolute w-max"
               style={{
-                left: `${hoveredTick ? hoveredTick.left : `${percent}%`}`,
+                left: hoveredTick
+                  ? hoveredTick.left
+                  : usableTrack * ((safeVal - min) / (max - min)) +
+                    thumbSize / 2,
+                transform: "translateX(-50%)",
                 bottom: `calc(var(--pi-range-track-height) + 10px)`,
               }}
               aria-hidden
@@ -216,10 +239,7 @@ export default function Range({
               >
                 {String(hoveredTick ? hoveredTick.value : safeVal)}
               </div>
-              <div
-                className="pi-range-tooltip-arrow mt-1"
-                style={{ borderTopColor: "var(--pi-range-active-color)" }}
-              />
+              {/* Tooltip arrow removed as requested */}
             </div>
           )}
       </div>
@@ -292,14 +312,7 @@ export default function Range({
           transform: translateY(-6px);
           white-space: nowrap;
         }
-        .pi-range-tooltip-arrow {
-          width: 0;
-          height: 0;
-          border-left: 6px solid transparent;
-          border-right: 6px solid transparent;
-          border-top: 6px solid var(--pi-range-active-color);
-          margin: 0 auto -6px;
-        }
+        /* Tooltip arrow removed */
       `}</style>
     </div>
   );
