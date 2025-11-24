@@ -25,11 +25,28 @@ if (!i18n.isInitialized) {
 // Helper to call on the client to set the runtime language from client-only sources
 export function setClientLanguage(lang?: string) {
   if (typeof window === 'undefined') return;
-  const resolved = lang ?? (localStorage.getItem('lang') as string | null) ?? 'en';
+  // prefer localStorage, then cookie, then default
+  const fromLocal = (localStorage.getItem('lang') as string | null) ?? undefined;
+  const cookieMatch = typeof document !== 'undefined' ? document.cookie.match(/(?:^|; )lang=(vi|en)(?:;|$)/) : null;
+  const fromCookie = cookieMatch ? (cookieMatch[1] as string) : undefined;
+  const resolved = lang ?? fromLocal ?? fromCookie ?? 'en';
   try {
     i18n.changeLanguage(resolved);
   } catch (error) {
     // ignore errors
+  }
+}
+
+// Helper to call on the server during a request to set the runtime language for
+// the current render. Note: this mutates the singleton i18n instance and may
+// affect concurrent renders in a long-running server environment.
+export function setServerLanguage(lang?: string) {
+  if (typeof window !== 'undefined') return;
+  const resolved = lang ?? 'en';
+  try {
+    i18n.changeLanguage(resolved);
+  } catch (error) {
+    // ignore
   }
 }
 

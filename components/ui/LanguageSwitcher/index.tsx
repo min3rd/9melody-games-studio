@@ -14,6 +14,11 @@ export default function LanguageSwitcher({ preset, color }: { preset?: Preset; c
     try {
       localStorage.setItem('lang', lang);
     } catch {}
+    // persist as cookie so server can read the language for SSR
+    try {
+      const maxAge = 60 * 60 * 24 * 365; // 1 year
+      document.cookie = `lang=${lang}; path=/; max-age=${maxAge}; samesite=lax`;
+    } catch {}
     if (typeof document !== 'undefined') document.documentElement.lang = lang;
     // inform i18n about language change
     if (i18n && i18n.language !== lang) i18n.changeLanguage(lang);
