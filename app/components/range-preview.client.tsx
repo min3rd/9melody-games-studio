@@ -14,6 +14,8 @@ export default function RangePreview(): React.ReactElement {
   const [max, setMax] = useState<number>(100);
   const [step, setStep] = useState<number>(1);
   const [withEffects, setWithEffects] = useState(true);
+  const [showTicks, setShowTicks] = useState<boolean>(true);
+  const [showTooltip, setShowTooltip] = useState<boolean>(true);
 
   let presetProp: any = undefined;
   if (preset !== 'custom' && preset !== 'none') presetProp = preset;
@@ -23,7 +25,7 @@ export default function RangePreview(): React.ReactElement {
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <div className="flex-1">
-          <Range value={val} onValueChange={(v) => setVal(v)} min={min} max={max} step={step} preset={presetProp} color={colorProp} size={size} withEffects={withEffects} />
+          <Range value={val} onValueChange={(v) => setVal(v)} min={min} max={max} step={step} preset={presetProp} color={colorProp} size={size} withEffects={withEffects} showTicks={showTicks} showTooltip={showTooltip} />
           <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">{t('selected_lang').replace('{{lang}}', String(val))}</div>
         </div>
       </div>
@@ -58,6 +60,12 @@ export default function RangePreview(): React.ReactElement {
         <label className="text-sm">Effects
           <input className="ml-2" type="checkbox" checked={withEffects} onChange={(e) => setWithEffects(e.target.checked)} />
         </label>
+        <label className="text-sm">Ticks
+          <input className="ml-2" type="checkbox" checked={showTicks} onChange={(e) => setShowTicks(e.target.checked)} />
+        </label>
+        <label className="text-sm">Tooltip
+          <input className="ml-2" type="checkbox" checked={showTooltip} onChange={(e) => setShowTooltip(e.target.checked)} />
+        </label>
       </div>
 
       <div className="flex gap-4 items-center">
@@ -75,7 +83,7 @@ export default function RangePreview(): React.ReactElement {
       <div className="text-sm">
         <div className="font-medium mb-2">Usage</div>
         <pre className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded text-xs">
-{`<Range min={${min}} max={${max}} step={${step}} value={${val}} preset="${preset}${preset === 'custom' ? `" color="${color}` : ''}" size="${size}" withEffects={${withEffects}} />`}
+      {`<Range min={${min}} max={${max}} step={${step}} value={${val}} preset="${preset}${preset === 'custom' ? `" color="${color}` : ''}" size="${size}" withEffects={${withEffects}} showTicks={${showTicks}} showTooltip={${showTooltip}} />`}
         </pre>
       </div>
     </div>
