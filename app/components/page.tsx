@@ -36,6 +36,7 @@ import RadioPreview from "./radio-preview.client";
 import RangePreview from "./range-preview.client";
 import RatingPreview from "./rating-preview.client";
 import TextInputPreview from "./textinput-preview.client";
+import TextAreaPreview from "./textarea-preview.client";
 import SelectPreview from "./select-preview.client";
 
 export const metadata = {
@@ -128,6 +129,8 @@ export default function ComponentsPage() {
         return <RatingPreview />;
       case "TextInput":
         return <TextInputPreview />;
+      case "TextArea":
+        return <TextAreaPreview />;
       case "Select":
         return <SelectPreview />;
       default:
