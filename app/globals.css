@@ -359,22 +359,125 @@ html.dark body {
 
 /* ensure neon input text is readable */
 .input-pattern-neon input { color: #fff; }
-.input-pattern-bubble::before,
-.input-pattern-bubble::after {
-  content: "";
-  position: absolute;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(255,255,255,0.02) 40%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(255,255,255,0.03), rgba(255,255,255,0.01) 40%, transparent 60%), radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02), rgba(0,0,0,0.01) 40%, transparent 60%), radial-gradient(circle, rgba(0,0,0,0), rgba(0,0,0,0));
-  width: 160px;
-  height: 160px;
-  mix-blend-mode: lighten;
-  opacity: 0.95;
-  pointer-events: none;
+
+/* Bubble pattern: sweet gradient background with interactive bubbles */
+.input-pattern-bubble {
+  position: relative;
+  background: linear-gradient(135deg, 
+    #ff9a9e 0%, 
+    #fecfef 25%, 
+    #ffdde1 50%, 
+    #ffeaa7 75%, 
+    #ff9a9e 100%);
+  background-size: 400% 400%;
+  animation: bubble-gradient 15s ease infinite;
+  color: #fff;
+  overflow: hidden;
 }
-.input-pattern-bubble::before { left: -40px; top: -20px; animation: bubble-drift-1 8s linear infinite; background-blend-mode: screen; }
-.input-pattern-bubble::after { right: -40px; bottom: -20px; animation: bubble-drift-2 12s linear infinite; background-blend-mode: screen; }
-@keyframes bubble-drift-1 { 0% { transform: translateY(0) } 50% { transform: translateY(8px) } 100% { transform: translateY(0) } }
-@keyframes bubble-drift-2 { 0% { transform: translateY(0) } 50% { transform: translateY(-8px) } 100% { transform: translateY(0) } }
+
+@keyframes bubble-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.input-pattern-bubble input {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Bubble overlay container */
+.input-bubble-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Floating bubbles (automatic) */
+.input-bubble-float {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 
+    inset 0 0 10px rgba(255, 255, 255, 0.4),
+    0 0 20px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: bubble-float var(--bubble-duration, 3000ms) ease-out forwards;
+  will-change: transform, opacity;
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(255, 255, 255, 0.8), 
+    rgba(255, 255, 255, 0.2) 40%, 
+    transparent 70%);
+  background-blend-mode: overlay;
+}
+
+@keyframes bubble-float {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.6;
+    transform: translateY(-120%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-130%) scale(1.1);
+  }
+}
+
+/* Hover bubbles (interactive) */
+.input-bubble-hover {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  box-shadow: 
+    inset 0 0 15px rgba(255, 255, 255, 0.5),
+    0 0 25px rgba(255, 255, 255, 0.4),
+    0 4px 15px rgba(0, 0, 0, 0.25);
+  animation: bubble-hover-burst var(--bubble-duration, 1500ms) ease-out forwards;
+  will-change: transform, opacity, filter;
+  background: radial-gradient(circle at 35% 35%, 
+    rgba(255, 255, 255, 0.9), 
+    rgba(255, 255, 255, 0.3) 45%, 
+    transparent 75%);
+  background-blend-mode: overlay;
+  filter: blur(0);
+}
+
+@keyframes bubble-hover-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+    filter: blur(0);
+  }
+  15% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0);
+  }
+  70% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.5);
+    filter: blur(1px);
+  }
+  85% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(2);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.5);
+    filter: blur(3px);
+  }
+}
 
 
 /* Small visual polish for the nav scroll to avoid overlaying content */

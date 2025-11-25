@@ -180,6 +180,81 @@ export default function TextInput({
     };
   }, [pattern, wrapperRef, activeColor]);
 
+  // Bubble pattern: interactive bubbles on hover + automatic floating bubbles
+  type Bubble = { id: number; x: number; y: number; size: number; duration: number; color: string; isHover?: boolean };
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const bubbleId = useRef(0);
+  const bubbleColors = ['#ff69b4', '#ff1493', '#ff6b9d', '#ff8c94', '#ff4757', '#ff6348', '#ffa502', '#ff7675'];
+
+  useEffect(() => {
+    if (pattern !== 'bubble' || !wrapperRef.current) {
+      setBubbles([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    // Spawn automatic floating bubbles from bottom
+    const spawnFloating = () => {
+      if (cancelled) return;
+      const id = bubbleId.current++;
+      const x = Math.random() * 100; // percent
+      const y = 100; // start from bottom
+      const size = 10 + Math.random() * 30; // 10-40px
+      const duration = 2000 + Math.random() * 3000; // 2-5s
+      const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+      const bubble: Bubble = { id, x, y, size, duration, color };
+      
+      setBubbles(s => [...s, bubble]);
+
+      // Remove after duration
+      setTimeout(() => {
+        if (!cancelled) setBubbles(s => s.filter(b => b.id !== id));
+      }, duration);
+
+      // Schedule next
+      const next = 800 + Math.random() * 1200;
+      setTimeout(() => spawnFloating(), next);
+    };
+
+    // Start spawning
+    const initialTimer = setTimeout(spawnFloating, 200);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(initialTimer);
+      setBubbles([]);
+    };
+  }, [pattern]);
+
+  // Handle mouse move for hover bubbles
+  const handleBubbleHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (pattern !== 'bubble' || !wrapperRef.current) return;
+    
+    const rect = wrapperRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    // Spawn multiple bubbles at hover position
+    const count = 3 + Math.floor(Math.random() * 3); // 3-5 bubbles
+    for (let i = 0; i < count; i++) {
+      const id = bubbleId.current++;
+      const offsetX = x + (Math.random() - 0.5) * 10;
+      const offsetY = y + (Math.random() - 0.5) * 10;
+      const size = 15 + Math.random() * 25;
+      const duration = 1000 + Math.random() * 1000; // 1-2s
+      const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+      const bubble: Bubble = { id, x: offsetX, y: offsetY, size, duration, color, isHover: true };
+      
+      setBubbles(s => [...s, bubble]);
+
+      // Remove after duration
+      setTimeout(() => {
+        setBubbles(s => s.filter(b => b.id !== id));
+      }, duration);
+    }
+  };
+
   // compute overlay tile color derived from activeColor if possible
   function hexToRgba(hex: string, alpha = 0.06) {
     const sanitized = String(hex).replace('#', '');
@@ -218,9 +293,12 @@ export default function TextInput({
                 ? 'var(--input-pattern-bg)'
                 : pattern === 'neon'
                 ? 'var(--input-pattern-bg-dark, #05060a)'
+                : pattern === 'bubble'
+                ? 'transparent'
                 : (inputStyle as any)?.backgroundColor,
           }}
           aria-disabled={disabled}
+          onMouseMove={pattern === 'bubble' ? handleBubbleHover : undefined}
         >
           {pattern === 'neon' && (
             <div className="input-neon-overlay" aria-hidden>
@@ -250,6 +328,24 @@ export default function TextInput({
                   key={t.id}
                   className="input-pattern-tile"
                   style={{ animationDelay: `${-t.delay}s`, animationDuration: `${t.duration}ms`, opacity: t.opacity } as React.CSSProperties}
+                />
+              ))}
+            </div>
+          )}
+          {pattern === 'bubble' && (
+            <div className="input-bubble-overlay" aria-hidden>
+              {bubbles.map((b) => (
+                <span
+                  key={b.id}
+                  className={b.isHover ? 'input-bubble-hover' : 'input-bubble-float'}
+                  style={{
+                    left: `${b.x}%`,
+                    top: `${b.y}%`,
+                    width: `${b.size}px`,
+                    height: `${b.size}px`,
+                    backgroundColor: b.color,
+                    ['--bubble-duration' as any]: `${b.duration}ms`,
+                  } as React.CSSProperties}
                 />
               ))}
             </div>
