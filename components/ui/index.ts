@@ -55,4 +55,5 @@ export { default as Range } from "./Range";
 export { default as Rating } from "./Rating";
 export { default as TextInput } from "./TextInput";
 export { default as TextArea } from "./TextArea";
+export { default as PatternOverlay } from "./patterns";
 export { default as Select } from "./Select";
