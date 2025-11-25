@@ -31,6 +31,9 @@
       "inside": "Inside",
       "outside": "Outside"
     },
+    "navbar": {
+      "description": "Use the controls to change the Navbar placement and rendering behaviour."
+    },
     "toggle": {
       "title": "Enable feature",
       "description": "Toggle this to enable or disable the feature",

@@ -16,7 +16,6 @@ import ModalPreview from "./modal-preview.client";
 import TogglePreview from "./toggle-preview.client";
 import ThemeTogglePreviewCustom from "./theme-toggle-preview.client";
 import AccordionPreview from "./accordion-preview.client";
-import { CodePreview } from "@/components/ui";
 import ListPreview from "./list-preview.client";
 import TimelinePreview from "./timeline-preview.client";
 import TextRotatePreview from "./text-rotate-preview.client";

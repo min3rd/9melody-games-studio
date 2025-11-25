@@ -16,6 +16,9 @@
   "noComponents": "Không tìm thấy thành phần nào",
   "noPreview": "Chưa có bản xem trước nào.",
   "preview": {
+    "navbar": {
+      "description": "Sử dụng các điều khiển để thay đổi vị trí và chế độ hiển thị của Navbar."
+    },
     "progress": {
       "indeterminate": "không xác định",
       "labelPosition": "Vị trí nhãn",
