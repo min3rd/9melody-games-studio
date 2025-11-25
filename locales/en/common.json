@@ -29,6 +29,7 @@
       "default": "Default",
       "variant": "Variant",
       "color": "Color",
+      "placeholder": "Placeholder",
       "preset": "Preset",
       "customColor": "Custom Color",
       "inside": "Inside",

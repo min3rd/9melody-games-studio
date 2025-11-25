@@ -24,6 +24,7 @@
       "variant": "Biến thể",
       "color": "Màu sắc",
       "direction": "Hướng"
+      ,"placeholder": "Placeholder"
     },
         "rating": {
           "customPreset": "Mẫu tùy chỉnh (success), Kích thước lg",
