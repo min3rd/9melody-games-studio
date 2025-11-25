@@ -132,7 +132,7 @@ export default function TextInput({
   }, [tileCount]);
 
   // Neon pattern: dynamic neon pixel tiles that spawn randomly and fade out
-  type NeonTile = { id: number; left: number; top: number; size: number; duration: number };
+  type NeonTile = { id: number; left: number; top: number; size: number; duration: number; delay: number };
   const [neonTiles, setNeonTiles] = useState<NeonTile[]>([]);
   const neonTileId = useRef(0);
 
@@ -148,9 +148,10 @@ export default function TextInput({
       const id = neonTileId.current++;
       const left = Math.round(Math.random() * 92 * 100) / 100; // percent
       const top = Math.round(Math.random() * 72 * 100) / 100; // percent - keep inside top area
+      const delay = Math.random() * 0.8; // seconds (used as animationDelay - negative for immediate stagger)
       const size = Math.round((4 + Math.random() * 10) * 10) / 10; // px
       const duration = 700 + Math.round(Math.random() * 1000);
-      const tile: NeonTile = { id, left, top, size, duration };
+      const tile: NeonTile = { id, left, top, size, duration, delay };
       setNeonTiles(s => [...s, tile]);
 
       // remove after duration
@@ -210,6 +211,8 @@ export default function TextInput({
             ['--input-pattern-color' as any]: activeColor,
             ['--input-pattern-cols' as any]: tileCols,
             ['--input-pattern-tile' as any]: tileColorVar,
+              ['--input-neon-tile-shadow' as any]: `0 0 6px ${activeColor}, 0 0 14px ${activeColor}`,
+              ['--input-neon-tile-strong-shadow' as any]: `0 0 12px ${activeColor}, 0 0 28px ${activeColor}`,
             backgroundColor:
               pattern === 'pixel'
                 ? 'var(--input-pattern-bg)'
@@ -225,14 +228,17 @@ export default function TextInput({
                 <span
                   key={t.id}
                   className="input-neon-tile"
-                  style={{
-                    left: `${t.left}%`,
-                    top: `${t.top}%`,
-                    width: `${t.size}px`,
-                    height: `${t.size}px`,
-                    backgroundColor: activeColor,
-                    animationDuration: `${t.duration}ms`,
-                  } as React.CSSProperties}
+                    style={{
+                      left: `${t.left}%`,
+                      top: `${t.top}%`,
+                      width: `${t.size}px`,
+                      height: `${t.size}px`,
+                      backgroundColor: activeColor,
+                      ['--input-neon-duration' as any]: `${t.duration}ms`,
+                      ['--input-neon-flicker-duration' as any]: `${300 + (Math.round(Math.random() * 300))}ms`,
+                      ['--input-neon-delay' as any]: `${-t.delay}s`,
+                      // stronger glow available as an override; wrapper sets default if needed
+                    } as React.CSSProperties}
                 />
               ))}
             </div>

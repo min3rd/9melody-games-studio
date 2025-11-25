@@ -296,13 +296,11 @@ html.dark body {
 
 /* Neon line pattern: subtle neon glow along the border and pulsing line */
 .input-pattern-neon {
-  box-shadow: 0 0 8px rgba(0,0,0,0.02) inset, 0 0 18px var(--input-pattern-color, rgba(59,130,246,0.6));
-}
-.input-pattern-neon {
   /* Remove halo/glow by default and switch to solid dark background for neon pattern */
   position: relative;
   background-color: var(--input-pattern-bg-dark, #05060a);
   color: #fff;
+  --input-neon-tile-shadow: none; /* default: no tile glow */
 }
 
 /* Overlay container that will hold neon pixel tiles (spawned dynamically) */
@@ -320,15 +318,43 @@ html.dark body {
   border-radius: 1px;
   transform-origin: 50% 50%;
   background: var(--input-pattern-color, #3b82f6);
-  box-shadow: 0 0 6px var(--input-pattern-color, #3b82f6), 0 0 12px var(--input-pattern-color, #3b82f6), 0 0 18px var(--input-pattern-color, #3b82f6);
+  box-shadow: var(--input-neon-tile-shadow, 0 0 6px var(--input-pattern-color, #3b82f6));
   opacity: 0;
-  animation: input-neon-tile 1.2s cubic-bezier(.2,.9,.2,1) forwards;
+  animation:
+    input-neon-tile var(--input-neon-duration, 1200ms) cubic-bezier(.2,.9,.2,1) forwards,
+    input-neon-flicker var(--input-neon-flicker-duration, 600ms) cubic-bezier(.2,.9,.2,1) infinite alternate;
+  /* allow per-tile delay (applies to both animations) */
+  animation-delay: var(--input-neon-delay, 0s), var(--input-neon-delay, 0s);
+  will-change: transform, opacity, box-shadow, filter;
 }
 
 @keyframes input-neon-tile {
   0% { opacity: 0; transform: scale(0.6) translateY(-2px); }
   40% { opacity: 1; transform: scale(1) translateY(0); }
   100% { opacity: 0; transform: scale(1.05) translateY(0); }
+}
+
+@keyframes input-neon-flicker {
+  0% {
+    filter: brightness(1);
+    box-shadow: var(--input-neon-tile-shadow, 0 0 6px var(--input-pattern-color));
+    transform: scale(0.98);
+  }
+  30% {
+    filter: brightness(1.5) saturate(1.2);
+    box-shadow: var(--input-neon-tile-strong-shadow, 0 0 12px var(--input-pattern-color), 0 0 24px var(--input-pattern-color));
+    transform: scale(1.06);
+  }
+  60% {
+    filter: brightness(1.2);
+    box-shadow: var(--input-neon-tile-shadow, 0 0 6px var(--input-pattern-color));
+    transform: scale(1.02);
+  }
+  100% {
+    filter: brightness(1);
+    box-shadow: var(--input-neon-tile-shadow, 0 0 6px var(--input-pattern-color));
+    transform: scale(1);
+  }
 }
 
 /* ensure neon input text is readable */
