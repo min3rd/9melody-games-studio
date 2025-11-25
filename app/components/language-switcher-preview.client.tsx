@@ -7,13 +7,18 @@ import PreviewLayout from '@/components/preview/PreviewLayout';
 import { useI18n } from '@/hooks/useI18n';
 
 export default function LanguageSwitcherPreview(): React.ReactElement {
-  const [lang, setLang] = useState<'en' | 'vi'>(() => {
-    if (typeof window === 'undefined') return 'en';
-    const stored = localStorage.getItem('lang');
-    return stored === 'vi' ? 'vi' : 'en';
-  });
+  // Start with the server-default so initial render matches SSR output.
+  const [lang, setLang] = useState<'en' | 'vi'>('en');
 
+  // On client mount read persisted language and listen for storage changes.
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('lang');
+        if (stored === 'vi') setLang('vi');
+      } catch {}
+    }
+
     function onStorage(e: StorageEvent) {
       if (e.key === 'lang') setLang(e.newValue === 'vi' ? 'vi' : 'en');
     }

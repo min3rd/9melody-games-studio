@@ -4,11 +4,17 @@ import i18n from '@/lib/i18n';
 import { PRESET_MAP, type Preset } from '../presets';
 
 export default function LanguageSwitcher({ preset, color }: { preset?: Preset; color?: string } = {}) {
-  const [lang, setLang] = useState<'en' | 'vi'>(() => {
-    if (typeof window === 'undefined') return 'en';
-    const stored = localStorage.getItem('lang');
-    return stored === 'vi' ? 'vi' : 'en';
-  });
+  // Initialize to the server-rendered default to avoid hydration mismatch.
+  // Read `localStorage` only on the client in an effect and update state there.
+  const [lang, setLang] = useState<'en' | 'vi'>('en');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem('lang');
+      if (stored === 'vi') setLang('vi');
+    } catch {}
+  }, []);
 
   useEffect(() => {
     try {
