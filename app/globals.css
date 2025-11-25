@@ -219,6 +219,76 @@ html.dark body {
   background: var(--scrollbar-thumb-hover);
 }
 
+/* Input pattern: small pixel grid (inspired by .btn-pattern-pixel) */
+.input-pattern-pixel {
+  --input-pattern-size: 4px;
+  --input-pattern-overlay: rgba(0, 0, 0, 0.04);
+  background-image: linear-gradient(0deg, var(--input-pattern-overlay), var(--input-pattern-overlay)), linear-gradient(90deg, rgba(0,0,0,0.06) 8%, transparent 8%), linear-gradient(0deg, rgba(0,0,0,0.06) 8%, transparent 8%);
+  background-size: var(--input-pattern-size) var(--input-pattern-size), calc(var(--input-pattern-size) * 2) var(--input-pattern-size), var(--input-pattern-size) calc(var(--input-pattern-size) * 2);
+  background-position: 0 0, 0 0, 0 0;
+}
+
+.input-pattern-pixel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.06), rgba(255,255,255,0));
+  mix-blend-mode: overlay;
+  transform: translateX(-120%);
+  animation: input-pattern-wave 2.6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes input-pattern-wave {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+/* Neon line pattern: subtle neon glow along the border and pulsing line */
+.input-pattern-neon {
+  box-shadow: 0 0 8px rgba(0,0,0,0.02) inset, 0 0 18px var(--input-pattern-color, rgba(59,130,246,0.6));
+}
+.input-pattern-neon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 2px;
+  width: 60%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1), var(--input-pattern-color, rgba(59,130,246,0.6)), rgba(255,255,255,0.1));
+  opacity: 0.9;
+  transform: translateX(-120%);
+  animation: input-neon-shine 2.2s linear infinite;
+  pointer-events: none;
+}
+@keyframes input-neon-shine {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+/* Bubble pattern: soft floating translucent circles behind the input */
+.input-pattern-bubble {
+  position: relative;
+  overflow: hidden;
+}
+.input-pattern-bubble::before,
+.input-pattern-bubble::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(255,255,255,0.02) 40%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(255,255,255,0.03), rgba(255,255,255,0.01) 40%, transparent 60%), radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02), rgba(0,0,0,0.01) 40%, transparent 60%), radial-gradient(circle, rgba(0,0,0,0), rgba(0,0,0,0));
+  width: 160px;
+  height: 160px;
+  mix-blend-mode: lighten;
+  opacity: 0.95;
+  pointer-events: none;
+}
+.input-pattern-bubble::before { left: -40px; top: -20px; animation: bubble-drift-1 8s linear infinite; background-blend-mode: screen; }
+.input-pattern-bubble::after { right: -40px; bottom: -20px; animation: bubble-drift-2 12s linear infinite; background-blend-mode: screen; }
+@keyframes bubble-drift-1 { 0% { transform: translateY(0) } 50% { transform: translateY(8px) } 100% { transform: translateY(0) } }
+@keyframes bubble-drift-2 { 0% { transform: translateY(0) } 50% { transform: translateY(-8px) } 100% { transform: translateY(0) } }
+
+
 /* Small visual polish for the nav scroll to avoid overlaying content */
 .custom-scrollbar:focus {
   outline: 2px solid rgba(59, 130, 246, 0.12);

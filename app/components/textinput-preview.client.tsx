@@ -16,6 +16,7 @@ export default function TextInputPreview(): React.ReactElement {
   const [color, setColor] = useState('#3b82f6');
   const [variant, setVariant] = useState<'solid'|'ghost'|'outline'|'none'>('solid');
   const [clearable, setClearable] = useState(false);
+  const [pattern, setPattern] = useState<'pixel' | 'neon' | 'bubble' | 'none' | 'undefined'>('none');
   const [label, setLabel] = useState('Label');
   const [hint, setHint] = useState('This is a hint');
 
@@ -30,6 +31,7 @@ export default function TextInputPreview(): React.ReactElement {
           color={useCustom ? color : undefined}
           variant={variant}
           clearable={clearable}
+          pattern={pattern === 'none' ? undefined : (pattern as any)}
           value={value}
           onValueChange={setValue}
           hint={hint}
@@ -41,7 +43,7 @@ export default function TextInputPreview(): React.ReactElement {
     </div>
   );
 
-  const snippetCode = `import { TextInput } from '@/components/ui';\n\n<TextInput label="${label}" placeholder="${t('preview.common.placeholder') ?? 'Enter text...'}" size="${size}" ${useCustom ? `color="${color}"` : ''} preset="${preset}" variant="${variant}" clearable={${clearable}} />`;
+  const snippetCode = `import { TextInput } from '@/components/ui';\n\n<TextInput label="${label}" placeholder="${t('preview.common.placeholder') ?? 'Enter text...'}" size="${size}" ${useCustom ? `color="${color}"` : ''} preset="${preset}" variant="${variant}" clearable={${clearable}} ${pattern === 'none' ? '' : `pattern="${pattern}"`} />`;
 
   const snippet = <CodePreview language="tsx" code={snippetCode} />;
 
@@ -84,6 +86,14 @@ export default function TextInputPreview(): React.ReactElement {
       </label>
       <label className="text-sm">Clearable
         <input className="ml-2" type="checkbox" checked={clearable} onChange={(e) => setClearable(e.target.checked)} />
+      </label>
+      <label className="text-sm">{t('preview.common.pattern') ?? 'Pattern'}
+        <select className="ml-2 rounded p-1 border text-sm" value={pattern} onChange={(e) => setPattern(e.target.value as any)}>
+          <option value="none">None</option>
+          <option value="pixel">Pixel</option>
+          <option value="neon">Neon line</option>
+          <option value="bubble">Bubble</option>
+        </select>
       </label>
     </div>
   );

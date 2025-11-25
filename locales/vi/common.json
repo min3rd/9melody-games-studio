@@ -22,6 +22,7 @@
     "common": {
       "default": "Mặc định",
       "variant": "Biến thể",
+      "pattern": "Mẫu",
       "color": "Màu sắc",
       "direction": "Hướng"
       ,"placeholder": "Placeholder"

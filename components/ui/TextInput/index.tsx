@@ -16,6 +16,7 @@ export interface TextInputProps extends Omit<React.InputHTMLAttributes<HTMLInput
   color?: string;
   size?: UISize;
   variant?: 'solid' | 'ghost' | 'outline' | 'none';
+  pattern?: 'pixel' | 'neon' | 'bubble';
   rounded?: keyof typeof ROUND_CLASSES;
   withEffects?: boolean;
   clearable?: boolean; // shows clear button when true
@@ -37,6 +38,7 @@ export default function TextInput({
   rounded = 'sm',
   withEffects = true,
   clearable = false,
+  pattern,
   id: idProp,
   className = '',
   disabled = false,
@@ -60,6 +62,8 @@ export default function TextInput({
     none: 'bg-transparent border-none',
   };
 
+  const patternClass = pattern === 'pixel' ? 'input-pattern-pixel' : pattern === 'neon' ? 'input-pattern-neon' : pattern === 'bubble' ? 'input-pattern-bubble' : '';
+
   function handleChange(next: string) {
     if (!isControlled) setValueState(next);
     onValueChange?.(next);
@@ -76,12 +80,13 @@ export default function TextInput({
   const base = clsx('inline-flex items-center gap-2 w-full', roundClass, className);
 
   const inputWrapper = clsx(
-    'flex items-center w-full',
+    'flex items-center w-full relative overflow-hidden',
     'border border-neutral-200 dark:border-neutral-700',
     sizeClass,
     roundClass,
     effectClass,
     variantClasses[variant],
+    patternClass,
     disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-text'
   );
 
@@ -104,7 +109,7 @@ export default function TextInput({
       )}
 
       <div className="flex flex-col w-full">
-        <div className={inputWrapper} style={inputStyle} aria-disabled={disabled}>
+        <div className={inputWrapper} style={{ ...inputStyle, ['--input-pattern-color' as any]: activeColor }} aria-disabled={disabled}>
           {prefix && <div className="pl-2 pr-1 text-sm text-neutral-600 dark:text-neutral-300">{prefix}</div>}
 
           <input
