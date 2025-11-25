@@ -5,6 +5,7 @@ import { type Preset } from '@/components/ui/presets';
 import type { UISize } from '@/components/ui/presets';
 import PreviewLayout from '@/components/preview/PreviewLayout';
 import { useI18n } from '@/hooks/useI18n';
+import { CodePreview } from '@/components/ui';
 
 export default function NavbarPreview(): React.ReactElement {
   const { t } = useI18n();
@@ -129,19 +130,11 @@ export default function NavbarPreview(): React.ReactElement {
     </div>
   );
 
-  const snippet = (
-    <pre className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded text-xs">{`import { Navbar } from '@/components/ui';
+  const snippetCode = `import { Navbar } from '@/components/ui';\n\n<Navbar items={[{label: 'Home', href:'#'}]} placement="${placement}" display="${display}" size="${size}" preset="${preset}"${useCustom ? ` color="${color}"` : ''} withEffects={${withEffects}} />`;
 
-<Navbar items={[{label: 'Home', href:'#'}]} placement="${placement}" display="${display}" size="${size}" preset="${preset}" ${useCustom ? `color="${color}"` : ''} />`}</pre>
+  const snippet = (
+    <CodePreview language="tsx" code={snippetCode} />
   );
-        <label className="text-sm">Placement
-          <select className="ml-2 rounded p-1 border text-sm" value={placement} onChange={(e) => setPlacement(e.target.value as NavbarPlacement)}>
-            <option value="left">Left</option>
-            <option value="right">Right</option>
-            <option value="top">Top</option>
-            <option value="bottom">Bottom</option>
-          </select>
-        </label>
   return (
     <PreviewLayout
       title="Navbar"
