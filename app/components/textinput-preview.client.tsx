@@ -16,7 +16,7 @@ export default function TextInputPreview(): React.ReactElement {
   const [color, setColor] = useState('#3b82f6');
   const [variant, setVariant] = useState<'solid'|'ghost'|'outline'|'none'>('solid');
   const [clearable, setClearable] = useState(false);
-  const [pattern, setPattern] = useState<'pixel' | 'neon' | 'bubble' | 'none' | 'undefined'>('neon');
+  const [pattern, setPattern] = useState<'pixel' | 'neon' | 'bubble' | 'pixel3d' | 'none' | 'undefined'>('pixel3d');
   const [label, setLabel] = useState('Label');
   const [hint, setHint] = useState('This is a hint');
 
@@ -93,6 +93,7 @@ export default function TextInputPreview(): React.ReactElement {
           <option value="pixel">Pixel</option>
           <option value="neon">Neon (pixels)</option>
           <option value="bubble">Bubble</option>
+          <option value="pixel3d">Pixel 3D</option>
         </select>
       </label>
     </div>

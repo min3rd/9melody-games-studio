@@ -479,6 +479,153 @@ html.dark body {
   }
 }
 
+/* Pixel 3D pattern: falling blocks with 3D depth and mouse gravity */
+.input-pattern-pixel3d {
+  position: relative;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  overflow: hidden;
+  perspective: 1000px;
+}
+
+.input-pattern-pixel3d input {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Pixel 3D overlay container */
+.input-pixel3d-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.input-pixel3d-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 2px;
+}
+
+/* Individual 3D pixel blocks */
+.input-pixel3d-block {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  transition: transform 0.15s ease-out;
+}
+
+/* 3D depth effect */
+.input-pixel3d-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    transparent 50%, 
+    rgba(0, 0, 0, 0.3) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.input-pixel3d-block::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 2px;
+  right: -2px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  filter: blur(2px);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Falling phase */
+.input-pixel3d-block.falling {
+  animation: pixel3d-fall var(--pixel-duration, 1500ms) cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--pixel-delay, 0s);
+}
+
+@keyframes pixel3d-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-200%) translateZ(100px) rotateX(45deg) rotateZ(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(0%) translateZ(20px) rotateX(10deg) rotateZ(5deg);
+  }
+  85% {
+    transform: translateY(3%) translateZ(0px) rotateX(-5deg) rotateZ(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%) translateZ(0px) rotateX(0deg) rotateZ(0deg);
+  }
+}
+
+/* Settled phase - pixel is at rest */
+.input-pixel3d-block.settled {
+  opacity: 1;
+  transform: translateY(0%) translateZ(0px) rotateX(0deg);
+}
+
+.input-pixel3d-block.settled::after {
+  opacity: 0.6;
+}
+
+/* Fading phase */
+.input-pixel3d-block.fading {
+  animation: pixel3d-fade 600ms ease-out forwards;
+}
+
+@keyframes pixel3d-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0%) scale(1) translateZ(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10%) scale(0.8) translateZ(-50px);
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .input-pixel3d-block {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .input-pixel3d-block.falling {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .input-pixel3d-block.fading {
+    animation: pixel3d-fade-simple 600ms ease-out forwards;
+  }
+  
+  @keyframes pixel3d-fade-simple {
+    to {
+      opacity: 0;
+    }
+  }
+}
+
 
 /* Small visual polish for the nav scroll to avoid overlaying content */
 .custom-scrollbar:focus {
