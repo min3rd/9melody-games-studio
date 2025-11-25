@@ -254,7 +254,7 @@ html.dark body {
   display: grid;
   grid-template-columns: repeat(var(--input-pattern-cols, 12), var(--input-pattern-size));
   grid-auto-rows: var(--input-pattern-size);
-  gap: 2px;
+  gap: var(--input-pattern-gap, 2px);
   z-index: 1; /* behind input content which is z-20 */
   pointer-events: none;
 }

@@ -133,6 +133,8 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
   const [tileCols, setTileCols] = useState<number>(12);
   const [tileRows, setTileRows] = useState<number>(2);
   const [tileCount, setTileCount] = useState<number>(24);
+  const [tileSize, setTileSize] = useState<number>(6);
+  const [tileGap, setTileGap] = useState<number>(2);
 
   useEffect(() => {
     if (pattern !== 'pixel' || !wrapperRef.current) {
@@ -146,16 +148,19 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
     const ro = new ResizeObserver(() => {
       const styles = window.getComputedStyle(el);
       const tileSizeStr = styles.getPropertyValue('--input-pattern-size') || '6px';
-      const tileSize = parseFloat(tileSizeStr);
+      const parsedTileSize = parseFloat(tileSizeStr);
+      const gapStr = styles.getPropertyValue('--input-pattern-gap') || '2px';
+      const parsedGap = parseFloat(gapStr);
       const rect = el.getBoundingClientRect();
-      const cols = Math.max(1, Math.ceil(rect.width / tileSize));
-      const rows = Math.max(1, Math.ceil(rect.height / tileSize));
+      // compute columns/rows to completely cover the element
+      const cols = Math.max(1, Math.ceil((rect.width + parsedGap) / (parsedTileSize + parsedGap)));
+      const rows = Math.max(1, Math.ceil((rect.height + parsedGap) / (parsedTileSize + parsedGap)));
       setTileCols(cols);
       setTileRows(rows);
-      setTileCount(cols * rows + cols);
+      setTileSize(parsedTileSize);
+      setTileGap(parsedGap);
+      setTileCount(cols * rows);
     });
-    ro.observe(el);
-    ro.disconnect();
     ro.observe(el);
     return () => ro.disconnect();
   }, [pattern, wrapperRef]);
@@ -186,8 +191,11 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       if (!wrapperRef.current) return;
       const rect = wrapperRef.current.getBoundingClientRect();
       const pixelSize = 16; // pixel block size
-      const cols = Math.max(10, Math.floor(rect.width / pixelSize));
-      const rows = Math.max(2, Math.floor(rect.height / pixelSize));
+      const styles = window.getComputedStyle(wrapperRef.current);
+      const gapStr = styles.getPropertyValue('--input-pattern-gap') || '2px';
+      const gap = parseFloat(gapStr);
+      const cols = Math.max(10, Math.floor((rect.width + gap) / (pixelSize + gap)));
+      const rows = Math.max(2, Math.floor((rect.height + gap) / (pixelSize + gap)));
       setGridCols(cols);
       setGridRows(rows);
       claimedRef.current = new Array(cols * rows).fill(false);
@@ -242,7 +250,9 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       const duration = 1200 + Math.random() * 800;
 
       const rect = wrapperRef.current!.getBoundingClientRect();
-      const gap = 2;
+      const styles = window.getComputedStyle(wrapperRef.current!);
+      const gapStr2 = styles.getPropertyValue('--input-pattern-gap') || '2px';
+      const gap = parseFloat(gapStr2);
       const pixelW = Math.floor((rect.width - (cols - 1) * gap) / cols);
       const pixelH = Math.floor((rect.height - (rows - 1) * gap) / rows);
       const left = Math.round(col * (pixelW + gap));
@@ -354,9 +364,25 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       )}
 
       {pattern === 'pixel' && (
-        <div className="input-pattern-overlay" aria-hidden>
+        <div
+          className="input-pattern-overlay"
+          aria-hidden
+          style={{
+            gridTemplateColumns: `repeat(${tileCols}, ${tileSize}px)`,
+            gridAutoRows: `${tileSize}px`,
+            gap: `${tileGap}px`,
+            // ensure overlay inherits the same tile size variables for CSS that relies on them
+            ['--input-pattern-size' as any]: `${tileSize}px`,
+            ['--input-pattern-cols' as any]: tileCols,
+            ['--input-pattern-gap' as any]: `${tileGap}px`,
+          } as React.CSSProperties}
+        >
           {tiles.map((t) => (
-            <span key={t.id} className="input-pattern-tile" style={{ animationDelay: `${-t.delay}s`, animationDuration: `${t.duration}ms`, opacity: t.opacity } as React.CSSProperties} />
+            <span
+              key={t.id}
+              className="input-pattern-tile"
+              style={{ width: `${tileSize}px`, height: `${tileSize}px`, animationDelay: `${-t.delay}s`, animationDuration: `${t.duration}ms`, opacity: t.opacity } as React.CSSProperties}
+            />
           ))}
         </div>
       )}
