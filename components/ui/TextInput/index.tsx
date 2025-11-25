@@ -264,6 +264,13 @@ export default function TextInput({
     delay: number; 
     duration: number;
     phase: 'falling' | 'settled' | 'fading';
+    left: number; // px
+    top: number; // px
+    width: number; // px
+    height: number; // px
+    startX: number; // px absolute start coordinate (for offset calc)
+    startY: number; // px
+    claimedIndex: number; // index into grid cols*rows
   };
   const [pixels3D, setPixels3D] = useState<Pixel3D[]>([]);
   const pixel3DId = useRef(0);
@@ -273,11 +280,13 @@ export default function TextInput({
   // Calculate grid dimensions for pixel3d
   const [pixel3DCols, setPixel3DCols] = useState(20);
   const [pixel3DRows, setPixel3DRows] = useState(3);
+  const claimedRef = useRef<boolean[]>([]);
 
   useEffect(() => {
     if (pattern !== 'pixel3d' || !wrapperRef.current) {
       setPixels3D([]);
       setMousePos(null);
+      claimedRef.current = [];
       return;
     }
 
@@ -290,6 +299,8 @@ export default function TextInput({
       const rows = Math.max(2, Math.floor(rect.height / pixelSize));
       setPixel3DCols(cols);
       setPixel3DRows(rows);
+      // initialize claimed grid with false
+      claimedRef.current = new Array(cols * rows).fill(false);
     };
 
     updateGrid();
@@ -301,15 +312,88 @@ export default function TextInput({
     // Spawn falling pixels
     const spawnPixel = () => {
       if (cancelled) return;
-      
+      // compute available cells (weighted toward bottom rows)
+      const cols = pixel3DCols;
+      const rows = pixel3DRows;
+      const gridCount = cols * rows;
+      // Avoid overspawning more than grid capacity + small buffer
+      if (pixels3D.length > gridCount * 1.5) {
+        const retry = 200 + Math.random() * 400;
+        setTimeout(spawnPixel, retry);
+        return;
+      }
+      // Build a list of unclaimed indices
+      const candidates: { col: number; row: number; weight: number; index: number }[] = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const idx = r * cols + c;
+          if (!claimedRef.current[idx]) {
+            const weight = 1 + (rows - r); // prefer lower rows: bottom rows heavier
+            candidates.push({ col: c, row: r, weight, index: idx });
+          }
+        }
+      }
+
+      if (candidates.length === 0) {
+        // all claimed, quietly exit; we'll try again later
+        const retry = 300 + Math.random() * 500;
+        setTimeout(spawnPixel, retry);
+        return;
+      }
+
+      // choose by weighted random
+      let total = 0;
+      for (const t of candidates) total += t.weight;
+      let pick = Math.random() * total;
+      let chosen = candidates[0];
+      for (const t of candidates) {
+        if (pick < t.weight) {
+          chosen = t; break;
+        }
+        pick -= t.weight;
+      }
+
       const id = pixel3DId.current++;
-      const col = Math.floor(Math.random() * pixel3DCols);
-      const row = 0; // start from top
+      const col = chosen.col;
+      const row = chosen.row;
+      const claimedIndex = chosen.index;
+      claimedRef.current[claimedIndex] = true; // reserve
       const color = pixel3DColors[Math.floor(Math.random() * pixel3DColors.length)];
       const delay = Math.random() * 0.3;
       const duration = 1200 + Math.random() * 800;
-      
-      const pixel: Pixel3D = { id, col, row, color, delay, duration, phase: 'falling' };
+
+      // compute pixel final left/top coordinates inside wrapper
+      const rect = wrapperRef.current!.getBoundingClientRect();
+      const gap = 2;
+      const pixelW = Math.floor((rect.width - (cols - 1) * gap) / cols);
+      const pixelH = Math.floor((rect.height - (rows - 1) * gap) / rows);
+      const left = Math.round(col * (pixelW + gap));
+      const top = Math.round(row * (pixelH + gap));
+
+      // choose a random start point outside the wrapper area
+      const spawnPad = 80 + Math.random() * 120;
+      const dir = Math.floor(Math.random() * 4); // 0 top, 1 right, 2 bottom, 3 left
+      let startX: number, startY: number;
+      switch (dir) {
+        case 0: // top
+          startX = Math.random() * rect.width;
+          startY = -spawnPad;
+          break;
+        case 1: // right
+          startX = rect.width + spawnPad;
+          startY = Math.random() * rect.height;
+          break;
+        case 2: // bottom
+          startX = Math.random() * rect.width;
+          startY = rect.height + spawnPad;
+          break;
+        default: // left
+          startX = -spawnPad;
+          startY = Math.random() * rect.height;
+          break;
+      }
+
+      const pixel: Pixel3D = { id, col, row, color, delay, duration, phase: 'falling', left, top, width: pixelW, height: pixelH, startX, startY, claimedIndex };
       
       setPixels3D(s => [...s, pixel]);
 
@@ -325,24 +409,38 @@ export default function TextInput({
               
               // Remove after fade
               setTimeout(() => {
-                if (!cancelled) setPixels3D(s => s.filter(p => p.id !== id));
+                if (!cancelled) {
+                  // free claimed index when removed
+                  const idx = claimedIndex;
+                  claimedRef.current[idx] = false;
+                  setPixels3D(s => s.filter(p => p.id !== id));
+                }
               }, 600);
             }
           }, 1000 + Math.random() * 1000);
         }
       }, duration);
 
-      // Schedule next spawn
-      const next = 150 + Math.random() * 250;
+      // Schedule next spawn dynamically based on remaining unclaimed cells; faster when grid is sparse
+      const totalCells = pixel3DCols * pixel3DRows;
+      const claimedCount = claimedRef.current.filter(Boolean).length;
+      const unclaimed = totalCells - claimedCount;
+      const density = claimedCount / Math.max(1, totalCells);
+      // target fill until ~80% coverage
+      const base = 120 + Math.random() * 260;
+      const next = Math.max(80, base - Math.round((1 - density) * 300));
       setTimeout(() => spawnPixel(), next);
     };
 
-    // Start spawning
-    const initialTimer = setTimeout(spawnPixel, 100);
+    // Start spawning rapidly to build coverage from the outside
+    const initialTimers: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      initialTimers.push(window.setTimeout(spawnPixel, 30 * i));
+    }
 
     return () => {
       cancelled = true;
-      clearTimeout(initialTimer);
+      initialTimers.forEach((t) => clearTimeout(t));
       ro.disconnect();
       setPixels3D([]);
       setMousePos(null);
@@ -472,41 +570,43 @@ export default function TextInput({
                 }}
               >
                 {pixels3D.map((p) => {
-                  // Calculate distance to mouse for gravity effect
-                  let transform = '';
-                  if (mousePos && wrapperRef.current && p.phase === 'settled') {
-                    const rect = wrapperRef.current.getBoundingClientRect();
-                    const pixelSize = rect.width / pixel3DCols;
-                    const pixelX = (p.col + 0.5) * pixelSize;
-                    const pixelY = rect.height - pixelSize * 0.5; // bottom position
-                    
-                    const dx = mousePos.x - pixelX;
-                    const dy = mousePos.y - pixelY;
+                  // Calculate distance to mouse for gravity effect (apply to inner)
+                  const rect = wrapperRef.current?.getBoundingClientRect();
+                  let innerTransform = '';
+                  if (mousePos && rect && p.phase === 'settled') {
+                    const pixelCenterX = p.left + p.width / 2;
+                    const pixelCenterY = p.top + p.height / 2;
+                    const dx = mousePos.x - pixelCenterX;
+                    const dy = mousePos.y - pixelCenterY;
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     const maxDistance = 150; // pixels
-                    
                     if (distance < maxDistance) {
-                      const force = 1 - (distance / maxDistance);
-                      const bendX = dx * force * 0.3;
-                      const bendY = dy * force * 0.3;
-                      const scale = 1 + force * 0.2;
-                      transform = `translate(${bendX}px, ${bendY}px) scale(${scale})`;
+                      const force = 1 - distance / maxDistance;
+                      const bendX = dx * force * 0.18;
+                      const bendY = dy * force * 0.18;
+                      const scale = 1 + force * 0.12;
+                      innerTransform = `translate(${bendX}px, ${bendY}px) scale(${scale})`;
                     }
                   }
-                  
+
                   return (
                     <span
                       key={p.id}
                       className={`input-pixel3d-block ${p.phase}`}
                       style={{
                         backgroundColor: p.color,
-                        gridColumn: p.col + 1,
-                        gridRow: p.row + 1,
+                        left: `${p.left}px`,
+                        top: `${p.top}px`,
+                        width: `${p.width}px`,
+                        height: `${p.height}px`,
                         ['--pixel-delay' as any]: `${p.delay}s`,
                         ['--pixel-duration' as any]: `${p.duration}ms`,
-                        transform: transform || undefined,
+                        ['--start-x' as any]: `${p.startX - p.left}px`,
+                        ['--start-y' as any]: `${p.startY - p.top}px`,
                       } as React.CSSProperties}
-                    />
+                    >
+                      <span className={`input-pixel3d-inner ${p.phase}`} style={{ transform: innerTransform || undefined }} />
+                    </span>
                   );
                 })}
               </div>
