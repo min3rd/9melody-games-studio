@@ -34,6 +34,15 @@
     "navbar": {
       "description": "Use the controls to change the Navbar placement and rendering behaviour."
     },
+    "pagination": {
+      "description": "Pagination component visual demonstration.",
+      "total": "Total",
+      "current": "Current",
+      "prevNext": "Prev/Next",
+      "firstLast": "First/Last",
+      "siblings": "Siblings",
+      "boundary": "Boundary"
+    },
     "toggle": {
       "title": "Enable feature",
       "description": "Toggle this to enable or disable the feature",

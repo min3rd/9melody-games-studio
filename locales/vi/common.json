@@ -19,6 +19,15 @@
     "navbar": {
       "description": "Sử dụng các điều khiển để thay đổi vị trí và chế độ hiển thị của Navbar."
     },
+    "pagination": {
+      "description": "Bản trình diễn giao diện phân trang (pagination).",
+      "total": "Tổng",
+      "current": "Hiện tại",
+      "prevNext": "Trước/Sau",
+      "firstLast": "Đầu/Cuối",
+      "siblings": "Số trang cạnh",
+      "boundary": "Số trang biên"
+    },
     "progress": {
       "indeterminate": "không xác định",
       "labelPosition": "Vị trí nhãn",
