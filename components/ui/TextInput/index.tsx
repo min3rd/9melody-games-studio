@@ -271,6 +271,8 @@ export default function TextInput({
     startX: number; // px absolute start coordinate (for offset calc)
     startY: number; // px
     claimedIndex: number; // index into grid cols*rows
+    startScale: number; // initial scale for landing animation
+    startZ: number; // initial translateZ distance
   };
   const [pixels3D, setPixels3D] = useState<Pixel3D[]>([]);
   const pixel3DId = useRef(0);
@@ -393,7 +395,9 @@ export default function TextInput({
           break;
       }
 
-      const pixel: Pixel3D = { id, col, row, color, delay, duration, phase: 'falling', left, top, width: pixelW, height: pixelH, startX, startY, claimedIndex };
+      const startScale = 1.5 + Math.random() * 1.2; // 1.5 - 2.7
+      const startZ = 60 + Math.random() * 140; // 60 - 200 px
+      const pixel: Pixel3D = { id, col, row, color, delay, duration, phase: 'falling', left, top, width: pixelW, height: pixelH, startX, startY, claimedIndex, startScale, startZ };
       
       setPixels3D(s => [...s, pixel]);
 
@@ -603,6 +607,8 @@ export default function TextInput({
                         ['--pixel-duration' as any]: `${p.duration}ms`,
                         ['--start-x' as any]: `${p.startX - p.left}px`,
                         ['--start-y' as any]: `${p.startY - p.top}px`,
+                        ['--start-scale' as any]: `${p.startScale}`,
+                        ['--start-z' as any]: `${p.startZ}px`,
                       } as React.CSSProperties}
                     >
                       <span className={`input-pixel3d-inner ${p.phase}`} style={{ transform: innerTransform || undefined }} />
