@@ -1,6 +1,6 @@
-import i18n from 'i18next';
-import en from '@/locales/en/common.json';
-import vi from '@/locales/vi/common.json';
+import i18n from "i18next";
+import en from "@/locales/en/common.json";
+import vi from "@/locales/vi/common.json";
 
 // resources loaded from locales
 const resources = {
@@ -14,22 +14,26 @@ if (!i18n.isInitialized) {
     resources,
     // Use a server-safe default here. Client code should call `setClientLanguage`
     // to harmonize the runtime language with localStorage or user preferences.
-    lng: 'en',
-    fallbackLng: 'en',
-    ns: ['common'],
-    defaultNS: 'common',
+    lng: "en",
+    fallbackLng: "en",
+    ns: ["common"],
+    defaultNS: "common",
     interpolation: { escapeValue: false },
   });
 }
 
 // Helper to call on the client to set the runtime language from client-only sources
 export function setClientLanguage(lang?: string) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   // prefer localStorage, then cookie, then default
-  const fromLocal = (localStorage.getItem('lang') as string | null) ?? undefined;
-  const cookieMatch = typeof document !== 'undefined' ? document.cookie.match(/(?:^|; )lang=(vi|en)(?:;|$)/) : null;
+  const fromLocal =
+    (localStorage.getItem("lang") as string | null) ?? undefined;
+  const cookieMatch =
+    typeof document !== "undefined"
+      ? document.cookie.match(/(?:^|; )lang=(vi|en)(?:;|$)/)
+      : null;
   const fromCookie = cookieMatch ? (cookieMatch[1] as string) : undefined;
-  const resolved = lang ?? fromLocal ?? fromCookie ?? 'en';
+  const resolved = lang ?? fromLocal ?? fromCookie ?? "en";
   try {
     i18n.changeLanguage(resolved);
   } catch (error) {
@@ -41,8 +45,8 @@ export function setClientLanguage(lang?: string) {
 // the current render. Note: this mutates the singleton i18n instance and may
 // affect concurrent renders in a long-running server environment.
 export function setServerLanguage(lang?: string) {
-  if (typeof window !== 'undefined') return;
-  const resolved = lang ?? 'en';
+  if (typeof window !== "undefined") return;
+  const resolved = lang ?? "en";
   try {
     i18n.changeLanguage(resolved);
   } catch (error) {
