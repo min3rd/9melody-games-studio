@@ -43,3 +43,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Where to add new tokens:** Add new CSS variables under the `:root` block in `app/globals.css` and document the reason for the exception directly above the token.
 
 Following these rules helps keep styles consistent, maintainable, and themeable across the project.
+
+### Using Prisma with Postgres
+
+If you'd like to use Postgres as the datasource for Prisma, add a Postgres-style `DATABASE_URL` to your `.env` (example provided in `.env.example`). This repo includes a `prisma.config.ts` which Prisma v7 uses to read the `DATABASE_URL` from the environment.
+
+Example development environment setup (Postgres):
+
+```bash
+cp .env.example .env
+# Update .env to use a postgres URL e.g.
+# DATABASE_URL="postgresql://username:password@localhost:5432/mydb?schema=public"
+npm run prisma:generate
+npm run prisma:migrate
+```
+
+If you want me to create a `prisma/schema.prisma` tailored for Postgres (provider: `postgresql`) — or update the Prisma client usage — tell me and I’ll follow up in a separate change, step by step.
