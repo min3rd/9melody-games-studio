@@ -221,8 +221,10 @@ html.dark body {
 
 /* Input pattern: small pixel grid (inspired by .btn-pattern-pixel) */
 .input-pattern-pixel {
-  --input-pattern-size: 4px;
-  --input-pattern-overlay: rgba(0, 0, 0, 0.04);
+  --input-pattern-size: 6px;
+  --input-pattern-bg: #071028; /* dark background for pixel pattern */
+  --input-pattern-tile: rgba(255, 255, 255, 0.06);
+  --input-pattern-overlay: rgba(255, 255, 255, 0.02);
   background-image: linear-gradient(0deg, var(--input-pattern-overlay), var(--input-pattern-overlay)), linear-gradient(90deg, rgba(0,0,0,0.06) 8%, transparent 8%), linear-gradient(0deg, rgba(0,0,0,0.06) 8%, transparent 8%);
   background-size: var(--input-pattern-size) var(--input-pattern-size), calc(var(--input-pattern-size) * 2) var(--input-pattern-size), var(--input-pattern-size) calc(var(--input-pattern-size) * 2);
   background-position: 0 0, 0 0, 0 0;
@@ -242,6 +244,53 @@ html.dark body {
 @keyframes input-pattern-wave {
   0% { transform: translateX(-120%); }
   100% { transform: translateX(120%); }
+}
+
+/* Overlay grid for pixel tiles */
+.input-pattern-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--input-pattern-cols, 12), var(--input-pattern-size));
+  grid-auto-rows: var(--input-pattern-size);
+  gap: 2px;
+  z-index: 1; /* behind input content which is z-20 */
+  pointer-events: none;
+}
+
+.input-pattern-tile {
+  width: var(--input-pattern-size);
+  height: var(--input-pattern-size);
+  border-radius: 1px;
+  background-color: var(--input-pattern-tile);
+  opacity: 0;
+  transform-origin: center;
+  animation-name: input-pattern-tile-drop;
+  animation-duration: 1000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+@keyframes input-pattern-tile-drop {
+  0% {
+    transform: translateY(-120%) scale(0.9);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.input-pattern-pixel {
+  background-color: var(--input-pattern-bg);
+  color: #fff;
+}
+.input-pattern-pixel input {
+  color: #fff;
 }
 
 /* Neon line pattern: subtle neon glow along the border and pulsing line */

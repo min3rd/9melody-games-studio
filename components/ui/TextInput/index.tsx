@@ -1,5 +1,5 @@
 "use client";
-import React, { useId, useState } from "react";
+import React, { useId, useState, useMemo, useRef, useEffect } from "react";
 import clsx from "clsx";
 import { PRESET_MAP, type Preset, BUTTON_SIZE_CLASSES, ROUND_CLASSES, type UISize } from "../presets";
 
@@ -100,6 +100,51 @@ export default function TextInput({
 
   const inputId = id;
 
+  // dynamic measurement for tile grid to fully cover wrapper
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [tileCols, setTileCols] = useState(12);
+  const [tileRows, setTileRows] = useState(2);
+  const [tileCount, setTileCount] = useState(24);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    const el = wrapperRef.current;
+    const ro = new ResizeObserver(() => {
+      const styles = window.getComputedStyle(el);
+      const tileSizeStr = styles.getPropertyValue('--input-pattern-size') || '6px';
+      const tileSize = parseFloat(tileSizeStr);
+      const rect = el.getBoundingClientRect();
+      const cols = Math.max(1, Math.ceil(rect.width / tileSize));
+      const rows = Math.max(1, Math.ceil(rect.height / tileSize));
+      setTileCols(cols);
+      setTileRows(rows);
+      setTileCount(cols * rows + cols); // add extra row to ensure full coverage
+    });
+    ro.observe(el);
+    // initialize once
+    ro.disconnect();
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [wrapperRef]);
+
+  const tiles = useMemo(() => {
+    return Array.from({ length: tileCount }).map((_, i) => ({ id: i, delay: Math.random() * 1.8, opacity: 0.5 + Math.random() * 0.5 }));
+  }, [tileCount]);
+
+  // compute overlay tile color derived from activeColor if possible
+  function hexToRgba(hex: string, alpha = 0.06) {
+    const sanitized = String(hex).replace('#', '');
+    const isShort = sanitized.length === 3;
+    const re = isShort ? /([a-f0-9])([a-f0-9])([a-f0-9])/i : /([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})/i;
+    const match = sanitized.match(re);
+    if (!match) return undefined;
+    const r = parseInt(isShort ? match[1] + match[1] : match[1], 16);
+    const g = parseInt(isShort ? match[2] + match[2] : match[2], 16);
+    const b = parseInt(isShort ? match[3] + match[3] : match[3], 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  const tileColorVar = hexToRgba(String(activeColor)) ?? undefined;
+
   return (
     <div className={base}>
       {label && (
@@ -109,12 +154,23 @@ export default function TextInput({
       )}
 
       <div className="flex flex-col w-full">
-        <div className={inputWrapper} style={{ ...inputStyle, ['--input-pattern-color' as any]: activeColor }} aria-disabled={disabled}>
-          {prefix && <div className="pl-2 pr-1 text-sm text-neutral-600 dark:text-neutral-300">{prefix}</div>}
+        <div ref={wrapperRef} className={inputWrapper} style={{ ...inputStyle, ['--input-pattern-color' as any]: activeColor, ['--input-pattern-cols' as any]: tileCols, ['--input-pattern-tile' as any]: tileColorVar, backgroundColor: pattern === 'pixel' ? 'var(--input-pattern-bg)' : (inputStyle as any)?.backgroundColor }} aria-disabled={disabled}>
+          {pattern === 'pixel' && (
+            <div className="input-pattern-overlay" aria-hidden>
+              {tiles.map((t) => (
+                <span
+                  key={t.id}
+                  className="input-pattern-tile"
+                  style={{ animationDelay: `${-t.delay}s`, animationDuration: `${t.duration}ms`, opacity: t.opacity } as React.CSSProperties}
+                />
+              ))}
+            </div>
+          )}
+          {prefix && <div className={clsx('pl-2 pr-1 text-sm', pattern === 'pixel' ? 'text-neutral-100' : 'text-neutral-600 dark:text-neutral-300')}>{prefix}</div>}
 
           <input
             id={inputId}
-            className={clsx('flex-1 bg-transparent border-none outline-none text-sm text-neutral-800 dark:text-neutral-100 px-2', disabled ? 'cursor-not-allowed' : 'cursor-text')}
+            className={clsx('flex-1 bg-transparent border-none outline-none text-sm text-neutral-800 dark:text-neutral-100 px-2 relative z-20', disabled ? 'cursor-not-allowed' : 'cursor-text')}
             disabled={disabled}
             value={value ?? ''}
             onChange={(e) => handleChange(e.target.value)}
@@ -125,14 +181,14 @@ export default function TextInput({
             <button
               type="button"
               aria-label="Clear"
-              className="px-2 text-sm text-neutral-700 dark:text-neutral-200"
+              className={clsx('px-2 text-sm', pattern === 'pixel' ? 'text-neutral-100' : 'text-neutral-700 dark:text-neutral-200')}
               onClick={() => clear()}
             >
               ✕
             </button>
           )}
 
-          {suffix && <div className="pl-1 pr-2 text-sm text-neutral-600 dark:text-neutral-300">{suffix}</div>}
+          {suffix && <div className={clsx('pl-1 pr-2 text-sm', pattern === 'pixel' ? 'text-neutral-100' : 'text-neutral-600 dark:text-neutral-300')}>{suffix}</div>}
         </div>
 
         <div className="flex items-center justify-between mt-1">
