@@ -16,7 +16,7 @@ export default function TextInputPreview(): React.ReactElement {
   const [color, setColor] = useState('#3b82f6');
   const [variant, setVariant] = useState<'solid'|'ghost'|'outline'|'none'>('solid');
   const [clearable, setClearable] = useState(false);
-  const [pattern, setPattern] = useState<'pixel' | 'neon' | 'bubble' | 'none' | 'undefined'>('none');
+  const [pattern, setPattern] = useState<'pixel' | 'neon' | 'bubble' | 'none' | 'undefined'>('neon');
   const [label, setLabel] = useState('Label');
   const [hint, setHint] = useState('This is a hint');
 
@@ -91,7 +91,7 @@ export default function TextInputPreview(): React.ReactElement {
         <select className="ml-2 rounded p-1 border text-sm" value={pattern} onChange={(e) => setPattern(e.target.value as any)}>
           <option value="none">None</option>
           <option value="pixel">Pixel</option>
-          <option value="neon">Neon line</option>
+          <option value="neon">Neon (pixels)</option>
           <option value="bubble">Bubble</option>
         </select>
       </label>

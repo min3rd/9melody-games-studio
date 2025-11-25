@@ -225,6 +225,7 @@ html.dark body {
   --input-pattern-bg: #071028; /* dark background for pixel pattern */
   --input-pattern-tile: rgba(255, 255, 255, 0.06);
   --input-pattern-overlay: rgba(255, 255, 255, 0.02);
+  --input-pattern-bg-dark: #05060a; /* darker background for neon pattern */
   background-image: linear-gradient(0deg, var(--input-pattern-overlay), var(--input-pattern-overlay)), linear-gradient(90deg, rgba(0,0,0,0.06) 8%, transparent 8%), linear-gradient(0deg, rgba(0,0,0,0.06) 8%, transparent 8%);
   background-size: var(--input-pattern-size) var(--input-pattern-size), calc(var(--input-pattern-size) * 2) var(--input-pattern-size), var(--input-pattern-size) calc(var(--input-pattern-size) * 2);
   background-position: 0 0, 0 0, 0 0;
@@ -297,29 +298,41 @@ html.dark body {
 .input-pattern-neon {
   box-shadow: 0 0 8px rgba(0,0,0,0.02) inset, 0 0 18px var(--input-pattern-color, rgba(59,130,246,0.6));
 }
-.input-pattern-neon::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 2px;
-  width: 60%;
-  background: linear-gradient(90deg, rgba(255,255,255,0.1), var(--input-pattern-color, rgba(59,130,246,0.6)), rgba(255,255,255,0.1));
-  opacity: 0.9;
-  transform: translateX(-120%);
-  animation: input-neon-shine 2.2s linear infinite;
-  pointer-events: none;
-}
-@keyframes input-neon-shine {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(120%); }
+.input-pattern-neon {
+  /* Remove halo/glow by default and switch to solid dark background for neon pattern */
+  position: relative;
+  background-color: var(--input-pattern-bg-dark, #05060a);
+  color: #fff;
 }
 
-/* Bubble pattern: soft floating translucent circles behind the input */
-.input-pattern-bubble {
-  position: relative;
+/* Overlay container that will hold neon pixel tiles (spawned dynamically) */
+.input-neon-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
   overflow: hidden;
 }
+
+/* Individual neon tiles (pixels) */
+.input-neon-tile {
+  position: absolute;
+  border-radius: 1px;
+  transform-origin: 50% 50%;
+  background: var(--input-pattern-color, #3b82f6);
+  box-shadow: 0 0 6px var(--input-pattern-color, #3b82f6), 0 0 12px var(--input-pattern-color, #3b82f6), 0 0 18px var(--input-pattern-color, #3b82f6);
+  opacity: 0;
+  animation: input-neon-tile 1.2s cubic-bezier(.2,.9,.2,1) forwards;
+}
+
+@keyframes input-neon-tile {
+  0% { opacity: 0; transform: scale(0.6) translateY(-2px); }
+  40% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(1.05) translateY(0); }
+}
+
+/* ensure neon input text is readable */
+.input-pattern-neon input { color: #fff; }
 .input-pattern-bubble::before,
 .input-pattern-bubble::after {
   content: "";

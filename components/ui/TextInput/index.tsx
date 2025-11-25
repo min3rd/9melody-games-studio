@@ -128,8 +128,56 @@ export default function TextInput({
   }, [wrapperRef]);
 
   const tiles = useMemo(() => {
-    return Array.from({ length: tileCount }).map((_, i) => ({ id: i, delay: Math.random() * 1.8, opacity: 0.5 + Math.random() * 0.5 }));
+    return Array.from({ length: tileCount }).map((_, i) => ({ id: i, delay: Math.random() * 1.8, opacity: 0.5 + Math.random() * 0.5, duration: 800 + Math.random() * 1200 }));
   }, [tileCount]);
+
+  // Neon pattern: dynamic neon pixel tiles that spawn randomly and fade out
+  type NeonTile = { id: number; left: number; top: number; size: number; duration: number };
+  const [neonTiles, setNeonTiles] = useState<NeonTile[]>([]);
+  const neonTileId = useRef(0);
+
+  useEffect(() => {
+    if (pattern !== 'neon' || !wrapperRef.current) {
+      setNeonTiles([]);
+      return;
+    }
+
+    let cancelled = false;
+    const spawn = () => {
+      if (cancelled) return;
+      const id = neonTileId.current++;
+      const left = Math.round(Math.random() * 92 * 100) / 100; // percent
+      const top = Math.round(Math.random() * 72 * 100) / 100; // percent - keep inside top area
+      const size = Math.round((4 + Math.random() * 10) * 10) / 10; // px
+      const duration = 700 + Math.round(Math.random() * 1000);
+      const tile: NeonTile = { id, left, top, size, duration };
+      setNeonTiles(s => [...s, tile]);
+
+      // remove after duration
+      const timeoutId = setTimeout(() => {
+        setNeonTiles(s => s.filter(t => t.id !== id));
+      }, duration + 80);
+
+      // schedule next spawn at a random interval
+      const next = 220 + Math.random() * 420;
+      setTimeout(() => spawn(), next);
+      // ensure cleanup for timeout
+      return () => clearTimeout(timeoutId);
+    };
+
+    // initial spawn set
+    const initialTimers: any[] = [];
+    for (let i = 0; i < 2; i++) {
+      const t = setTimeout(spawn, 80 * i);
+      initialTimers.push(t);
+    }
+
+    return () => {
+      cancelled = true;
+      initialTimers.forEach((t) => clearTimeout(t));
+      setNeonTiles([]);
+    };
+  }, [pattern, wrapperRef, activeColor]);
 
   // compute overlay tile color derived from activeColor if possible
   function hexToRgba(hex: string, alpha = 0.06) {
@@ -154,7 +202,41 @@ export default function TextInput({
       )}
 
       <div className="flex flex-col w-full">
-        <div ref={wrapperRef} className={inputWrapper} style={{ ...inputStyle, ['--input-pattern-color' as any]: activeColor, ['--input-pattern-cols' as any]: tileCols, ['--input-pattern-tile' as any]: tileColorVar, backgroundColor: pattern === 'pixel' ? 'var(--input-pattern-bg)' : (inputStyle as any)?.backgroundColor }} aria-disabled={disabled}>
+        <div
+          ref={wrapperRef}
+          className={inputWrapper}
+          style={{
+            ...inputStyle,
+            ['--input-pattern-color' as any]: activeColor,
+            ['--input-pattern-cols' as any]: tileCols,
+            ['--input-pattern-tile' as any]: tileColorVar,
+            backgroundColor:
+              pattern === 'pixel'
+                ? 'var(--input-pattern-bg)'
+                : pattern === 'neon'
+                ? 'var(--input-pattern-bg-dark, #05060a)'
+                : (inputStyle as any)?.backgroundColor,
+          }}
+          aria-disabled={disabled}
+        >
+          {pattern === 'neon' && (
+            <div className="input-neon-overlay" aria-hidden>
+              {neonTiles.map((t) => (
+                <span
+                  key={t.id}
+                  className="input-neon-tile"
+                  style={{
+                    left: `${t.left}%`,
+                    top: `${t.top}%`,
+                    width: `${t.size}px`,
+                    height: `${t.size}px`,
+                    backgroundColor: activeColor,
+                    animationDuration: `${t.duration}ms`,
+                  } as React.CSSProperties}
+                />
+              ))}
+            </div>
+          )}
           {pattern === 'pixel' && (
             <div className="input-pattern-overlay" aria-hidden>
               {tiles.map((t) => (
@@ -166,7 +248,7 @@ export default function TextInput({
               ))}
             </div>
           )}
-          {prefix && <div className={clsx('pl-2 pr-1 text-sm', pattern === 'pixel' ? 'text-neutral-100' : 'text-neutral-600 dark:text-neutral-300')}>{prefix}</div>}
+          {prefix && <div className={clsx('pl-2 pr-1 text-sm', pattern === 'pixel' || pattern === 'neon' ? 'text-neutral-100' : 'text-neutral-600 dark:text-neutral-300')}>{prefix}</div>}
 
           <input
             id={inputId}
@@ -181,14 +263,14 @@ export default function TextInput({
             <button
               type="button"
               aria-label="Clear"
-              className={clsx('px-2 text-sm', pattern === 'pixel' ? 'text-neutral-100' : 'text-neutral-700 dark:text-neutral-200')}
+              className={clsx('px-2 text-sm', pattern === 'pixel' || pattern === 'neon' ? 'text-neutral-100' : 'text-neutral-700 dark:text-neutral-200')}
               onClick={() => clear()}
             >
               ✕
             </button>
           )}
 
-          {suffix && <div className={clsx('pl-1 pr-2 text-sm', pattern === 'pixel' ? 'text-neutral-100' : 'text-neutral-600 dark:text-neutral-300')}>{suffix}</div>}
+          {suffix && <div className={clsx('pl-1 pr-2 text-sm', pattern === 'pixel' || pattern === 'neon' ? 'text-neutral-100' : 'text-neutral-600 dark:text-neutral-300')}>{suffix}</div>}
         </div>
 
         <div className="flex items-center justify-between mt-1">
