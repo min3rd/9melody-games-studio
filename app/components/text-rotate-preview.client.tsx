@@ -1,10 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import TextRotate from "@/components/ui/TextRotate";
+import PreviewLayout from '@/components/preview/PreviewLayout';
+import { CodePreview } from '@/components/ui';
+import { useI18n } from '@/hooks/useI18n';
 import { type Preset } from "@/components/ui/presets";
 import type { UISize } from "@/components/ui/presets";
 
 export default function TextRotatePreview(): React.ReactElement {
+  const { t } = useI18n();
   const [preset] = useState<Preset>("muted");
   const [color, setColor] = useState<string>("#3b82f6");
   const [size, setSize] = useState<UISize>("md");
@@ -23,8 +27,8 @@ export default function TextRotatePreview(): React.ReactElement {
 
   const items = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"];
 
-  return (
-    <div className="space-y-4">
+  const preview = (
+    <div className="p-4">
       <div className="flex items-center gap-4 flex-wrap">
         <label className="text-sm">
           Size
@@ -179,5 +183,74 @@ export default function TextRotatePreview(): React.ReactElement {
         />
       </div>
     </div>
+  );
+
+  const snippetCode = `import { TextRotate } from '@/components/ui';\n\n<TextRotate items={[${items.map((i) => `'${i}'`).join(', ')}]} interval={${interval}} animation="${animation}" direction="${direction}" size="${size}" textSize="${textSize}" loop={${loop}} pauseOnHover={${pauseOnHover}} />`;
+
+  const snippet = <CodePreview language="tsx" code={snippetCode} />;
+
+  const controls = (
+    <div className="flex flex-wrap items-center gap-3">
+      <label className="text-sm">{t('preview.common.size')}
+        <select
+          className="ml-2 text-sm rounded p-1 border"
+          value={size}
+          onChange={(e) => setSize(e.target.value as UISize)}
+        >
+          <option value="sm">Small</option>
+          <option value="md">Medium</option>
+          <option value="lg">Large</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.textRotate.animation') ?? 'Animation'}
+        <select
+          className="ml-2 text-sm rounded p-1 border"
+          value={animation}
+          onChange={(e) => setAnimation(e.target.value as 'slide' | 'fade' | 'flip')}
+        >
+          <option value="slide">Slide</option>
+          <option value="fade">Fade</option>
+          <option value="flip">Flip</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.direction') ?? 'Direction'}
+        <select
+          className="ml-2 text-sm rounded p-1 border"
+          value={direction}
+          onChange={(e) => setDirection(e.target.value as 'up' | 'down')}
+        >
+          <option value="up">Up</option>
+          <option value="down">Down</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.textRotate.interval') ?? 'Interval'}
+        <input
+          className="ml-2"
+          type="range"
+          min="500"
+          max="5000"
+          value={interval}
+          onChange={(e) => setIntervalMs(Number(e.target.value))}
+        />
+      </label>
+      <label className="text-sm">{t('preview.common.loop') ?? 'Loop'}
+        <input className="ml-2" type="checkbox" checked={loop} onChange={(e) => setLoop(e.target.checked)} />
+      </label>
+      <label className="text-sm">{t('preview.textRotate.pauseOnHover') ?? 'Pause on hover'}
+        <input className="ml-2" type="checkbox" checked={pauseOnHover} onChange={(e) => setPauseOnHover(e.target.checked)} />
+      </label>
+      <label className="text-sm">{t('preview.common.customColor')}
+        <input className="ml-2" type="checkbox" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} />
+      </label>
+      {useCustom && (
+        <label className="text-sm">{t('preview.common.color') ?? 'Color'}
+          <input className="ml-2" type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+        </label>
+      )}
+    </div>
+  );
+
+  return (
+    <PreviewLayout title="TextRotate" preview={preview} controls={controls} snippet={snippet} />
   );
 }

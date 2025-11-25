@@ -26,10 +26,25 @@
       "small": "Small",
       "medium": "Medium",
       "large": "Large",
+      "default": "Default",
+      "variant": "Variant",
+      "color": "Color",
       "preset": "Preset",
       "customColor": "Custom Color",
       "inside": "Inside",
       "outside": "Outside"
+    },
+    "rating": {
+      "customPreset": "Custom Preset (success), Size lg",
+      "customColor": "Custom Color, Size sm, No Effects",
+      "readOnly": "Read Only",
+      "current": "Current value",
+      "value": "Value"
+    },
+    "textRotate": {
+      "animation": "Animation",
+      "interval": "Interval",
+      "pauseOnHover": "Pause on hover"
     },
     "navbar": {
       "description": "Use the controls to change the Navbar placement and rendering behaviour."

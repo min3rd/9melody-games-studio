@@ -19,6 +19,24 @@
     "navbar": {
       "description": "Sử dụng các điều khiển để thay đổi vị trí và chế độ hiển thị của Navbar."
     },
+    "common": {
+      "default": "Mặc định",
+      "variant": "Biến thể",
+      "color": "Màu sắc",
+      "direction": "Hướng"
+    },
+        "rating": {
+          "customPreset": "Mẫu tùy chỉnh (success), Kích thước lg",
+          "customColor": "Màu tùy chỉnh, Kích thước sm, Không hiệu ứng",
+          "readOnly": "Chỉ đọc",
+          "current": "Giá trị hiện tại",
+          "value": "Giá trị"
+        },
+        "textRotate": {
+          "animation": "Hoạt ảnh",
+          "interval": "Khoảng thời gian",
+          "pauseOnHover": "Tạm dừng khi rê chuột"
+        },
     "pagination": {
       "description": "Bản trình diễn giao diện phân trang (pagination).",
       "total": "Tổng",

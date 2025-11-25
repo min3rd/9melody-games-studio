@@ -1,10 +1,14 @@
 "use client";
 import React, { useState } from 'react';
 import Tabs from '@/components/ui/Tabs';
+import PreviewLayout from '@/components/preview/PreviewLayout';
+import { CodePreview } from '@/components/ui';
+import { useI18n } from '@/hooks/useI18n';
 import { type Preset } from '@/components/ui/presets';
 import type { UISize } from '@/components/ui/presets';
 
 export default function TabPreview(): React.ReactElement {
+  const { t } = useI18n();
   const [size, setSize] = useState<UISize>('md');
   const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
@@ -21,8 +25,8 @@ export default function TabPreview(): React.ReactElement {
     { key: 'contact', label: 'Contact' },
   ];
 
-  return (
-    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-lg shadow text-neutral-900 dark:text-neutral-100 p-4">
+  const preview = (
+    <div className="p-4 bg-white dark:bg-neutral-900 rounded">
       <div className="flex items-center gap-4">
         <label className="text-sm">Size
           <select className="ml-2 rounded p-1 border text-sm" value={size} onChange={(e) => setSize(e.target.value as UISize)}>
@@ -75,5 +79,58 @@ export default function TabPreview(): React.ReactElement {
         )} />
       </div>
     </div>
+  );
+
+  const snippetCode = `import { Tabs } from '@/components/ui';\n\n<Tabs items={[{ key: 'home', label: 'Home' }]} activeKey={'home'} />`;
+
+  const snippet = <CodePreview language="tsx" code={snippetCode} />;
+
+  const controls = (
+    <div className="flex items-center gap-3 flex-wrap">
+      <label className="text-sm">{t('preview.common.size')}
+        <select className="ml-2 rounded p-1 border text-sm" value={size} onChange={(e) => setSize(e.target.value as UISize)}>
+          <option value="sm">Small</option>
+          <option value="md">Medium</option>
+          <option value="lg">Large</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.preset')}
+        <select className="ml-2 rounded p-1 border text-sm" value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
+          <option value="muted">muted</option>
+          <option value="primary">primary</option>
+          <option value="success">success</option>
+          <option value="danger">danger</option>
+          <option value="warning">warning</option>
+          <option value="info">info</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.customColor')}
+        <input className="ml-2" type="checkbox" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} />
+      </label>
+      {useCustom && (
+        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+      )}
+      <label className="text-sm">{t('preview.common.variant') ?? 'Variant'}
+        <select className="ml-2 rounded p-1 border text-sm" value={variant} onChange={(e) => setVariant(e.target.value as 'solid'|'ghost'|'outline')}>
+          <option value="ghost">ghost</option>
+          <option value="solid">solid</option>
+          <option value="outline">outline</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.rounded') ?? 'Rounded'}
+        <select className="ml-2 rounded p-1 border text-sm" value={rounded} onChange={(e) => setRounded(e.target.value as 'sm'|'full'|'none')}>
+          <option value="sm">sm</option>
+          <option value="full">full</option>
+          <option value="none">none</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.withEffects') ?? 'With Effects'}
+        <input className="ml-2" type="checkbox" checked={withEffects} onChange={(e) => setWithEffects(e.target.checked)} />
+      </label>
+    </div>
+  );
+
+  return (
+    <PreviewLayout title="Tabs" preview={preview} controls={controls} snippet={snippet} />
   );
 }

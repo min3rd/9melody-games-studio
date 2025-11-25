@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useI18n } from '@/hooks/useI18n';
 import RadialProgress from '@/components/ui/RadialProgress';
+import PreviewLayout from '@/components/preview/PreviewLayout';
+import { CodePreview } from '@/components/ui';
 import { type Preset } from '@/components/ui/presets';
 import type { UISize } from '@/components/ui/presets';
 
@@ -13,9 +15,8 @@ export default function RadialProgressPreview(): React.ReactElement {
   const [preset, setPreset] = useState<Preset>('muted');
   const [useCustom, setUseCustom] = useState(false);
   const [color, setColor] = useState<string>('#06b6d4');
-
-  return (
-    <div className="space-y-4 bg-white dark:bg-neutral-800 rounded-lg shadow text-neutral-900 dark:text-neutral-100">
+  const preview = (
+    <div className="p-4 bg-white dark:bg-neutral-800 rounded">
       <div className="flex items-center gap-4 flex-wrap">
         <label className="text-sm">{t('preview.progress.value')}
           <input type="range" min={0} max={100} value={value} onChange={(e) => setValue(Number(e.target.value))} className="ml-2" />
@@ -64,5 +65,51 @@ export default function RadialProgressPreview(): React.ReactElement {
         </div>
       </div>
     </div>
+  );
+  const snippetCode = `import { RadialProgress } from '@/components/ui';\n\n<RadialProgress value={${value}} size="${size}" preset="${preset}"${useCustom ? ` color="${color}"` : ''} indeterminate={${indeterminate}} />`;
+
+  const snippet = (
+    <CodePreview language="tsx" code={snippetCode} />
+  );
+
+  const controls = (
+    <div className="flex items-center gap-3 flex-wrap">
+      <label className="text-sm">{t('preview.progress.value')}
+        <input type="range" min={0} max={100} value={value} onChange={(e) => setValue(Number(e.target.value))} className="ml-2" />
+      </label>
+      <label className="text-sm">{t('preview.progress.indeterminate')}
+        <input className="ml-2" type="checkbox" checked={indeterminate} onChange={(e) => setIndeterminate(e.target.checked)} />
+      </label>
+      <label className="text-sm">{t('preview.common.size')}
+        <select className="ml-2 rounded p-1 border text-sm" value={size} onChange={(e) => setSize(e.target.value as UISize)}>
+          <option value="sm">Small</option>
+          <option value="md">Medium</option>
+          <option value="lg">Large</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.preset')}
+        <select className="ml-2 rounded p-1 border text-sm" value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
+          <option value="muted">muted</option>
+          <option value="primary">primary</option>
+          <option value="success">success</option>
+          <option value="danger">danger</option>
+          <option value="warning">warning</option>
+          <option value="info">info</option>
+        </select>
+      </label>
+      <label className="text-sm">{t('preview.common.customColor')}
+        <input className="ml-2" type="checkbox" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} />
+      </label>
+      {useCustom && <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />}
+    </div>
+  );
+
+  return (
+    <PreviewLayout
+      title="Radial Progress"
+      preview={preview}
+      controls={controls}
+      snippet={snippet}
+    />
   );
 }
