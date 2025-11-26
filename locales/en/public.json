@@ -12,5 +12,16 @@
       "alreadyHave": "Already have an account?",
       "login": "Log in"
     }
+    ,
+    "login": {
+      "title": "Sign in",
+      "description": "Sign in to your account.",
+      "identifier": "Email or username",
+      "identifierPlaceholder": "you@example.com or username",
+      "password": "Password",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "register": "Create account"
+    }
   }
 }

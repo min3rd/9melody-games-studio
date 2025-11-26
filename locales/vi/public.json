@@ -12,5 +12,16 @@
       "alreadyHave": "Đã có tài khoản?",
       "login": "Đăng nhập"
     }
+    ,
+    "login": {
+      "title": "Đăng nhập",
+      "description": "Đăng nhập vào tài khoản của bạn.",
+      "identifier": "Email hoặc tên người dùng",
+      "identifierPlaceholder": "you@example.com hoặc username",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "noAccount": "Chưa có tài khoản?",
+      "register": "Tạo tài khoản"
+    }
   }
 }

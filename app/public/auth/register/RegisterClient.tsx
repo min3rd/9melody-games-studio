@@ -71,7 +71,7 @@ export default function RegisterClient() {
             {t('public:auth.register.submit')}
           </Button>
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
-            {t('public:auth.register.alreadyHave')} <a className="underline" href="/login">{t('public:auth.register.login')}</a>
+            {t('public:auth.register.alreadyHave')} <a className="underline" href="/public/auth/login">{t('public:auth.register.login')}</a>
           </div>
         </div>
       </div>
