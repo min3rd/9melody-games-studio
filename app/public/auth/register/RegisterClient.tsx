@@ -41,20 +41,33 @@ export default function RegisterClient() {
     }
   }
 
+  const emailId = 'register-email';
+  const usernameId = 'register-username';
+  const nameId = 'register-name';
+  const passwordId = 'register-password';
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white dark:bg-neutral-900 p-6 rounded shadow">
         <h1 className="text-xl font-bold mb-2">{t('public:auth.register.title')}</h1>
         <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-400">{t('public:auth.register.description')}</p>
-        <div className="flex flex-col gap-3 mb-4">
-          <TextInput label={t('public:auth.register.email')} value={email} onValueChange={setEmail} placeholder="you@example.com" />
-          <TextInput label={t('public:auth.register.username')} value={username} onValueChange={setUsername} placeholder="username" />
-          <TextInput label={t('public:auth.register.name')} value={name} onValueChange={setName} placeholder="Your full name" />
-          <TextInput label={t('public:auth.register.password')} value={password} onValueChange={setPassword} placeholder="Password" type="password" />
+        {/* Grid layout with fixed label column so labels and inputs align */}
+        <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-4 gap-y-3 items-center mb-4">
+          <label htmlFor={emailId} className="text-sm font-medium mb-0 block">{t('public:auth.register.email')}</label>
+          <TextInput id={emailId} value={email} onValueChange={setEmail} placeholder="you@example.com" variant="outline" />
+
+          <label htmlFor={usernameId} className="text-sm font-medium mb-0 block">{t('public:auth.register.username')}</label>
+          <TextInput id={usernameId} value={username} onValueChange={setUsername} placeholder="username" variant="outline" />
+
+          <label htmlFor={nameId} className="text-sm font-medium mb-0 block">{t('public:auth.register.name')}</label>
+          <TextInput id={nameId} value={name} onValueChange={setName} placeholder="Your full name" variant="outline" />
+
+          <label htmlFor={passwordId} className="text-sm font-medium mb-0 block">{t('public:auth.register.password')}</label>
+          <TextInput id={passwordId} value={password} onValueChange={setPassword} placeholder="Password" type="password" variant="outline" />
         </div>
         {error ? <ErrorMessage error={error} /> : null}
         <div className="flex items-center justify-between gap-2 mt-4">
-          <Button onClick={handleRegister} disabled={loading}>
+          <Button onClick={handleRegister} disabled={loading} pattern="pixel">
             {t('public:auth.register.submit')}
           </Button>
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
