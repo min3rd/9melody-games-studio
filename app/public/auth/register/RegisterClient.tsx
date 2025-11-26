@@ -27,6 +27,8 @@ export default function RegisterClient() {
         body: JSON.stringify({ email, username, name, password }),
       });
       if (res.ok) {
+        try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch {}
+        try { window.dispatchEvent(new Event('auth-changed')); } catch {}
         // registration success - redirect to login or home
         router.push('/login');
         return;

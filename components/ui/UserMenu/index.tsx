@@ -11,6 +11,8 @@ export default function UserMenu({ email, isAdmin }: { email?: string | null; is
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
+    try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch {}
+    try { window.dispatchEvent(new Event('auth-changed')); } catch {}
     router.push('/');
   }
 

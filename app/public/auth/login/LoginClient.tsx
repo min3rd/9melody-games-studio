@@ -24,6 +24,9 @@ export default function LoginClient() {
     try {
       const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: identifier, username: identifier, password }), headers: { 'content-type': 'application/json' } });
       if (res.ok) {
+        // notify other listeners that auth state changed
+        try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch {}
+        try { window.dispatchEvent(new Event('auth-changed')); } catch {}
         router.push(next);
         return;
       }

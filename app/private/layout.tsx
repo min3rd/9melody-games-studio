@@ -2,7 +2,7 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { setServerLanguage } from '@/lib/i18n';
-import { ThemeToggle, UserMenu, Button } from '@/components/ui';
+import ClientAuthHeader from '@/components/ClientAuthHeader';
 
 export default async function PrivateLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -19,15 +19,8 @@ export default async function PrivateLayout({ children }: { children: React.Reac
   return (
     <html lang={htmlLang}>
       <body className="antialiased min-h-screen bg-neutral-50 dark:bg-neutral-900">
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
-          <ThemeToggle />
-          {userEmail ? (
-            <UserMenu email={userEmail} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
-          ) : (
-            <Button variant="ghost" pattern="pixel" href="/public/auth/login">
-              Login
-            </Button>
-          )}
+        <div className="fixed top-4 right-4 z-50">
+          <ClientAuthHeader />
         </div>
         {/* ClientInit is mounted in root layout */}
         <div className="p-4">
