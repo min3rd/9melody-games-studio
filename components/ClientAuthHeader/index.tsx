@@ -12,7 +12,7 @@ export default function ClientAuthHeader() {
       {email ? (
         <UserMenu email={email} isAdmin={isAdmin} />
       ) : (
-        <Button variant="ghost" pattern="pixel" href="/public/auth/login">Login</Button>
+        <Button variant="ghost" pattern="pixel" href="/auth/login">Login</Button>
       )}
     </div>
   );

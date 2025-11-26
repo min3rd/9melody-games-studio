@@ -61,7 +61,7 @@ export default function LoginClient() {
         <div className="flex items-center justify-between gap-2 mt-4">
           <Button onClick={handleLogin} disabled={loading} pattern="pixel">{t('public:auth.login.submit')}</Button>
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
-            {t('public:auth.login.noAccount')} <a className="underline" href="/public/auth/register">{t('public:auth.login.register')}</a>
+            {t('public:auth.login.noAccount')} <a className="underline" href="/auth/register">{t('public:auth.login.register')}</a>
           </div>
         </div>
       </div>

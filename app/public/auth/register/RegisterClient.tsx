@@ -31,7 +31,7 @@ export default function RegisterClient() {
       if (res.ok) {
         try { await auth.refresh(); } catch (e) {}
         // registration success - redirect to login or home
-        router.push('/login');
+        router.push('/auth/login');
         return;
       }
       const body = await res.json();
@@ -74,7 +74,7 @@ export default function RegisterClient() {
             {t('public:auth.register.submit')}
           </Button>
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
-            {t('public:auth.register.alreadyHave')} <a className="underline" href="/public/auth/login">{t('public:auth.register.login')}</a>
+            {t('public:auth.register.alreadyHave')} <a className="underline" href="/auth/login">{t('public:auth.register.login')}</a>
           </div>
         </div>
       </div>

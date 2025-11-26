@@ -12,8 +12,8 @@ export default async function PrivateLayout({ children }: { children: React.Reac
 
   const userEmail = cookieStore.get('userEmail')?.value;
   if (!userEmail) {
-    // Not logged in - redirect to public login
-    redirect('/public/auth/login');
+    // Not logged in - redirect to auth login
+    redirect('/auth/login');
   }
 
   return (
