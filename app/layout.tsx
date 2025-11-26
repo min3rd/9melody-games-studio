@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { setServerLanguage } from "@/lib/i18n";
 import "./globals.css";
-import { ThemeToggle } from "@/components/ui";
+import { ThemeToggle, UserMenu } from "@/components/ui";
 import ClientInit from "@/components/ClientInit";
 
 export default async function RootLayout({
@@ -23,8 +23,13 @@ export default async function RootLayout({
       <body
         className="antialiased"
       >
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
           <ThemeToggle />
+          {cookieStore.get('userEmail')?.value ? (
+            <UserMenu email={cookieStore.get('userEmail')?.value} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
+          ) : (
+            <a href="/public/auth/login" className="btn btn-ghost">Login</a>
+          )}
         </div>
         <ClientInit />
         {children}

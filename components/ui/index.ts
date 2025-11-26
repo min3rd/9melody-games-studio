@@ -23,6 +23,7 @@ export {
   type UICardSize,
 } from "./presets";
 export { default as Avatar, AvatarGroup } from "./Avatar";
+export { default as UserMenu } from './UserMenu';
 export { default as Badge } from "./Badge";
 export {
   default as Card,
