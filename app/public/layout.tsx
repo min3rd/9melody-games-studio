@@ -1,36 +1,29 @@
 import React from 'react';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { setServerLanguage } from '@/lib/i18n';
+// `globals.css` is imported by the root layout (app/layout.tsx). Avoid importing
+// it here to prevent duplicate side-effect imports during server compilation.
 import { ThemeToggle, UserMenu } from '@/components/ui';
 
-export default async function PrivateLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const cookieLang = cookieStore.get('lang')?.value;
   const htmlLang = cookieLang === 'vi' ? 'vi' : 'en';
   setServerLanguage(htmlLang);
 
-  const userEmail = cookieStore.get('userEmail')?.value;
-  if (!userEmail) {
-    // Not logged in - redirect to public login
-    redirect('/public/auth/login');
-  }
-
   return (
     <html lang={htmlLang}>
-      <body className="antialiased min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <body className="antialiased">
         <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
           <ThemeToggle />
-          {userEmail ? (
-            <UserMenu email={userEmail} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
+          {cookieStore.get('userEmail')?.value ? (
+            <UserMenu email={cookieStore.get('userEmail')?.value} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
           ) : (
             <a href="/public/auth/login" className="btn btn-ghost">Login</a>
           )}
         </div>
         {/* ClientInit is mounted in root layout */}
-        <div className="p-4">
-          <main className="mt-6">{children}</main>
-        </div>
+        {children}
       </body>
     </html>
   );
