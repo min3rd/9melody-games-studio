@@ -18,7 +18,7 @@ export default function UserMenu({ email, isAdmin }: { email?: string | null; is
 
   const label = (
     <div className="inline-flex items-center gap-2">
-      <Avatar name={email ?? 'User'} size="md" indicator={false} />
+      <Avatar name={email ?? 'User'} size="sm" indicator={false} />
     </div>
   );
 
@@ -29,6 +29,6 @@ export default function UserMenu({ email, isAdmin }: { email?: string | null; is
   ];
 
   return (
-    <Dropdown label={label} items={items} align="right" />
+    <Dropdown compact label={label} items={items} align="right" />
   );
 }
