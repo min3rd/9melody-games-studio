@@ -17,16 +17,16 @@ export default async function PrivateLayout({ children }: { children: React.Reac
   }
 
   return (
-    <html lang={htmlLang}>
-      <body className="antialiased min-h-screen bg-neutral-50 dark:bg-neutral-900">
-        <div className="fixed top-4 right-4 z-50">
-          <ClientAuthHeader />
-        </div>
-        {/* ClientInit is mounted in root layout */}
+    <>
+      <div className="fixed top-4 right-4 z-50">
+        <ClientAuthHeader />
+      </div>
+      {/* ClientInit is mounted in root layout */}
+      <div className="antialiased min-h-screen bg-neutral-50 dark:bg-neutral-900">
         <div className="p-4">
           <main className="mt-6">{children}</main>
         </div>
-      </body>
-    </html>
+      </div>
+    </>
   );
 }

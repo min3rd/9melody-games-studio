@@ -12,14 +12,12 @@ export default async function PublicLayout({ children }: { children: React.React
   setServerLanguage(htmlLang);
 
   return (
-    <html lang={htmlLang}>
-      <body className="antialiased">
-        <div className="fixed top-4 right-4 z-50">
-          <ClientAuthHeader />
-        </div>
-        {/* ClientInit is mounted in root layout */}
-        {children}
-      </body>
-    </html>
+    <>
+      <div className="fixed top-4 right-4 z-50">
+        <ClientAuthHeader />
+      </div>
+      {/* ClientInit is mounted in root layout */}
+      {children}
+    </>
   );
 }
