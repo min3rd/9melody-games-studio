@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { useI18n } from '@/hooks/useI18n';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function LoginClient() {
   const { t } = useI18n();
@@ -12,6 +13,7 @@ export default function LoginClient() {
   const params = useSearchParams();
   const next = params?.get('next') ?? '/';
 
+  const auth = useAuth();
   const [identifier, setIdentifier] = React.useState('');
   const [password, setPassword] = React.useState('');
   type APIError = { code?: string; message?: string } | string | null;
@@ -24,9 +26,8 @@ export default function LoginClient() {
     try {
       const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: identifier, username: identifier, password }), headers: { 'content-type': 'application/json' } });
       if (res.ok) {
-        // notify other listeners that auth state changed
-        try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch {}
-        try { window.dispatchEvent(new Event('auth-changed')); } catch {}
+        // refresh auth provider state so UI updates immediately
+        try { await auth.refresh(); } catch (e) {}
         router.push(next);
         return;
       }

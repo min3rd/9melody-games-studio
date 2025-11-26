@@ -4,11 +4,13 @@ import TextInput from '@/components/ui/TextInput';
 import Button from '@/components/ui/Button';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { useI18n } from '@/hooks/useI18n';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterClient() {
   const { t } = useI18n();
   const router = useRouter();
+  const auth = useAuth();
   const [email, setEmail] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [name, setName] = React.useState('');
@@ -27,8 +29,7 @@ export default function RegisterClient() {
         body: JSON.stringify({ email, username, name, password }),
       });
       if (res.ok) {
-        try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch {}
-        try { window.dispatchEvent(new Event('auth-changed')); } catch {}
+        try { await auth.refresh(); } catch (e) {}
         // registration success - redirect to login or home
         router.push('/login');
         return;

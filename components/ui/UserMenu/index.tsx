@@ -1,18 +1,18 @@
 "use client";
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/auth/AuthProvider';
 import Avatar from '../Avatar';
 import Dropdown from '../Dropdown';
 import { useI18n } from '@/hooks/useI18n';
 
 export default function UserMenu({ email, isAdmin }: { email?: string | null; isAdmin?: boolean; }) {
   const router = useRouter();
+  const auth = useAuth();
   const { t } = useI18n();
 
   async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch {}
-    try { window.dispatchEvent(new Event('auth-changed')); } catch {}
+    await auth.logout();
     router.push('/');
   }
 

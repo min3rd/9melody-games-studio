@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { setServerLanguage } from "@/lib/i18n";
 import "./globals.css";
 // Header components moved to public/private layouts
-import ClientInit from "@/components/ClientInit";
+import ClientProviders from "@/components/ClientProviders";
 
 export default async function RootLayout({
   children,
@@ -23,8 +23,10 @@ export default async function RootLayout({
       <body
         className="antialiased"
       >
-        <ClientInit />
-        {children}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
+        
       </body>
     </html>
   );
