@@ -59,3 +59,21 @@ npm run prisma:migrate
 ```
 
 If you want me to create a `prisma/schema.prisma` tailored for Postgres (provider: `postgresql`) — or update the Prisma client usage — tell me and I’ll follow up in a separate change, step by step.
+
+### Quick start: Docker (Postgres + App)
+
+This repo includes a minimal `docker-compose.yml` for a local dev environment using Postgres and a Node container running your Next app. It provides a quick way to bring up Postgres and your app without changing your local environment.
+
+**Start**:
+```bash
+docker compose up --build
+```
+
+The app runs on port 3000 in the container and Postgres on port 5432 on your machine. `DATABASE_URL` inside the container is set to:
+`postgresql://prisma:prisma@db:5432/devdb?schema=public`
+
+When the containers are running, you can run Prisma migrations from inside the app container:
+```bash
+docker compose exec app npx prisma migrate dev --name init
+```
+
