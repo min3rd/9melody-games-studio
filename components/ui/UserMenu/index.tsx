@@ -22,7 +22,7 @@ export default function UserMenu({ email, isAdmin }: { email?: string | null; is
 
   const items = [
     { key: 'account', label: t('common:account') || 'Account', href: '/account' },
-    ...(isAdmin ? [{ key: 'admin', label: t('admin:dashboard') || 'Admin', href: '/admin' }] : []),
+    ...(isAdmin ? [{ key: 'admin', label: t('admin:dashboard') || 'Admin', href: '/private/admin' }] : []),
     { key: 'logout', label: t('admin:logout') || 'Logout', onClick: handleLogout },
   ];
 
