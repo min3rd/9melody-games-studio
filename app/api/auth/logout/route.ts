@@ -7,3 +7,4 @@ export async function POST(request: NextRequest) {
   res.cookies.set('adminEmail', '', { maxAge: 0, path: '/' });
   return res;
 }
+

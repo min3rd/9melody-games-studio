@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ErrorCodes, formatError } from '@/lib/errorCodes';
 import type { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
   } = body;
 
   if (!email) {
-    return NextResponse.json({ error: 'email is required' }, { status: 400 });
+    return NextResponse.json(formatError(ErrorCodes.EMAIL_REQUIRED), { status: 400 });
   }
 
   try {
@@ -51,6 +52,16 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.create({ data });
     return NextResponse.json(user, { status: 201 });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    // Detect unique constraint for email/username and return specific codes
+    const msg = String(err?.message || '');
+    if (msg.includes('Unique constraint failed') || msg.includes('duplicate key')) {
+      if (msg.includes('email') || msg.includes('EMAIL')) {
+          return NextResponse.json(formatError(ErrorCodes.EMAIL_EXISTS), { status: 409 });
+        }
+        if (msg.includes('username')) {
+          return NextResponse.json(formatError(ErrorCodes.USERNAME_EXISTS), { status: 409 });
+        }
+    }
+    return NextResponse.json({ ...formatError(ErrorCodes.INTERNAL_ERROR), message: err?.message }, { status: 500 });
   }
 }

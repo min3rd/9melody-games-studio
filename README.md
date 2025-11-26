@@ -75,5 +75,24 @@ The app runs on port 3000 in the container and Postgres on port 5432 on your mac
 When the containers are running, you can run Prisma migrations from inside the app container:
 ```bash
 docker compose exec app npx prisma migrate dev --name init
+### API Error handling and i18n
+
+API endpoints now return structured error responses in JSON with a standardized `code` field. Use the `errors` translation namespace in `locales/*/errors.json` to localize messages on the client.
+
+Server example (error response):
+```json
+{ "code": "INVALID_CREDENTIALS" }
+```
+
+Client example (JS):
+```js
+const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+if (!res.ok) {
+	const body = await res.json();
+	const message = body?.code ? t(`errors.${body.code}`) : body?.message;
+	// display message to user
+}
+```
+
 ```
 

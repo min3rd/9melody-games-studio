@@ -1,0 +1,9 @@
+{
+  "dashboard": "Admin Dashboard",
+  "users": "Users",
+  "settings": "Settings",
+  "notAuthorized": "Not authorized",
+  "loginToAdmin": "Log in as Admin",
+  "logout": "Logout",
+  "welcome": "Welcome, Admin"
+}

@@ -1,0 +1,9 @@
+{
+  "dashboard": "Bảng điều khiển Admin",
+  "users": "Người dùng",
+  "settings": "Cài đặt",
+  "notAuthorized": "Không có quyền",
+  "loginToAdmin": "Đăng nhập Admin",
+  "logout": "Đăng xuất",
+  "welcome": "Chào mừng, Admin"
+}
