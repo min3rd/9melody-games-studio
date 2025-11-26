@@ -3,13 +3,15 @@ import en from "@/locales/en/common.json";
 import vi from "@/locales/vi/common.json";
 import enAdmin from "@/locales/en/admin.json";
 import viAdmin from "@/locales/vi/admin.json";
+import enPublic from "@/locales/en/public.json";
+import viPublic from "@/locales/vi/public.json";
 import enErrors from "@/locales/en/errors.json";
 import viErrors from "@/locales/vi/errors.json";
 
 // resources loaded from locales
 const resources = {
-  en: { common: en, admin: enAdmin, errors: enErrors },
-  vi: { common: vi, admin: viAdmin, errors: viErrors },
+  en: { common: en, admin: enAdmin, errors: enErrors, public: enPublic },
+  vi: { common: vi, admin: viAdmin, errors: viErrors, public: viPublic },
 };
 
 // init i18next
@@ -20,7 +22,7 @@ if (!i18n.isInitialized) {
     // to harmonize the runtime language with localStorage or user preferences.
     lng: "en",
     fallbackLng: "en",
-    ns: ["common", "admin", "errors"],
+    ns: ["common", "admin", "errors", "public"],
     defaultNS: "common",
     interpolation: { escapeValue: false },
   });

@@ -1,0 +1,16 @@
+{
+  "auth": {
+    "register": {
+      "title": "Create an account",
+      "description": "Create an account to access additional features.",
+      "email": "Email",
+      "username": "Username",
+      "name": "Full name",
+      "password": "Password",
+      "submit": "Create account",
+      "success": "Account created successfully",
+      "alreadyHave": "Already have an account?",
+      "login": "Log in"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "auth": {
+    "register": {
+      "title": "Tạo tài khoản",
+      "description": "Tạo tài khoản để truy cập các tính năng bổ sung.",
+      "email": "Email",
+      "username": "Tên người dùng",
+      "name": "Họ và tên",
+      "password": "Mật khẩu",
+      "submit": "Tạo tài khoản",
+      "success": "Tạo tài khoản thành công",
+      "alreadyHave": "Đã có tài khoản?",
+      "login": "Đăng nhập"
+    }
+  }
+}

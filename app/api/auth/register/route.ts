@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { ErrorCodes, formatError } from '@/lib/errorCodes';
 
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const hashed = await bcrypt.hash(password, 10);
-    const data: any = { email, username, name, passwordHash: hashed };
+    const data: Prisma.UserCreateInput = { email, username, name, passwordHash: hashed } as Prisma.UserCreateInput;
     const user = await prisma.user.create({ data });
 
     const res = NextResponse.json({ ok: true, user: { id: user.id, email: user.email, role: user.role } }, { status: 201 });
@@ -23,13 +24,14 @@ export async function POST(request: NextRequest) {
       res.cookies.set('adminEmail', user.email, { path: '/', maxAge: 60 * 60 * 12, httpOnly: true, sameSite: 'lax' });
     }
     return res;
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Prisma known errors include a code property (P2002 = unique constraint violation)
-    const code = err?.code;
-    const msg = String(err?.message || '');
+    const e = err as { code?: string; message?: string; meta?: { target?: string[] } | undefined };
+    const code = e?.code;
+    const msg = String(e?.message || '');
     if (code === 'P2002') {
       // err.meta.target may include the failing fields
-      const target = Array.isArray(err?.meta?.target) ? err.meta.target.join(',') : String(err?.meta?.target || '');
+      const target = Array.isArray(e?.meta?.target) ? e.meta.target.join(',') : String(e?.meta?.target || '');
       if (target.includes('email')) return NextResponse.json(formatError(ErrorCodes.EMAIL_EXISTS), { status: 409 });
       if (target.includes('username')) return NextResponse.json(formatError(ErrorCodes.USERNAME_EXISTS), { status: 409 });
     }
@@ -41,6 +43,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(formatError(ErrorCodes.USERNAME_EXISTS), { status: 409 });
       }
     }
-    return NextResponse.json({ ...formatError(ErrorCodes.INTERNAL_ERROR), message: err?.message }, { status: 500 });
+    return NextResponse.json({ ...formatError(ErrorCodes.INTERNAL_ERROR), message: e?.message }, { status: 500 });
   }
 }
