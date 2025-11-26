@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui';
 
 export default function PrivateAdminNotAuthorized() {
   return (
@@ -9,7 +10,9 @@ export default function PrivateAdminNotAuthorized() {
         <p className="mb-4">You do not have permission to view this page.</p>
         <div className="flex gap-2">
           <Link href="/" className="btn">Home</Link>
-          <Link href="/public/auth/login" className="btn btn-ghost">Log in</Link>
+          <Button variant="ghost" pattern="pixel" onClick={() => { window.location.href = '/public/auth/login'; }}>
+            Log in
+          </Button>
         </div>
       </div>
     </div>

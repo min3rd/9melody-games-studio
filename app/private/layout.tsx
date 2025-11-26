@@ -2,7 +2,7 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { setServerLanguage } from '@/lib/i18n';
-import { ThemeToggle, UserMenu } from '@/components/ui';
+import { ThemeToggle, UserMenu, Button } from '@/components/ui';
 
 export default async function PrivateLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -24,7 +24,9 @@ export default async function PrivateLayout({ children }: { children: React.Reac
           {userEmail ? (
             <UserMenu email={userEmail} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
           ) : (
-            <a href="/public/auth/login" className="btn btn-ghost">Login</a>
+            <Button variant="ghost" pattern="pixel" onClick={() => { window.location.href = '/public/auth/login'; }}>
+              Login
+            </Button>
           )}
         </div>
         {/* ClientInit is mounted in root layout */}
