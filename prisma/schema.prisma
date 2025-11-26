@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // User model matching common Google account / profile fields
@@ -19,6 +18,11 @@ model User {
   id            Int       @id @default(autoincrement())
   googleId      String?   @unique
   email         String    @unique
+  username      String?   @unique
+  // store hashed password (nullable for OAuth-only users)
+  passwordHash  String?   @map("password_hash")
+  // optional role for auth & authorization (e.g., admin/user)
+  role          String    @default("user")
   emailVerified Boolean?  @map("email_verified")
   name          String?
   givenName     String?   @map("given_name")
