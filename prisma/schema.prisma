@@ -13,3 +13,22 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// User model matching common Google account / profile fields
+model User {
+  id            Int       @id @default(autoincrement())
+  googleId      String?   @unique
+  email         String    @unique
+  emailVerified Boolean?  @map("email_verified")
+  name          String?
+  givenName     String?   @map("given_name")
+  familyName    String?   @map("family_name")
+  picture       String?
+  locale        String?
+  hd            String?   // hosted domain (if GSuite)
+  profile       String?   // profile url
+  accessToken   String?   @map("access_token")
+  refreshToken  String?   @map("refresh_token")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
