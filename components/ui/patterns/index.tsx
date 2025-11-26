@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { type Preset } from "../presets";
 
 export type Pattern = 'pixel' | 'neon' | 'bubble' | 'pixel3d' | undefined;
@@ -74,7 +74,7 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
   type Bubble = { id: number; x: number; y: number; size: number; duration: number; color: string; isHover?: boolean };
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const bubbleId = useRef(0);
-  const bubbleColors = ['#ff69b4', '#ff1493', '#ff6b9d', '#ff8c94', '#ff4757', '#ff6348', '#ffa502', '#ff7675'];
+  const bubbleColors = useMemo(() => ['#ff69b4', '#ff1493', '#ff6b9d', '#ff8c94', '#ff4757', '#ff6348', '#ffa502', '#ff7675'], []);
 
   useEffect(() => {
     if (pattern !== 'bubble' || !wrapperRef.current) {
@@ -182,7 +182,8 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
   type Pixel3D = { id: number; left: number; top: number; width: number; height: number; color: string; delay: number; duration: number; phase: 'falling' | 'settled' | 'fading'; startX: number; startY: number; startScale: number; startZ: number; claimedIndex: number; };
   const [pixels3D, setPixels3D] = useState<Pixel3D[]>([]);
   const pixel3DId = useRef(0);
-  const pixel3DColors = ['#00d4ff', '#0099ff', '#0066ff', '#6b5cff', '#00ffcc', '#4db8ff', '#3399ff', '#5577ff'];
+  const pixel3DColors = useMemo(() => ['#00d4ff', '#0099ff', '#0066ff', '#6b5cff', '#00ffcc', '#4db8ff', '#3399ff', '#5577ff'], []);
+  const pixels3DCountRef = useRef(0);
   const claimedRef = useRef<boolean[]>([]);
   const [gridCols, setGridCols] = useState<number>(20);
   const [gridRows, setGridRows] = useState<number>(3);
@@ -221,7 +222,7 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       const cols = gridCols;
       const rows = gridRows;
       const gridCount = cols * rows;
-      if (pixels3D.length > gridCount * 1.5) { setTimeout(spawnPixel, 200 + Math.random() * 400); return; }
+      if (pixels3DCountRef.current > gridCount * 1.5) { setTimeout(spawnPixel, 200 + Math.random() * 400); return; }
 
       const candidates: { col: number; row: number; weight: number; index: number }[] = [];
       for (let r = 0; r < rows; r++) {
@@ -290,7 +291,7 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       }
 
       const pixel: Pixel3D = { id, color, delay, duration, phase: 'falling', left, top, width: pixelW, height: pixelH, startX, startY, startScale: 1.5 + Math.random() * 1.2, startZ: 60 + Math.random() * 140, claimedIndex };
-      setPixels3D(s => [...s, pixel]);
+      setPixels3D(s => { pixels3DCountRef.current = s.length + 1; return [...s, pixel]; });
 
       setTimeout(() => {
         if (!cancelled) {
@@ -302,7 +303,7 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
                 if (!cancelled) {
                   const idx = claimedIndex;
                   claimedRef.current[idx] = false;
-                  setPixels3D(s => s.filter(p => p.id !== id));
+                  setPixels3D(s => { pixels3DCountRef.current = Math.max(0, s.length - 1); return s.filter(p => p.id !== id); });
                 }
               }, 600);
             }
@@ -324,8 +325,8 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       initialTimers.push(window.setTimeout(spawnPixel, 30 * i));
     }
 
-    return () => { cancelled = true; initialTimers.forEach(t => clearTimeout(t)); ro.disconnect(); setPixels3D([]); claimedRef.current = [] };
-  }, [pattern, wrapperRef, gridCols, gridRows, classPrefix, pixel3DColors, pixels3D.length]);
+    return () => { cancelled = true; initialTimers.forEach(t => clearTimeout(t)); ro.disconnect(); pixels3DCountRef.current = 0; setPixels3D([]); claimedRef.current = [] };
+  }, [pattern, wrapperRef, gridCols, gridRows, classPrefix, pixel3DColors]);
 
   // Do not render anything if no pattern
   if (!pattern) return null;
