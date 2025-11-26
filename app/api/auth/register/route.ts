@@ -13,6 +13,22 @@ export async function POST(request: NextRequest) {
   if (!password) return NextResponse.json(formatError(ErrorCodes.PASSWORD_REQUIRED), { status: 400 });
 
   try {
+    // Proactively check for existing email / username to return clean errors
+    try {
+      const existingEmail = await prisma.user.findUnique({ where: { email } as Prisma.UserWhereUniqueInput });
+      if (existingEmail) return NextResponse.json(formatError(ErrorCodes.EMAIL_EXISTS), { status: 409 });
+    } catch (e) {
+      // If the DB is misconfigured, let the outer catch handle it; log for debugging
+      console.error('Error while checking existing email:', e);
+    }
+    if (username) {
+      try {
+        const existingUser = await prisma.user.findUnique({ where: { username } as Prisma.UserWhereUniqueInput });
+        if (existingUser) return NextResponse.json(formatError(ErrorCodes.USERNAME_EXISTS), { status: 409 });
+      } catch (e) {
+        console.error('Error while checking existing username:', e);
+      }
+    }
     const hashed = await bcrypt.hash(password, 10);
     const data: Prisma.UserCreateInput = { email, username, name, passwordHash: hashed } as Prisma.UserCreateInput;
     const user = await prisma.user.create({ data });
@@ -29,6 +45,8 @@ export async function POST(request: NextRequest) {
     const e = err as { code?: string; message?: string; meta?: { target?: string[] } | undefined };
     const code = e?.code;
     const msg = String(e?.message || '');
+    // Log error details for debugging
+    console.error('Register route error:', { code, msg, meta: e?.meta });
     if (code === 'P2002') {
       // err.meta.target may include the failing fields
       const target = Array.isArray(e?.meta?.target) ? e.meta.target.join(',') : String(e?.meta?.target || '');
@@ -43,6 +61,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(formatError(ErrorCodes.USERNAME_EXISTS), { status: 409 });
       }
     }
-    return NextResponse.json({ ...formatError(ErrorCodes.INTERNAL_ERROR), message: e?.message }, { status: 500 });
+    const responsePayload: { code: string; message?: string } = { code: ErrorCodes.INTERNAL_ERROR };
+    if (process.env.NODE_ENV !== 'production') responsePayload.message = e?.message;
+    return NextResponse.json(responsePayload, { status: 500 });
   }
 }
