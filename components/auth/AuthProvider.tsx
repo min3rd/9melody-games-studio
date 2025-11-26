@@ -34,15 +34,21 @@ async function fetchMe(): Promise<AuthState> {
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({ email: undefined, isAdmin: false });
   const [loading, setLoading] = useState(true);
+  const isRefreshingRef = React.useRef(false);
 
   const performRefresh = useCallback(async () => {
-    setLoading(true);
-    const me = await fetchMe();
-    setState(me);
-    setLoading(false);
-    try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch (e) {}
-    // Dispatch the event so other tabs update as well
-    try { window.dispatchEvent(new Event('auth-changed')); } catch (e) {}
+    // guard against re-entrant or concurrent refreshes
+    if (isRefreshingRef.current) return;
+    isRefreshingRef.current = true;
+    try {
+      setLoading(true);
+      const me = await fetchMe();
+      setState(me);
+      setLoading(false);
+      try { window.localStorage.setItem('auth-changed', String(Date.now())); } catch (e) {}
+    } finally {
+      isRefreshingRef.current = false;
+    }
   }, []);
 
   const logout = useCallback(async () => {
@@ -60,12 +66,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       await performRefresh();
       if (!mounted) return;
       // Subscribe to storage events to handle cross-tab logins/logouts
-      const onAuth = () => performRefresh();
       const onStorage = (e: StorageEvent) => { if (e.key === 'auth-changed') performRefresh(); };
-      window.addEventListener('auth-changed', onAuth);
       window.addEventListener('storage', onStorage);
       return () => {
-        window.removeEventListener('auth-changed', onAuth);
         window.removeEventListener('storage', onStorage);
       };
     })();
