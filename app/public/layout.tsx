@@ -19,14 +19,7 @@ export default async function PublicLayout({ children }: { children: React.React
           {cookieStore.get('userEmail')?.value ? (
             <UserMenu email={cookieStore.get('userEmail')?.value} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
           ) : (
-            <Button
-              variant="ghost"
-              pattern="pixel"
-              onClick={() => {
-                // Client-side navigation to login page
-                window.location.href = '/public/auth/login';
-              }}
-            >
+            <Button variant="ghost" pattern="pixel" href="/public/auth/login">
               Login
             </Button>
           )}

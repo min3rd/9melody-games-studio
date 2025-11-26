@@ -10,7 +10,7 @@ export default function PrivateAdminNotAuthorized() {
         <p className="mb-4">You do not have permission to view this page.</p>
         <div className="flex gap-2">
           <Link href="/" className="btn">Home</Link>
-          <Button variant="ghost" pattern="pixel" onClick={() => { window.location.href = '/public/auth/login'; }}>
+          <Button variant="ghost" pattern="pixel" href="/public/auth/login">
             Log in
           </Button>
         </div>

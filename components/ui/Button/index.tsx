@@ -13,8 +13,7 @@ type ButtonVariant = "primary" | "ghost" | "danger";
 export type ButtonPreset = Preset;
 type ButtonSize = UISize;
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.HTMLAttributes<HTMLElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   color?: string; // custom color for the button (hex or CSS color)
@@ -22,10 +21,12 @@ export interface ButtonProps
   withEffects?: boolean;
   rounded?: boolean;
   pattern?: Pattern;
+  href?: string;
+  disabled?: boolean;
 }
 
 const ButtonImpl: React.ForwardRefRenderFunction<
-  HTMLButtonElement,
+  HTMLElement,
   ButtonProps
 > = (
   {
@@ -37,26 +38,28 @@ const ButtonImpl: React.ForwardRefRenderFunction<
     preset,
     withEffects = true,
     pattern,
+    href,
     rounded = false,
+    disabled = false,
     ...rest
   }: Readonly<ButtonProps>,
   ref
 ) => {
-  const localRef = useRef<HTMLButtonElement | null>(null);
+  const localRef = useRef<HTMLElement | null>(null);
   // If the caller passed a ref, ensure we forward the native element to them as
   // well as keep a local ref for measurements.
-  const setRefs = (node: HTMLButtonElement | null) => {
+  const setRefs = (node: HTMLElement | null) => {
     localRef.current = node;
     if (!ref) return;
     if (typeof ref === "function") {
-      ref(node);
+      ref(node as HTMLButtonElement & HTMLAnchorElement);
     } else {
-      (ref as React.MutableRefObject<HTMLButtonElement | null>).current = node;
+      (ref as React.MutableRefObject<HTMLElement | null>).current = node;
     }
   };
   const base =
     "font-medium inline-flex items-center justify-center gap-2 pixel-btn";
-  const disabled = !!(rest.disabled);
+  const isDisabled = !!disabled;
   const roundClass = rounded ? ROUND_CLASSES.sm : ROUND_CLASSES.none; // keep default `none` to preserve pixel-art look
   const effectsClasses =
     "transform transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-1 hover:scale-105 hover:shadow-lg active:translate-y-0 active:scale-95 active:shadow-sm";
@@ -73,7 +76,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<
 
   const patternClass = pattern ? `btn-pattern-${pattern}` : "";
   // Disable hover transforms when we are in pixel pattern mode (tile animation will run independently)
-  const cursorClass = disabled ? 'cursor-not-allowed' : 'cursor-pointer';
+  const cursorClass = isDisabled ? 'cursor-not-allowed' : 'cursor-pointer';
   const classes = `${base} ${patternClass} ${roundClass} ${cursorClass} ${
     withEffects && !disabled && pattern !== "pixel" ? effectsClasses : ""
   } ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
@@ -161,10 +164,20 @@ const ButtonImpl: React.ForwardRefRenderFunction<
 
   // PatternOverlay manages grid & size
 
+  const Tag: any = href ? 'a' : 'button';
+  const tagProps: any = href ? { href } : {};
+  // anchor semantics for disabled: no native disabled attr; use aria-disabled
+  if (href && isDisabled) {
+    tagProps['aria-disabled'] = true;
+    tagProps['tabIndex'] = -1;
+    tagProps['onClick'] = (e: any) => e.preventDefault();
+  }
+
   return (
-    <button
+    <Tag
       ref={setRefs}
       {...rest}
+      {...tagProps}
       className={classes}
       style={{
         outlineOffset: "2px",
@@ -177,10 +190,10 @@ const ButtonImpl: React.ForwardRefRenderFunction<
       {pattern && (
         <PatternOverlay pattern={pattern} wrapperRef={localRef} activeColor={activeColor} classPrefix="btn" />
       )}
-    </button>
+    </Tag>
   );
 };
-export default React.forwardRef<HTMLButtonElement, ButtonProps>(ButtonImpl);
+export default React.forwardRef<HTMLElement, ButtonProps>(ButtonImpl);
 // Make this name available in React DevTools
 // Assign displayName safely without using `any` type
 (ButtonImpl as unknown as { displayName?: string }).displayName = "Button";

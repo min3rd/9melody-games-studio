@@ -24,7 +24,7 @@ export default async function PrivateLayout({ children }: { children: React.Reac
           {userEmail ? (
             <UserMenu email={userEmail} isAdmin={cookieStore.get('isAdmin')?.value === 'true'} />
           ) : (
-            <Button variant="ghost" pattern="pixel" onClick={() => { window.location.href = '/public/auth/login'; }}>
+            <Button variant="ghost" pattern="pixel" href="/public/auth/login">
               Login
             </Button>
           )}
