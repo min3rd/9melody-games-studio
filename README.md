@@ -94,5 +94,16 @@ if (!res.ok) {
 }
 ```
 
+Register endpoint example (server):
+```js
+// POST /api/auth/register
+// Required: email, password
+const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, username, password, name }) });
+if (!res.ok) {
+	const body = await res.json();
+	const message = body?.code ? t(`errors.${body.code}`) : body?.message;
+}
+```
+
 ```
 
