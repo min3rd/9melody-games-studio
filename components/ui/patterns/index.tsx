@@ -6,9 +6,12 @@ export type Pattern = 'pixel' | 'neon' | 'bubble' | 'pixel3d' | undefined;
 
 export interface PatternOverlayProps {
   pattern?: Pattern;
-  wrapperRef: React.RefObject<HTMLDivElement | null>;
+  // allow any HTMLElement wrapper (div, input, button, etc)
+  wrapperRef: React.RefObject<HTMLElement | null>;
   activeColor?: string;
   preset?: Preset;
+  // optional class prefix for overlay classes and css variables; defaults to 'input'
+  classPrefix?: string;
 }
 
 /**
@@ -25,9 +28,9 @@ export interface PatternOverlayProps {
  *    <input ... />
  *  </div>
  */
-export default function PatternOverlay({ pattern, wrapperRef, activeColor, preset }: PatternOverlayProps) {
+export default function PatternOverlay({ pattern, wrapperRef, activeColor, preset, classPrefix = 'input' }: PatternOverlayProps) {
   // -------------------- Neon --------------------
-  type NeonTile = { id: number; left: number; top: number; size: number; duration: number; delay: number };
+  type NeonTile = { id: number; left: number; top: number; size: number; duration: number; delay: number; flickerDuration: number };
   const [neonTiles, setNeonTiles] = useState<NeonTile[]>([]);
   const neonTileId = useRef(0);
 
@@ -45,7 +48,8 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       const delay = Math.random() * 0.8;
       const size = Math.round((4 + Math.random() * 10) * 10) / 10;
       const duration = 700 + Math.round(Math.random() * 1000);
-      const tile: NeonTile = { id, left, top, size, duration, delay };
+      const flickerDuration = 300 + Math.round(Math.random() * 300);
+      const tile: NeonTile = { id, left, top, size, duration, delay, flickerDuration };
       setNeonTiles(s => [...s, tile]);
 
       const timeoutId = setTimeout(() => {
@@ -127,7 +131,7 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       el!.removeEventListener('mousemove', onMove);
       setBubbles([]);
     };
-  }, [pattern, wrapperRef]);
+  }, [pattern, wrapperRef, classPrefix, bubbleColors]);
 
   // -------------------- Pixel (grid) --------------------
   const [tileCols, setTileCols] = useState<number>(12);
@@ -147,9 +151,9 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
     const el = wrapperRef.current;
     const ro = new ResizeObserver(() => {
       const styles = window.getComputedStyle(el);
-      const tileSizeStr = styles.getPropertyValue('--input-pattern-size') || '6px';
+      const tileSizeStr = styles.getPropertyValue(`--${classPrefix}-pattern-size`) || '6px';
       const parsedTileSize = parseFloat(tileSizeStr);
-      const gapStr = styles.getPropertyValue('--input-pattern-gap') || '2px';
+      const gapStr = styles.getPropertyValue(`--${classPrefix}-pattern-gap`) || '2px';
       const parsedGap = parseFloat(gapStr);
       const rect = el.getBoundingClientRect();
       // compute columns/rows to completely cover the element
@@ -165,8 +169,13 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
     return () => ro.disconnect();
   }, [pattern, wrapperRef]);
 
-  const tiles = React.useMemo(() => {
-    return Array.from({ length: tileCount }).map((_, i) => ({ id: i, delay: Math.random() * 1.8, opacity: 0.5 + Math.random() * 0.5, duration: 800 + Math.random() * 1200 }));
+  const [tiles, setTiles] = useState(() => Array.from({ length: tileCount }).map((_, i) => ({ id: i, delay: 0, opacity: 1, duration: 1000 })));
+
+  useEffect(() => {
+    // generate non-deterministic randomness in effect to avoid impure render
+    setTiles(
+      Array.from({ length: tileCount }).map((_, i) => ({ id: i, delay: Math.random() * 1.8, opacity: 0.5 + Math.random() * 0.5, duration: 800 + Math.random() * 1200 }))
+    );
   }, [tileCount]);
 
   // -------------------- Pixel3D --------------------
@@ -192,7 +201,7 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       const rect = wrapperRef.current.getBoundingClientRect();
       const pixelSize = 16; // pixel block size
       const styles = window.getComputedStyle(wrapperRef.current);
-      const gapStr = styles.getPropertyValue('--input-pattern-gap') || '2px';
+      const gapStr = styles.getPropertyValue(`--${classPrefix}-pattern-gap`) || '2px';
       const gap = parseFloat(gapStr);
       const cols = Math.max(10, Math.floor((rect.width + gap) / (pixelSize + gap)));
       const rows = Math.max(2, Math.floor((rect.height + gap) / (pixelSize + gap)));
@@ -316,27 +325,32 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
     }
 
     return () => { cancelled = true; initialTimers.forEach(t => clearTimeout(t)); ro.disconnect(); setPixels3D([]); claimedRef.current = [] };
-  }, [pattern, wrapperRef, gridCols, gridRows]);
+  }, [pattern, wrapperRef, gridCols, gridRows, classPrefix, pixel3DColors, pixels3D.length]);
 
   // Do not render anything if no pattern
   if (!pattern) return null;
 
+  const cls = (suffix: string) => `${classPrefix}-${suffix}`;
+
   return (
     <>
       {pattern === 'neon' && (
-        <div className="input-neon-overlay" aria-hidden>
+        <div className={cls('neon-overlay')} aria-hidden>
           {neonTiles.map((t) => (
             <span
               key={t.id}
-              className="input-neon-tile"
+              className={cls('neon-tile')}
               style={{
                 left: `${t.left}%`,
                 top: `${t.top}%`,
                 width: `${t.size}px`,
                 height: `${t.size}px`,
                 backgroundColor: activeColor ?? undefined,
+                [`--${classPrefix}-neon-duration` as any]: `${t.duration}ms`,
                 ['--input-neon-duration' as any]: `${t.duration}ms`,
-                ['--input-neon-flicker-duration' as any]: `${300 + Math.round(Math.random() * 300)}ms`,
+                [`--${classPrefix}-neon-flicker-duration` as any]: `${t.flickerDuration}ms`,
+                ['--input-neon-flicker-duration' as any]: `${t.flickerDuration}ms`,
+                [`--${classPrefix}-neon-delay` as any]: `${-t.delay}s`,
                 ['--input-neon-delay' as any]: `${-t.delay}s`,
               } as React.CSSProperties}
             />
@@ -345,17 +359,18 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       )}
 
       {pattern === 'bubble' && (
-        <div className="input-bubble-overlay" aria-hidden>
+        <div className={cls('bubble-overlay')} aria-hidden>
           {bubbles.map((b) => (
             <span
               key={b.id}
-              className={b.isHover ? 'input-bubble-hover' : 'input-bubble-float'}
+              className={b.isHover ? cls('bubble-hover') : cls('bubble-float')}
               style={{
                 left: `${b.x}%`,
                 top: `${b.y}%`,
                 width: `${b.size}px`,
                 height: `${b.size}px`,
                 backgroundColor: b.color,
+                [`--${classPrefix}-bubble-duration` as any]: `${b.duration}ms`,
                 ['--bubble-duration' as any]: `${b.duration}ms`,
               } as React.CSSProperties}
             />
@@ -365,22 +380,25 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
 
       {pattern === 'pixel' && (
         <div
-          className="input-pattern-overlay"
+          className={cls('pattern-overlay')}
           aria-hidden
           style={{
             gridTemplateColumns: `repeat(${tileCols}, ${tileSize}px)`,
             gridAutoRows: `${tileSize}px`,
             gap: `${tileGap}px`,
             // ensure overlay inherits the same tile size variables for CSS that relies on them
+            [`--${classPrefix}-pattern-size` as any]: `${tileSize}px`,
             ['--input-pattern-size' as any]: `${tileSize}px`,
+            [`--${classPrefix}-pattern-cols` as any]: tileCols,
             ['--input-pattern-cols' as any]: tileCols,
+            [`--${classPrefix}-pattern-gap` as any]: `${tileGap}px`,
             ['--input-pattern-gap' as any]: `${tileGap}px`,
           } as React.CSSProperties}
         >
           {tiles.map((t) => (
             <span
               key={t.id}
-              className="input-pattern-tile"
+              className={cls('pattern-tile')}
               style={{ width: `${tileSize}px`, height: `${tileSize}px`, animationDelay: `${-t.delay}s`, animationDuration: `${t.duration}ms`, opacity: t.opacity } as React.CSSProperties}
             />
           ))}
@@ -388,27 +406,33 @@ export default function PatternOverlay({ pattern, wrapperRef, activeColor, prese
       )}
 
       {pattern === 'pixel3d' && (
-        <div className="input-pixel3d-overlay" aria-hidden>
-          <div className="input-pixel3d-grid">
+        <div className={cls('pixel3d-overlay')} aria-hidden>
+          <div className={cls('pixel3d-grid')}>
             {pixels3D.map((p) => (
               <span
                 key={p.id}
-                className={`input-pixel3d-block ${p.phase}`}
+                className={`${cls('pixel3d-block')} ${p.phase}`}
                 style={{
                   left: `${p.left}px`,
                   top: `${p.top}px`,
                   width: `${p.width}px`,
                   height: `${p.height}px`,
                   backgroundColor: p.color,
+                  [`--${classPrefix}-pixel-delay` as any]: `${p.delay}s`,
                   ['--pixel-delay' as any]: `${p.delay}s`,
+                  [`--${classPrefix}-pixel-duration` as any]: `${p.duration}ms`,
                   ['--pixel-duration' as any]: `${p.duration}ms`,
+                  [`--${classPrefix}-start-x` as any]: `${p.startX - p.left}px`,
                   ['--start-x' as any]: `${p.startX - p.left}px`,
+                  [`--${classPrefix}-start-y` as any]: `${p.startY - p.top}px`,
                   ['--start-y' as any]: `${p.startY - p.top}px`,
+                  [`--${classPrefix}-start-scale` as any]: `${p.startScale}`,
                   ['--start-scale' as any]: `${p.startScale}`,
+                  [`--${classPrefix}-start-z` as any]: `${p.startZ}px`,
                   ['--start-z' as any]: `${p.startZ}px`,
                 } as React.CSSProperties}
               >
-                <span className={`input-pixel3d-inner ${p.phase}`} style={{}} />
+                <span className={`${cls('pixel3d-inner')} ${p.phase}`} style={{}} />
               </span>
             ))}
           </div>

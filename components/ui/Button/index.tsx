@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   PRESET_MAP,
   type Preset,
@@ -7,6 +7,7 @@ import {
   ROUND_CLASSES,
   type UISize,
 } from "../presets";
+import PatternOverlay, { type Pattern } from '../patterns';
 
 type ButtonVariant = "primary" | "ghost" | "danger";
 export type ButtonPreset = Preset;
@@ -20,7 +21,7 @@ export interface ButtonProps
   preset?: ButtonPreset;
   withEffects?: boolean;
   rounded?: boolean;
-  pattern?: "pixel";
+  pattern?: Pattern;
 }
 
 const ButtonImpl: React.ForwardRefRenderFunction<
@@ -69,7 +70,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<
 
   const sizeClasses = BUTTON_SIZE_CLASSES as Record<ButtonSize, string>;
 
-  const patternClass = pattern === "pixel" ? "btn-pattern-pixel" : "";
+  const patternClass = pattern ? `btn-pattern-${pattern}` : "";
   // Disable hover transforms when we are in pixel pattern mode (tile animation will run independently)
   const classes = `${base} ${patternClass} ${roundClass} ${
     withEffects && pattern !== "pixel" ? effectsClasses : ""
@@ -125,8 +126,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<
   // Each tile size plus the grid gap should be used to compute how many tiles fit
   const tileSizeMap = { sm: 8, md: 12, lg: 16 } as const;
   const tileSize = tileSizeMap[size] ?? 6;
-  const [cols, setCols] = useState(0);
-  const [rows, setRows] = useState(0);
+  // no internal grid: PatternOverlay handles pattern rendering for all pattern types
 
   if (activeColor) {
     // allow pattern highlight to use a CSS variable if present
@@ -141,7 +141,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<
         "rgba(255,255,255,0.9)";
       styleOverride["--btn-pattern-shine"] = shine;
       styleOverride["--btn-pattern-overlay"] = base;
-      styleOverride["--btn-pattern-size"] = `${tileSize}px`;
+      styleOverride["--btn-pattern-size"] = `${tileSize}px`; 
     }
 
     /* Grid measurement for pixel overlay */
@@ -157,34 +157,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<
     }
   }
 
-  useEffect(() => {
-    if (pattern !== "pixel") return;
-    const node = localRef.current;
-    if (!node) return;
-
-    const computeGrid = () => {
-      const rect = node.getBoundingClientRect();
-      const gap = 2; // must match CSS .btn-pattern-overlay gap
-      const total = tileSize + gap;
-      // Use floor to avoid overshooting; add gap to numerator as per formula
-      const c = Math.max(1, Math.ceil((rect.width + gap) / total));
-      const r = Math.max(1, Math.ceil((rect.height + gap) / total));
-      setCols(c);
-      setRows(r);
-    };
-
-    computeGrid();
-    let ro: ResizeObserver | undefined;
-    try {
-      ro = new ResizeObserver(computeGrid);
-      ro.observe(node);
-    } catch {
-      // Fallback: listen to window resize
-      window.addEventListener("resize", computeGrid);
-      return () => window.removeEventListener("resize", computeGrid);
-    }
-    return () => ro?.disconnect();
-  }, [pattern, size, tileSize]);
+  // PatternOverlay manages grid & size
 
   return (
     <button
@@ -199,29 +172,8 @@ const ButtonImpl: React.ForwardRefRenderFunction<
       }}
     >
       {children}
-      {pattern === "pixel" && cols > 0 && rows > 0 && (
-        <span
-          aria-hidden
-          className="btn-pattern-overlay"
-          style={{
-            gridTemplateColumns: `repeat(${cols}, var(--btn-pattern-size))`,
-            gridAutoRows: `var(--btn-pattern-size)`,
-          }}
-        >
-          {Array.from({ length: rows * cols }).map((_, idx) => {
-            const r = Math.floor(idx / cols);
-            const c = idx % cols;
-            // Delay small step per column to create a left-to-right ripple; add small row offset
-            const delay = (c * 0.12 + r * 0.015).toFixed(3);
-            return (
-              <span
-                key={idx}
-                className="btn-pattern-tile"
-                style={{ animationDelay: `${delay}s` }}
-              />
-            );
-          })}
-        </span>
+      {pattern && (
+        <PatternOverlay pattern={pattern} wrapperRef={localRef} activeColor={activeColor} classPrefix="btn" />
       )}
     </button>
   );
