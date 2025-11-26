@@ -56,6 +56,7 @@ const ButtonImpl: React.ForwardRefRenderFunction<
   };
   const base =
     "font-medium inline-flex items-center justify-center gap-2 pixel-btn";
+  const disabled = !!(rest.disabled);
   const roundClass = rounded ? ROUND_CLASSES.sm : ROUND_CLASSES.none; // keep default `none` to preserve pixel-art look
   const effectsClasses =
     "transform transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-1 hover:scale-105 hover:shadow-lg active:translate-y-0 active:scale-95 active:shadow-sm";
@@ -72,8 +73,9 @@ const ButtonImpl: React.ForwardRefRenderFunction<
 
   const patternClass = pattern ? `btn-pattern-${pattern}` : "";
   // Disable hover transforms when we are in pixel pattern mode (tile animation will run independently)
-  const classes = `${base} ${patternClass} ${roundClass} ${
-    withEffects && pattern !== "pixel" ? effectsClasses : ""
+  const cursorClass = disabled ? 'cursor-not-allowed' : 'cursor-pointer';
+  const classes = `${base} ${patternClass} ${roundClass} ${cursorClass} ${
+    withEffects && !disabled && pattern !== "pixel" ? effectsClasses : ""
   } ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
 
   // Use shared PRESET_MAP
