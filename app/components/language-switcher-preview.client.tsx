@@ -8,19 +8,19 @@ import { useI18n } from '@/hooks/useI18n';
 
 export default function LanguageSwitcherPreview(): React.ReactElement {
   // Start with the server-default so initial render matches SSR output.
-  const [lang, setLang] = useState<'en' | 'vi'>('en');
+  const [lang, setLang] = useState<string>('en');
 
   // On client mount read persisted language and listen for storage changes.
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem('lang');
-        if (stored === 'vi') setLang('vi');
+        if (stored) setLang(stored);
       } catch {}
     }
 
     function onStorage(e: StorageEvent) {
-      if (e.key === 'lang') setLang(e.newValue === 'vi' ? 'vi' : 'en');
+      if (e.key === 'lang' && e.newValue) setLang(e.newValue);
     }
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -34,7 +34,7 @@ export default function LanguageSwitcherPreview(): React.ReactElement {
   const preview = (
     <div className="flex items-center gap-3">
       <LanguageSwitcher preset={useCustom ? undefined : preset} color={useCustom ? color : undefined} />
-      <div className="text-sm text-neutral-700 dark:text-neutral-300">{t('selected')} <span className="font-medium">{lang === 'en' ? 'English' : 'Tiếng Việt'}</span></div>
+      <div className="text-sm text-neutral-700 dark:text-neutral-300">{t('selected')} <span className="font-medium">{lang}</span></div>
     </div>
   );
 

@@ -17,6 +17,9 @@ export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   preset?: Preset;
   color?: string;
+  // optional style or classes applied to the dropdown trigger button
+  buttonStyle?: React.CSSProperties;
+  buttonClassName?: string;
   compact?: boolean;
 }
 
@@ -27,6 +30,8 @@ export default function Dropdown({
   className = '',
   preset,
   color,
+  buttonStyle,
+  buttonClassName,
   compact = false,
   ...rest
 }: Readonly<DropdownProps>) {
@@ -93,8 +98,8 @@ export default function Dropdown({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((s) => { const next = !s; if (next) setActiveIndex(null); return next; })}
-        className={compact ? `inline-flex items-center gap-0 p-0 pixel-btn rounded-full border border-transparent hover:shadow-sm transition duration-150 ease-out` : `inline-flex items-center gap-2 rounded-none px-3 py-2 pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition duration-150 ease-out`}
-        style={{ color: color ?? (preset ? PRESET_MAP[preset] : undefined) }}
+        className={`${compact ? `inline-flex items-center gap-0 p-0 pixel-btn rounded-full border border-transparent hover:shadow-sm transition duration-150 ease-out` : `inline-flex items-center gap-2 rounded-none px-3 py-2 pixel-btn border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition duration-150 ease-out`} ${buttonClassName ?? ''}`}
+        style={{ ...(buttonStyle ?? {}), color: color ?? (preset ? PRESET_MAP[preset] : undefined) }}
       >
         {label}
         {!compact && (
