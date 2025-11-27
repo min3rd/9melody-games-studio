@@ -153,6 +153,19 @@ export function Drawer({
       style.height = open ? (h ?? 'auto') : 0;
       style.width = '100%';
     }
+    // Avoid side drawers affecting layout when closed by hiding element.
+    // This prevents padding or borders from leaving a residual size when width/height is 0.
+    if (!open) {
+      style.display = 'none';
+      // enforce zero size & no min width/height in case CSS elsewhere sets them
+      if (isHorizontal) {
+        style.width = 0;
+        style.minWidth = 0;
+      } else {
+        style.height = 0;
+        style.minHeight = 0;
+      }
+    }
   } else {
     // over
     if (position === "right") style.right = 0;
