@@ -1,12 +1,16 @@
-import React from 'react';
-import { cookies } from 'next/headers';
-import { setServerLanguage } from '@/lib/i18n';
-import Link from 'next/link';
+import React from "react";
+import { cookies } from "next/headers";
+import { setServerLanguage } from "@/lib/i18n";
+import Link from "next/link";
 
-export default async function PrivateAdminLayout({ children }: { children: React.ReactNode }) {
+export default async function PrivateAdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const cookieStore = await cookies();
-  const cookieLang = cookieStore.get('lang')?.value;
-  const htmlLang = cookieLang === 'vi' ? 'vi' : 'en';
+  const cookieLang = cookieStore.get("lang")?.value;
+  const htmlLang = cookieLang === "vi" ? "vi" : "en";
   setServerLanguage(htmlLang);
 
   return (
@@ -17,9 +21,24 @@ export default async function PrivateAdminLayout({ children }: { children: React
             <h2 className="font-bold">Admin</h2>
           </div>
           <nav className="space-y-2">
-            <Link href="/private/admin" className="block px-3 py-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700">Overview</Link>
-            <Link href="/private/admin/users" className="block px-3 py-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700">Users</Link>
-            <Link href="/private/admin/settings" className="block px-3 py-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700">Settings</Link>
+            <Link
+              href="/private/admin"
+              className="block px-3 py-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+            >
+              Overview
+            </Link>
+            <Link
+              href="/private/admin/users"
+              className="block px-3 py-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+            >
+              Users
+            </Link>
+            <Link
+              href="/private/admin/settings"
+              className="block px-3 py-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+            >
+              Settings
+            </Link>
           </nav>
         </aside>
         <main className="flex-1 p-6 overflow-auto">
