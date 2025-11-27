@@ -8,7 +8,7 @@ export default function ClientAuthHeader() {
   const { email, isAdmin } = useAuth();
   // compute the login link using the router pathname in a client component
   // so we avoid reading window directly or using setState in an effect.
-  const pathname = usePathname() ?? '/public';
+  const pathname = usePathname() ?? '/';
   const loginHref = `/auth/login?next=${encodeURIComponent(pathname)}`;
 
   return (

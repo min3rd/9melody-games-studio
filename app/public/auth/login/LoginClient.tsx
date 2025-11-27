@@ -11,7 +11,7 @@ export default function LoginClient() {
   const { t } = useI18n();
   const router = useRouter();
   const params = useSearchParams();
-  const next = params?.get('next') ?? '/public';
+  const next = params?.get('next') ?? '/';
 
   const auth = useAuth();
   const [identifier, setIdentifier] = React.useState('');
