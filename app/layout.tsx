@@ -20,13 +20,8 @@ export default async function RootLayout({
 
   return (
     <html lang={htmlLang}>
-      <body
-        className="antialiased"
-      >
-        <ClientProviders>
-          {children}
-        </ClientProviders>
-        
+      <body>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );
