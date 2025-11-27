@@ -1,7 +1,6 @@
 import React from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import ClientAuthHeader from "@/components/ClientAuthHeader";
 
 export default async function PrivateLayout({
   children,
