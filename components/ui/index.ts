@@ -5,7 +5,7 @@ export { default as CodePreview } from "./CodePreview";
 export { default as LanguageSwitcher } from "./LanguageSwitcher";
 export { default as Modal } from "./Modal";
 export { default as Drawer } from "./Drawer";
-export { DrawerContainer, DrawerContent } from "./Drawer";
+export { DrawerContainer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter } from "./Drawer";
 export { default as Toggle } from "./Toggle";
 export { default as Accordion } from "./Accordion";
 export { default as Indicator } from "./Indicator";

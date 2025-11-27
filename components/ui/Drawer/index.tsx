@@ -42,6 +42,7 @@ interface DrawerContextValue {
   animationDuration?: number;
   preset?: Preset;
   color?: string;
+  overlayElement?: HTMLElement | null;
 }
 
 const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
@@ -52,8 +53,8 @@ export function DrawerContainer({
   onClose,
   position = "right",
   mode = "over",
-  width = 320,
-  height = 280,
+  width,
+  height,
   backdrop,
   animationDuration = 220,
   preset,
@@ -64,12 +65,11 @@ export function DrawerContainer({
 >) {
   const [internalOpen, setInternalOpen] = useState(Boolean(open));
 
-  useEffect(() => {
-    setInternalOpen(Boolean(open));
-  }, [open]);
+  useEffect(() => setInternalOpen(Boolean(open)), [open]);
 
-  const effectiveBackdrop =
-    typeof backdrop === "boolean" ? backdrop : mode === "over";
+  const effectiveBackdrop = typeof backdrop === "boolean" ? backdrop : mode === "over";
+  const overlayRootRef = useRef<HTMLDivElement | null>(null);
+  const overlayPanelRef = useRef<HTMLDivElement | null>(null);
   const ctx: DrawerContextValue = {
     open: internalOpen,
     onClose: onClose ?? (() => setInternalOpen(false)),
@@ -81,10 +81,9 @@ export function DrawerContainer({
     animationDuration,
     preset,
     color,
+    overlayElement: overlayPanelRef.current,
   };
 
-  // Container layout depending on position and mode. For `side` mode, we use flex layout
-  // so the drawer consumes space and shifts content. For `over` mode the drawer is absolute.
   const isSide = mode === "side";
   const isHorizontal = position === "left" || position === "right";
   const containerClasses = isSide
@@ -97,18 +96,17 @@ export function DrawerContainer({
     <div className={`relative ${className ?? ""}`}>
       <DrawerContext.Provider value={ctx}>
         {
-          <div className={`${containerClasses} w-full h-full relative`}>
-            {
-              // Render backdrop for 'over' mode as an overlay sibling when open
-            }
-            {mode === "over" && backdrop && open && (
+          <div className={`${containerClasses} w-full h-full relative ${mode === 'over' ? 'overflow-hidden' : ''}`}>
+            <div ref={overlayRootRef} className={`absolute inset-0 z-40 pointer-events-none`}> 
+              {mode === 'over' && effectiveBackdrop && internalOpen && (
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto" onClick={ctx.onClose} />
+              )}
               <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                style={{ zIndex: 40 }}
-                onClick={onClose}
-              ></div>
-            )}
-            {children}
+                ref={overlayPanelRef}
+                className={`absolute inset-0 z-50 ${mode === 'over' && internalOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+              />
+            </div>
+              {children}
           </div>
         }
       </DrawerContext.Provider>
@@ -133,6 +131,7 @@ export function Drawer({
     animationDuration,
     preset,
     color,
+    overlayElement,
   } = ctx as any;
   const w = sizeToCss(width);
   const h = sizeToCss(height);
@@ -148,9 +147,11 @@ export function Drawer({
   let style: React.CSSProperties = { transition };
   if (isSide) {
     if (isHorizontal) {
-      style.width = open ? w : 0;
+      style.width = open ? (w ?? 'auto') : 0;
+      style.height = '100%';
     } else {
-      style.height = open ? h : 0;
+      style.height = open ? (h ?? 'auto') : 0;
+      style.width = '100%';
     }
   } else {
     // over
@@ -158,8 +159,13 @@ export function Drawer({
     if (position === "left") style.left = 0;
     if (position === "top") style.top = 0;
     if (position === "bottom") style.bottom = 0;
-    if (isHorizontal) style.width = w;
-    else style.height = h;
+    if (isHorizontal) style.width = w ?? 'auto';
+    else style.height = h ?? 'auto';
+    // Fill container cross-axis. Use top/bottom for more reliable stretch in container
+    style.top = 0;
+    style.bottom = 0;
+    if (isHorizontal) style.width = w ?? 'auto';
+    else style.height = h ?? 'auto';
     style.transform =
       position === "right"
         ? open
@@ -178,15 +184,60 @@ export function Drawer({
         : "translateY(100%)";
   }
 
-  const panelBaseClass = `relative bg-white dark:bg-neutral-900 ${
-    isSide ? "shadow-none" : "shadow-xl"
-  } ${className ?? ""}`;
+  const panelBaseClass = `relative bg-white dark:bg-neutral-900 box-border ${isSide ? "shadow-none" : "shadow-xl"} ${isHorizontal ? 'h-full' : 'w-full'} ${className ?? ""}`;
 
   // Adjust order to place panel before/after content for side layouts
   const orderStyle: React.CSSProperties = {};
   if (isSide) {
     if (position === "right" || position === "bottom") orderStyle.order = 2;
     else orderStyle.order = 0;
+  }
+
+  // split children into header/body/footer if provided
+  const childArray = React.Children.toArray(children);
+  function isType(el: React.ReactNode, name: string) {
+    return React.isValidElement(el) && (((el.type as any).displayName === name) || ((el.type as any).name === name));
+  }
+  const headerChild = childArray.find((c) => isType(c, 'DrawerHeader')) as React.ReactElement | undefined;
+  const footerChild = childArray.find((c) => isType(c, 'DrawerFooter')) as React.ReactElement | undefined;
+  const bodyChildren = childArray.filter((c) => !isType(c, 'DrawerHeader') && !isType(c, 'DrawerFooter'));
+
+  // Portal into overlayElement when 'over' mode to ensure overlay is clipped to container
+  if (mode === 'over' && overlayElement) {
+    const overlayContent = (
+      <div
+        className={baseClass}
+        style={{ ...style, ...orderStyle }}
+        aria-hidden={!open}
+      >
+        <div className={panelBaseClass}>
+          <div className="flex flex-col h-full">
+            {headerChild ? (
+              headerChild
+            ) : (
+              <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800">
+                <div className="text-sm font-medium">{rest['aria-label'] ?? 'Drawer'}</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    aria-label="Close"
+                    onClick={onClose}
+                    className="px-2 py-1 text-xs rounded-sm transition-colors"
+                    style={color ? { background: color, color: '#fff' } : undefined}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-auto">{bodyChildren}</div>
+
+            {footerChild && <div className="border-t border-neutral-200 dark:border-neutral-800">{footerChild}</div>}
+          </div>
+        </div>
+      </div>
+    );
+    return ReactDOM.createPortal(overlayContent, overlayElement as HTMLElement);
   }
 
   return (
@@ -196,22 +247,25 @@ export function Drawer({
       aria-hidden={!open}
     >
       <div className={panelBaseClass}>
-        <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="text-sm font-medium">
-            {rest["aria-label"] ?? "Drawer"}
+        {headerChild ? (
+          headerChild
+        ) : (
+          <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800">
+            <div className="text-sm font-medium">{rest["aria-label"] ?? "Drawer"}</div>
+            <div className="flex items-center gap-2">
+              <button
+                aria-label="Close"
+                onClick={onClose}
+                className="px-2 py-1 text-xs rounded-sm transition-colors"
+                style={color ? { background: color, color: "#fff" } : undefined}
+              >
+                ✕
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              aria-label="Close"
-              onClick={onClose}
-              className="px-2 py-1 text-xs rounded-sm transition-colors"
-              style={color ? { background: color, color: "#fff" } : undefined}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-        <div className="p-4">{children}</div>
+        )}
+        <div className="flex-1 overflow-auto p-4">{bodyChildren}</div>
+        {footerChild && <div className="border-t border-neutral-200 dark:border-neutral-800">{footerChild}</div>}
       </div>
       {/* Backdrop for over mode is handled by DrawerContainer to span the full container */}
     </div>
@@ -244,3 +298,31 @@ export function DrawerContent({
 export default Drawer;
 
 // (DrawerContainer and DrawerContent are above as the new API)
+
+// Small header/footer/body helper components for composition
+export function DrawerHeader({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={`px-4 py-2 border-b border-neutral-200 dark:border-neutral-800 ${className ?? ""}`} {...rest}>
+      {children}
+    </div>
+  );
+}
+DrawerHeader.displayName = 'DrawerHeader';
+
+export function DrawerFooter({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={`px-4 py-2 border-t border-neutral-200 dark:border-neutral-800 ${className ?? ""}`} {...rest}>
+      {children}
+    </div>
+  );
+}
+DrawerFooter.displayName = 'DrawerFooter';
+
+export function DrawerBody({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={`flex-1 overflow-auto p-4 ${className ?? ""}`} {...rest}>
+      {children}
+    </div>
+  );
+}
+DrawerBody.displayName = 'DrawerBody';
