@@ -15,13 +15,8 @@ export default async function PrivateLayout({
   }
 
   return (
-    <>
-      <div className="fixed top-4 right-4 z-50">
-        <ClientAuthHeader />
-      </div>
-      <div className="flex flex-col w-full h-full overflow-hidden bg-neutral-50 dark:bg-neutral-900">
-        {children}
-      </div>
-    </>
+    <div className="flex flex-col w-full h-full overflow-hidden bg-neutral-50 dark:bg-neutral-900">
+      {children}
+    </div>
   );
 }
