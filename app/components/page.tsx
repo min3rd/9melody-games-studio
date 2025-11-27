@@ -13,6 +13,7 @@ import i18n from "@/lib/i18n";
 import ComponentsNav from "./components-nav.client";
 import LanguageSwitcherPreview from "./language-switcher-preview.client";
 import ModalPreview from "./modal-preview.client";
+import DrawerPreview from "./drawer-preview.client";
 import TogglePreview from "./toggle-preview.client";
 import ThemeTogglePreviewCustom from "./theme-toggle-preview.client";
 import AccordionPreview from "./accordion-preview.client";
@@ -83,6 +84,8 @@ export default function ComponentsPage() {
       case "Modal":
       case "Modal Component":
         return <ModalPreview />;
+      case "Drawer":
+        return <DrawerPreview />;
       case "Accordion":
         return <AccordionPreview />;
       case "Toggle":
