@@ -14,12 +14,13 @@ export default function Island3D() {
     <div className="w-full h-screen bg-linear-to-b from-sky-300 to-sky-100 dark:from-sky-900 dark:to-sky-700 overflow-hidden">
       <Canvas shadows camera={{ position: [8, 5, 8], fov: 45 }}>
         <PerspectiveCamera makeDefault position={[8, 5, 8]} />
-        <OrbitControls
+        <OrbitControls 
           enableZoom={true}
           enablePan={false}
           minDistance={5}
           maxDistance={15}
-          maxPolarAngle={Math.PI / 2.2}
+          maxPolarAngle={Math.PI - 0.1} // allow camera to look up near overhead
+          minPolarAngle={0.02} // prevent exact upside-down
         />
 
         {/* Time of day lighting & stars */}
