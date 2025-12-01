@@ -10,6 +10,8 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
   const sunRef = useRef<THREE.PointLight>(null);
   const starsRef = useRef<any>(null);
   const starOpacityRef = useRef<number>(0);
+  const starScaleRef = useRef<number>(0);
+  const starYRef = useRef<number>(0);
   const { scene } = useThree();
 
   useEffect(() => {
@@ -151,6 +153,29 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
         if (starsRef.current.material) {
           (starsRef.current.material as any).transparent = next < 0.999;
           (starsRef.current.material as any).opacity = Math.max(0, Math.min(1, next));
+          // grow/shrink star size at dawn/dusk using a smoothed scale
+          const minStarSize = 0.1;
+          const maxStarSize = 1.8;
+          const sizeTarget = minStarSize + Math.pow(next, 0.6) * (maxStarSize - minStarSize);
+          const prevScale = starScaleRef.current;
+          const scaleFactor = 1 - Math.exp(-3.0 * delta);
+          const nextScale = THREE.MathUtils.lerp(prevScale, sizeTarget, scaleFactor);
+          starScaleRef.current = nextScale;
+          // if the material has size and sizeAttenuation use them
+          if (typeof (starsRef.current.material as any).size !== 'undefined') {
+            (starsRef.current.material as any).size = nextScale;
+            (starsRef.current.material as any).sizeAttenuation = true;
+          }
+          // vertical rise/fall effect: move the starsGroup up as they fade in, down as they fade out
+          const minY = -1.2; // below origin
+          const maxY = 0.4; // above origin a bit
+          const yTarget = minY + Math.pow(next, 0.9) * (maxY - minY);
+          const prevY = starYRef.current;
+          const yNext = THREE.MathUtils.lerp(prevY, yTarget, scaleFactor);
+          starYRef.current = yNext;
+          if (starsRef.current.position) {
+            starsRef.current.position.y = yNext;
+          }
           (starsRef.current.material as any).needsUpdate = true;
         }
       } catch (e) {}
