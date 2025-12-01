@@ -8,6 +8,8 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
   const dirRef = useRef<THREE.DirectionalLight>(null);
   const hemiRef = useRef<THREE.HemisphereLight>(null);
   const sunRef = useRef<THREE.PointLight>(null);
+  const moonRef = useRef<THREE.DirectionalLight>(null);
+  const moonFillRef = useRef<THREE.PointLight>(null);
   const starsRef = useRef<any>(null);
   const starOpacityRef = useRef<number>(0);
   const starScaleRef = useRef<number>(0);
@@ -138,6 +140,30 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
       sunRef.current.color.copy(sunColor);
       sunRef.current.intensity = dirIntensity * 0.6;
     }
+    // subtle ambient tint at night from moon: mix moon color into hemisphere when starIntensity is high
+    if (hemiRef.current) {
+      const moonTint = new THREE.Color('#dfefff');
+      const hi = Math.max(0, Math.min(1, starIntensity));
+      // lerp hemisphere color slightly towards moon tint at night
+      const newHemi = new THREE.Color(hemiRef.current.color.getHex()).lerp(moonTint, hi * 0.08);
+      hemiRef.current.color.copy(newHemi);
+    }
+    // moon light (opposite the sun)
+    const moonColor = new THREE.Color('#dfefff');
+    const moonIntensity = Math.max(0, starIntensity * 0.85); // follow star intensity for night
+    const moonFillIntensity = Math.max(0, starIntensity * 0.25);
+    const moonAngle = angle + Math.PI; // opposite side of sun
+    if (moonRef.current) {
+      moonRef.current.color.copy(moonColor);
+      moonRef.current.intensity = moonIntensity;
+      moonRef.current.position.set(Math.cos(moonAngle) * 10, Math.sin(moonAngle) * 10, -6);
+      moonRef.current.target.position.set(0, 0, 0);
+    }
+    if (moonFillRef.current) {
+      moonFillRef.current.color.copy(moonColor);
+      moonFillRef.current.intensity = moonFillIntensity;
+      moonFillRef.current.position.set(Math.cos(moonAngle) * 6, Math.max(1, Math.sin(moonAngle) * 6) + 1.5, -8);
+    }
     if (starsRef.current) {
       try {
         // Smooth opacity transition for stars
@@ -198,6 +224,8 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
       <hemisphereLight ref={hemiRef} color={'#bde0ff'} groundColor={'#7aa5ff'} intensity={0.5} />
       <directionalLight ref={dirRef} castShadow position={[10, 10, 5]} intensity={0.8} shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
       <pointLight ref={sunRef} position={[2, 8, 1]} intensity={0.4} color={'#fff6df'} />
+      <directionalLight ref={moonRef} position={[-10, 10, -6]} intensity={0} color={'#dfefff'} />
+      <pointLight ref={moonFillRef} position={[1, 4, -8]} intensity={0} color={'#dfefff'} />
       <Stars ref={starsRef} radius={60} depth={50} count={4000} factor={7} saturation={0} fade={true} />
     </group>
   );
