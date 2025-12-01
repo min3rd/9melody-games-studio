@@ -72,8 +72,17 @@ export default function SceneSky({
       {/* Optional subtle fill light to reduce harsh contrast */}
       <directionalLight intensity={0.12} position={[0, -1, 0]} />
 
-      {/* Exponential fog for a more realistic, softer haze */}
-      <fogExp2 attach="fog" args={[fogColor, fogDensity]} />
+      {/* Ground-level horizon fog: a soft haze near the ocean/ground */}
+      <mesh position={[0, -1.2, 0]} rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow={false}
+      >
+        <planeGeometry args={[600, 600, 1, 1]} />
+        <meshBasicMaterial
+          color={fogColor}
+          transparent
+          opacity={0.7}
+        />
+      </mesh>
     </group>
   );
 }
