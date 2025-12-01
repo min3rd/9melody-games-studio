@@ -7,6 +7,7 @@ import LargeRegion from "./LargeRegion";
 import Ocean from "./Ocean";
 import CloudField from "./CloudField";
 import DayCycle from "./DayCycle";
+import WindStreaks from "./WindStreaks";
 
 // Main 3D Island Scene Component
 export default function Island3D() {
@@ -34,6 +35,20 @@ export default function Island3D() {
           height={1.2}
           groundY={-1.1}
           color="#F6F3EE"
+        />
+        {/* Faint wind streaks that follow the wind direction */}
+        <WindStreaks
+          count={140}
+          areaRadius={26}
+          minY={2.6}
+          maxY={6.8}
+          windDirection={[0.9, 0, 0.35]}
+          speed={0.85}
+          color="#ffffff"
+          opacity={0.2}
+          length={3.2}
+          width={0.14}
+          curve={0.28}
         />
         <CloudField
           useModel={false}
