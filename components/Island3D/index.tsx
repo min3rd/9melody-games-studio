@@ -6,7 +6,6 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import LargeRegion from "./LargeRegion";
 import Ocean from "./Ocean";
 import CloudField from "./CloudField";
-import DayCycle from "./DayCycle";
 import WindStreaks from "./WindStreaks";
 
 // Main 3D Island Scene Component
@@ -14,6 +13,9 @@ export default function Island3D() {
   return (
     <div className="w-full h-screen bg-linear-to-b from-sky-300 to-sky-100 dark:from-sky-900 dark:to-sky-700 overflow-hidden">
       <Canvas shadows camera={{ position: [8, 5, 8], fov: 45 }}>
+        {/* Linear fog to soften distant objects and blend with sky */}
+        <fog attach="fog" args={["#cfeeff", 12, 140]} />
+        {/* Atmosphere / Sun */}
         <PerspectiveCamera makeDefault position={[8, 5, 8]} />
         <OrbitControls 
           enableZoom={true}
@@ -23,9 +25,6 @@ export default function Island3D() {
           maxPolarAngle={Math.PI - 0.1} // allow camera to look up near overhead
           minPolarAngle={0.02} // prevent exact upside-down
         />
-
-        {/* Time of day lighting & stars */}
-        <DayCycle cycleDuration={60} />
 
         {/* Scene elements */}
         <LargeRegion
