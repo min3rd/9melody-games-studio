@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Stars } from '@react-three/drei';
@@ -14,6 +14,10 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
   const starOpacityRef = useRef<number>(0);
   const starScaleRef = useRef<number>(0);
   const starYRef = useRef<number>(0);
+  const sunMeshRef = useRef<THREE.Mesh>(null);
+  const moonMeshRef = useRef<THREE.Mesh>(null);
+  const sunGlowRef = useRef<THREE.Sprite>(null);
+  const moonGlowRef = useRef<THREE.Sprite>(null);
   const { scene } = useThree();
 
   useEffect(() => {
@@ -21,6 +25,31 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
     scene.background = new THREE.Color('#87CEEB');
     scene.fog = new THREE.Fog('#87CEEB', 8, 40);
   }, [scene]);
+
+  const orbGeo = useMemo(() => new THREE.SphereGeometry(1, 24, 16), []);
+  const sunMat = useMemo(() => new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff6df'), transparent: true, opacity: 1, blending: THREE.AdditiveBlending }), []);
+  const moonMat = useMemo(() => new THREE.MeshBasicMaterial({ color: new THREE.Color('#e8f2ff'), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending }), []);
+  const createRadial = (hex: string, innerAlpha = 1.0) => {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    const grd = ctx.createRadialGradient(size/2, size/2, 2, size/2, size/2, size/2);
+    const c = new THREE.Color(hex);
+    const rgb = `rgba(${Math.round(c.r*255)}, ${Math.round(c.g*255)}, ${Math.round(c.b*255)}, `;
+    grd.addColorStop(0.0, rgb + `${innerAlpha})`);
+    grd.addColorStop(0.5, rgb + `${innerAlpha*0.6})`);
+    grd.addColorStop(1.0, rgb + `0)`);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0,0,size,size);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.needsUpdate = true;
+    return tex;
+  };
+  const sunGlowTex = useMemo(() => createRadial('#fff6df', 0.95), []);
+  const moonGlowTex = useMemo(() => createRadial('#e8f2ff', 0.85), []);
 
   function lerpColor(a: string, b: string, t: number) {
     const ca = new THREE.Color(a);
@@ -32,8 +61,10 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
     const t = (state.clock.getElapsedTime() % cycleDuration) / cycleDuration; // 0-1
     // angle in radians for sun path
     const angle = t * Math.PI * 2;
+    const SUN_DISTANCE = 220; // far away from the terrain
+    const MOON_DISTANCE = 220;
     if (dirRef.current) {
-      dirRef.current.position.set(Math.cos(angle) * 10, Math.sin(angle) * 10, 5);
+      dirRef.current.position.set(Math.cos(angle) * SUN_DISTANCE, Math.sin(angle) * SUN_DISTANCE, 0);
       dirRef.current.target.position.set(0, 0, 0);
     }
 
@@ -156,13 +187,41 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
     if (moonRef.current) {
       moonRef.current.color.copy(moonColor);
       moonRef.current.intensity = moonIntensity;
-      moonRef.current.position.set(Math.cos(moonAngle) * 10, Math.sin(moonAngle) * 10, -6);
+      moonRef.current.position.set(Math.cos(moonAngle) * MOON_DISTANCE, Math.sin(moonAngle) * MOON_DISTANCE, 0);
       moonRef.current.target.position.set(0, 0, 0);
     }
     if (moonFillRef.current) {
       moonFillRef.current.color.copy(moonColor);
       moonFillRef.current.intensity = moonFillIntensity;
-      moonFillRef.current.position.set(Math.cos(moonAngle) * 6, Math.max(1, Math.sin(moonAngle) * 6) + 1.5, -8);
+      // place the fill light far away but slightly elevated to light the scene softly
+      moonFillRef.current.position.set(Math.cos(moonAngle) * (MOON_DISTANCE * 0.6), Math.max(1, Math.sin(moonAngle) * (MOON_DISTANCE * 0.35)) + 10, -8);
+    }
+    // sync the sun and moon visible orbs with their light positions and intensities
+    if (sunMeshRef.current && dirRef.current) {
+      sunMeshRef.current.position.copy(dirRef.current.position);
+      sunMeshRef.current.visible = dirIntensity > 0.05;
+      (sunMeshRef.current.material as any).opacity = Math.max(0.1, Math.min(1, dirIntensity));
+      const sScale = 0.6 + dirIntensity * 0.8;
+      sunMeshRef.current.scale.setScalar(sScale);
+    }
+    if (sunGlowRef.current && dirRef.current) {
+      sunGlowRef.current.position.copy(dirRef.current.position);
+      const gScale = 20 + dirIntensity * 140;
+      sunGlowRef.current.scale.set(gScale, gScale, gScale);
+      (sunGlowRef.current.material as any).opacity = Math.max(0, Math.min(0.9, dirIntensity * 0.95));
+    }
+    if (moonMeshRef.current && moonRef.current) {
+      moonMeshRef.current.position.copy(moonRef.current.position);
+      moonMeshRef.current.visible = moonIntensity > 0.02;
+      (moonMeshRef.current.material as any).opacity = Math.max(0.06, Math.min(0.9, moonIntensity * 1.2));
+      const mScale = 0.45 + moonIntensity * 0.6;
+      moonMeshRef.current.scale.setScalar(mScale);
+    }
+    if (moonGlowRef.current && moonRef.current) {
+      moonGlowRef.current.position.copy(moonRef.current.position);
+      const mgScale = 14 + moonIntensity * 80;
+      moonGlowRef.current.scale.set(mgScale, mgScale, mgScale);
+      (moonGlowRef.current.material as any).opacity = Math.max(0, Math.min(0.8, moonIntensity * 0.9));
     }
     if (starsRef.current) {
       try {
@@ -226,6 +285,14 @@ export default function DayCycle({ cycleDuration = 60 }: { cycleDuration?: numbe
       <pointLight ref={sunRef} position={[2, 8, 1]} intensity={0.4} color={'#fff6df'} />
       <directionalLight ref={moonRef} position={[-10, 10, -6]} intensity={0} color={'#dfefff'} />
       <pointLight ref={moonFillRef} position={[1, 4, -8]} intensity={0} color={'#dfefff'} />
+      <mesh ref={sunMeshRef} geometry={orbGeo} material={sunMat} position={[2, 8, 1]} scale={[1,1,1]} visible />
+      <sprite ref={sunGlowRef} position={[2, 8, 1]} scale={[60, 60, 60] as any}>
+        <spriteMaterial attach="material" map={sunGlowTex} color={new THREE.Color('#fff6df')} depthTest={false} depthWrite={false} blending={THREE.AdditiveBlending} transparent={true} opacity={0.8} />
+      </sprite>
+      <mesh ref={moonMeshRef} geometry={orbGeo} material={moonMat} position={[-10, 10, -6]} scale={[0.6,0.6,0.6]} visible />
+      <sprite ref={moonGlowRef} position={[-10, 10, -6]} scale={[40, 40, 40] as any}>
+        <spriteMaterial attach="material" map={moonGlowTex} color={new THREE.Color('#e8f2ff')} depthTest={false} depthWrite={false} blending={THREE.AdditiveBlending} transparent={true} opacity={0.6} />
+      </sprite>
       <Stars ref={starsRef} radius={60} depth={50} count={4000} factor={7} saturation={0} fade={true} />
     </group>
   );
