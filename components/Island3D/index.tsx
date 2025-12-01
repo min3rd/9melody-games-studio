@@ -5,8 +5,6 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 
 import LargeRegion from "./LargeRegion";
 import Ocean from "./Ocean";
-import CloudField from "./CloudField";
-import WindStreaks from "./WindStreaks";
 import SceneSky from "./Sky";
 
 // Main 3D Island Scene Component
@@ -43,33 +41,6 @@ export default function Island3D() {
           height={1.2}
           groundY={-1.1}
           color="#F6F3EE"
-        />
-        <WindStreaks
-          count={140}
-          areaRadius={26}
-          minY={2.6}
-          maxY={6.8}
-          windDirection={[0.9, 0, 0.35]}
-          speed={0.85}
-          color="#ffffff"
-          opacity={0.2}
-          length={3.2}
-          width={0.14}
-          curve={0.28}
-        />
-        <CloudField
-          useModel={false}
-          count={10}
-          radius={24}
-          minY={3.5}
-          maxY={7.0}
-          colors={["#ffffff", "#ffd7e0"]}
-          minSize={1.0}
-          maxSize={3.2}
-          driftSpeed={0.03}
-          elongation={1.6}
-          bumpAmplitude={0.13}
-          bumpFrequency={0.9}
         />
         <Ocean />
       </Canvas>
