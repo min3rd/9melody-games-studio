@@ -3,7 +3,7 @@ import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Stars } from '@react-three/drei';
 
-import Island from './Island';
+import LargeRegion from './LargeRegion';
 import Clouds from './Clouds';
 import Ocean from './Ocean';
 
@@ -33,9 +33,7 @@ export default function Island3D() {
         <pointLight position={[-10, 5, -10]} intensity={0.3} color="#ffa500" />
         
         {/* Scene elements */}
-        <Island />
-        <Clouds />
-        <Stars radius={100} depth={50} count={1000} factor={4} fade speed={0.5} />
+        <LargeRegion size={14} detail={96} jaggedness={0.6} height={1.2} groundY={-1.1} color="#F6F3EE" />
         <Ocean />
       </Canvas>
     </div>
