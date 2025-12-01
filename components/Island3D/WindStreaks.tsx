@@ -39,9 +39,13 @@ export default function WindStreaks({
       uTime: new THREE.Uniform(0),
       uColor: new THREE.Uniform(new THREE.Color(color)),
       uOpacity: new THREE.Uniform(opacity),
-    };
-    const vert = /* glsl */`
+    } as any;
+
+    const vert = /* glsl */ `
+      precision highp float;
       uniform float uTime;
+      attribute vec3 position;
+      attribute vec2 uv;
       attribute mat4 instanceMatrix;
       attribute float aCurve; // per-instance curvature amplitude
       attribute float aSeed;  // 0..1
@@ -58,7 +62,7 @@ export default function WindStreaks({
         p.y -= 0.5;
         // bend along local up/right depending on aMix
         vec3 upDir = vec3(0.0, 1.0, 0.0);
-        vec3 rightDir = vec3(0.0, 0.0, 1.0);
+        vec3 rightDir = vec3(1.0, 0.0, 0.0); // right along X
         vec3 bendDir = mix(upDir, rightDir, aMix);
         float phase = aSeed * 6.2831853;
         float flutter = 0.05 * (sin(phase + t * 4.0 + uTime * 0.7) * 0.5 + 0.5);
@@ -66,10 +70,13 @@ export default function WindStreaks({
         p += bendDir * (arch * aCurve + flutter * (uv.y - 0.5));
         // apply per-instance transform then camera
         vec4 worldPos = instanceMatrix * vec4(p, 1.0);
-        gl_Position = projectionMatrix * viewMatrix * worldPos;
+        vec4 mvPos = modelViewMatrix * worldPos;
+        gl_Position = projectionMatrix * mvPos;
       }
     `;
-    const frag = /* glsl */`
+
+    const frag = /* glsl */ `
+      precision mediump float;
       uniform vec3 uColor;
       uniform float uOpacity;
       varying vec2 vUv;
@@ -86,6 +93,7 @@ export default function WindStreaks({
         gl_FragColor = vec4(uColor, alpha);
       }
     `;
+
     const mat = new THREE.ShaderMaterial({
       uniforms,
       vertexShader: vert,
