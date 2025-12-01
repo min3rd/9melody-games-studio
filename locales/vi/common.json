@@ -25,8 +25,15 @@
       "variant": "Biến thể",
       "pattern": "Mẫu",
       "color": "Màu sắc",
-      "direction": "Hướng"
-      ,"placeholder": "Placeholder"
+      "direction": "Hướng",
+      "placeholder": "Placeholder",
+      "size": "Kích thước",
+      "small": "Nhỏ",
+      "medium": "Vừa",
+      "large": "Lớn",
+      "preset": "Bảng màu",
+      "custom": "Tùy chỉnh",
+      "customColor": "Màu tùy chỉnh"
     },
         "rating": {
           "customPreset": "Mẫu tùy chỉnh (success), Kích thước lg",
@@ -55,6 +62,23 @@
       "rounded": "làm tròn",
       "value": "Giá trị",
       "withEffects": "Có hiệu ứng"
+    },
+    "cloud": {
+      "title": "Đám mây low poly",
+      "description": "Pha những gam pastel ngọt ngào bằng cách đổi kích thước, biến thể và bảng màu.",
+      "variant": {
+        "layered": "Nhiều tầng",
+        "clustered": "Bồng bềnh"
+      },
+      "palettes": {
+        "cottonCandy": "Kẹo bông",
+        "peachFizz": "Đào kem",
+        "mauveBloom": "Hồng tím",
+        "sugarMist": "Sương ngọt"
+      },
+      "rounded": "Làm mềm mặt phẳng",
+      "effects": "Hiệu ứng bay",
+      "ariaDemo": "Đám mây pastel trang trí"
     }
   },
   "selected": "Đã chọn",

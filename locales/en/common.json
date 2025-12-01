@@ -82,6 +82,23 @@
       "labelPosition": "Label Position",
       "rounded": "Rounded",
       "withEffects": "With Effects"
+    },
+    "cloud": {
+      "title": "Low-poly cloud",
+      "description": "Blend sweet pastel clouds by tweaking size, variant, and palette.",
+      "variant": {
+        "layered": "Layered",
+        "clustered": "Clustered"
+      },
+      "palettes": {
+        "cottonCandy": "Cotton candy",
+        "peachFizz": "Peach fizz",
+        "mauveBloom": "Mauve bloom",
+        "sugarMist": "Sugar mist"
+      },
+      "rounded": "Soften facets",
+      "effects": "Float effects",
+      "ariaDemo": "Decorative pastel cloud"
     }
   }
 }

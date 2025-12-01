@@ -5,6 +5,10 @@ export const PRESET_MAP = {
   warning: '#f59e0b',
   info: '#06b6d4',
   muted: '#94a3b8',
+  cottonCandy: '#f9a8d4',
+  peachFizz: '#fbb1a8',
+  mauveBloom: '#d6a6ff',
+  sugarMist: '#fdf2f8',
 } as const;
 
 export type Preset = keyof typeof PRESET_MAP;

@@ -735,3 +735,31 @@ html.dark body {
     animation: none;
   }
 }
+
+/* Low-poly cloud helper classes (Cloud component) */
+@keyframes cloud-drift {
+  0% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 10px 0 rgba(15, 23, 42, 0.16));
+  }
+  50% {
+    transform: translateY(-6px) scale(1.02);
+    filter: drop-shadow(0 14px 0 rgba(15, 23, 42, 0.18));
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 10px 0 rgba(15, 23, 42, 0.16));
+  }
+}
+
+.cloud-float {
+  animation: cloud-drift 6s ease-in-out infinite;
+}
+
+.cloud-svg {
+  isolation: isolate;
+}
+
+.cloud-svg polygon {
+  transition: fill 200ms ease, opacity 200ms ease;
+}

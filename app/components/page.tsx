@@ -39,6 +39,7 @@ import RatingPreview from "./rating-preview.client";
 import TextInputPreview from "./textinput-preview.client";
 import TextAreaPreview from "./textarea-preview.client";
 import SelectPreview from "./select-preview.client";
+import CloudPreview from "./cloud-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -136,6 +137,8 @@ export default function ComponentsPage() {
         return <TextAreaPreview />;
       case "Select":
         return <SelectPreview />;
+      case "Cloud":
+        return <CloudPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
