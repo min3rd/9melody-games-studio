@@ -34,6 +34,7 @@ export default function Island3D() {
         
         {/* Scene elements */}
         <LargeRegion size={14} detail={96} jaggedness={0.6} height={1.2} groundY={-1.1} color="#F6F3EE" />
+        <Clouds count={10} radius={18} height={4.0} colors={["#ffffff","#ffccd6"]} />
         <Ocean />
       </Canvas>
     </div>
