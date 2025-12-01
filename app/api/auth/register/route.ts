@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
 
     const res = NextResponse.json({ ok: true, user: { id: user.id, email: user.email, role: user.role } }, { status: 201 });
     res.cookies.set('userEmail', user.email, { path: '/', maxAge: 60 * 60 * 12, httpOnly: true, sameSite: 'lax' });
+    res.cookies.set('sv', String(user.sessionVersion ?? 0), { path: '/', maxAge: 60 * 60 * 12, httpOnly: true, sameSite: 'lax' });
     if (user.role === 'admin') {
       res.cookies.set('isAdmin', 'true', { path: '/', maxAge: 60 * 60 * 12, httpOnly: true, sameSite: 'lax' });
       res.cookies.set('adminEmail', user.email, { path: '/', maxAge: 60 * 60 * 12, httpOnly: true, sameSite: 'lax' });

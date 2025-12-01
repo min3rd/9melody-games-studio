@@ -1,6 +1,8 @@
 import React from 'react';
+import { validateAdminAccess } from '@/lib/adminAuth';
 
-export default function PrivateAdminIndex() {
+export default async function PrivateAdminIndex() {
+  await validateAdminAccess();
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-2">Admin Overview</h1>

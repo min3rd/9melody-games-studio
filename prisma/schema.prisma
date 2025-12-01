@@ -21,6 +21,10 @@ model User {
   username      String?   @unique
   // store hashed password (nullable for OAuth-only users)
   passwordHash  String?   @map("password_hash")
+  // flag to disable account (prevents login)
+  disabled      Boolean   @default(false)
+  // session version for global logout; increment to revoke all sessions
+  sessionVersion Int      @default(0) @map("session_version")
   // optional role for auth & authorization (e.g., admin/user)
   role          String    @default("user")
   emailVerified Boolean?  @map("email_verified")

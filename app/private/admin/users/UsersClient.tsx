@@ -14,6 +14,8 @@ type User = {
   name?: string;
   username?: string;
   role?: string;
+  disabled?: boolean;
+  sessionVersion?: number;
   createdAt: string;
 };
 
@@ -63,16 +65,25 @@ export default function UsersClient() {
         headerName: "Actions",
         colId: 'actions',
         cellRenderer: (params: any) => {
-          // Render inline HTML for the cells. We add data-action attributes so clicks can be inspected in onCellClicked.
           const id = params?.data?.id ?? '';
-          return `<button data-action="edit" data-id="${id}" class="px-2 py-1 text-xs bg-transparent hover:bg-slate-100 rounded mr-2">Edit</button>` +
-            `<button data-action="delete" data-id="${id}" class="px-2 py-1 text-xs text-red-600 hover:bg-red-100 rounded">Delete</button>`;
+          const disabled = params?.data?.disabled ? true : false;
+          return (
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
+              <button data-action="edit" data-id={id} className="px-2 py-1 text-xs bg-transparent hover:bg-slate-100 rounded">Edit</button>
+              <button data-action="reset-password" data-id={id} className="px-2 py-1 text-xs bg-blue-600 text-white hover:bg-blue-700 rounded">Reset PW</button>
+              <button data-action="toggle-disable" data-id={id} className={`px-2 py-1 text-xs ${disabled ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'} text-white rounded`}>
+                {disabled ? 'Enable' : 'Disable'}
+              </button>
+              <button data-action="revoke-sessions" data-id={id} className="px-2 py-1 text-xs bg-purple-600 text-white hover:bg-purple-700 rounded">Revoke Sessions</button>
+              <button data-action="delete" data-id={id} className="px-2 py-1 text-xs text-red-600 hover:bg-red-100 rounded">Delete</button>
+            </div>
+          );
         },
         cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '6px 10px' },
         editable: false,
-        minWidth: 110,
-        maxWidth: 160,
-      },
+        minWidth: 220,
+        maxWidth: 520,
+      }
     ],
     [openDeleteConfirm]
   );
@@ -162,6 +173,26 @@ export default function UsersClient() {
                 if (col && params.rowIndex !== null && params.rowIndex !== undefined) {
                   params.api?.startEditingCell?.({ rowIndex: params.rowIndex as number, colKey: col.getColId() });
                 }
+              }
+              if (action === 'reset-password' && id) {
+                const newPw = window.prompt('Enter new password (min 6 chars)');
+                if (newPw && newPw.length >= 6) {
+                  fetch(`/api/users/${id}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'reset-password', newPassword: newPw }) })
+                    .then((r) => r.ok ? loadUsers() : r.json().then(setError))
+                    .catch(setError);
+                }
+              }
+              if (action === 'toggle-disable' && id) {
+                const row = params.data as any;
+                const next = !row?.disabled;
+                fetch(`/api/users/${id}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'disable', disabled: next }) })
+                  .then((r) => r.ok ? loadUsers() : r.json().then(setError))
+                  .catch(setError);
+              }
+              if (action === 'revoke-sessions' && id) {
+                fetch(`/api/users/${id}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'revoke-sessions' }) })
+                  .then((r) => r.ok ? loadUsers() : r.json().then(setError))
+                  .catch(setError);
               }
             } else {
               // fallback for other cells or if `data-action` is not present

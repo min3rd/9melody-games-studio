@@ -30,6 +30,35 @@ export async function PATCH(request: NextRequest, context: any) {
   }
 }
 
+// Reset password for a specific user (admin-only flow assumed at UI level)
+export async function POST(request: NextRequest, context: any) {
+  const id = parseId(context?.params?.id);
+  if (!id) return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
+  const body = await request.json().catch(() => ({}));
+  const { action, newPassword, disabled } = body as { action?: string; newPassword?: string; disabled?: boolean };
+  try {
+    if (action === 'reset-password') {
+      if (!newPassword || String(newPassword).length < 6) {
+        return NextResponse.json(formatError(ErrorCodes.PASSWORD_TOO_SHORT ?? ErrorCodes.PASSWORD_REQUIRED), { status: 400 });
+      }
+      const hashed = await (await import('bcryptjs')).default.hash(newPassword, 10);
+      const updated = await prisma.user.update({ where: { id }, data: { passwordHash: hashed } });
+      return NextResponse.json({ ok: true, id: updated.id });
+    }
+    if (action === 'disable') {
+      const updated = await prisma.user.update({ where: { id }, data: { disabled: disabled ?? true } });
+      return NextResponse.json({ ok: true, disabled: updated.disabled });
+    }
+    if (action === 'revoke-sessions') {
+      const updated = await prisma.user.update({ where: { id }, data: { sessionVersion: { increment: 1 } } });
+      return NextResponse.json({ ok: true, sessionVersion: updated.sessionVersion });
+    }
+    return NextResponse.json(formatError(ErrorCodes.INVALID_REQUEST ?? ErrorCodes.INTERNAL_ERROR), { status: 400 });
+  } catch (err: any) {
+    return NextResponse.json({ ...formatError(ErrorCodes.INTERNAL_ERROR), message: err?.message }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest, context: any) {
   const id = parseId(context?.params?.id);
   if (!id) return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
