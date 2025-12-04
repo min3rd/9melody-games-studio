@@ -6,7 +6,6 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import LargeRegion from "./LargeRegion";
 import Ocean from "./Ocean";
 import SceneSky from "./Sky";
-import Clouds from "./Clouds";
 
 // Main 3D Island Scene Component
 export default function Island3D() {
@@ -25,7 +24,7 @@ export default function Island3D() {
         />
         {/* Camera */}
         <PerspectiveCamera makeDefault position={[8, 5, 8]} />
-        <OrbitControls 
+        <OrbitControls
           enableZoom={true}
           enablePan={false}
           minDistance={5}
@@ -44,7 +43,6 @@ export default function Island3D() {
           color="#F6F3EE"
         />
         <Ocean />
-        <Clouds count={8} spread={20} minHeight={4} maxHeight={7.2} />
       </Canvas>
     </div>
   );
