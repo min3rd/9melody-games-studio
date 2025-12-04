@@ -40,6 +40,10 @@ import TextInputPreview from "./textinput-preview.client";
 import TextAreaPreview from "./textarea-preview.client";
 import SelectPreview from "./select-preview.client";
 import CloudPreview from "./cloud-preview.client";
+import Cloud3DPreview from "./cloud3d-preview.client";
+import Wind3DPreview from "./wind3d-preview.client";
+import Ocean3DPreview from "./ocean3d-preview.client";
+import Island3DPreview from "./island3d-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -57,6 +61,10 @@ export default function ComponentsPage() {
   } catch {
     components = [];
   }
+
+  // Thêm các component 3D vào danh sách
+  const threeDComponents = ["Cloud3D", "Wind3D", "Ocean3D", "Island3D"];
+  components = [...components, ...threeDComponents];
 
   function renderPreview(name: string) {
     switch (name) {
@@ -139,6 +147,14 @@ export default function ComponentsPage() {
         return <SelectPreview />;
       case "Cloud":
         return <CloudPreview />;
+      case "Cloud3D":
+        return <Cloud3DPreview />;
+      case "Wind3D":
+        return <Wind3DPreview />;
+      case "Ocean3D":
+        return <Ocean3DPreview />;
+      case "Island3D":
+        return <Island3DPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
