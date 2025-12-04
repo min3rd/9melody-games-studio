@@ -44,6 +44,7 @@ import Cloud3DPreview from "./cloud3d-preview.client";
 import Wind3DPreview from "./wind3d-preview.client";
 import Ocean3DPreview from "./ocean3d-preview.client";
 import Island3DPreview from "./island3d-preview.client";
+import Rock3DPreview from "./rock3d-preview.client";
 
 export const metadata = {
   title: "Components",
@@ -63,7 +64,7 @@ export default function ComponentsPage() {
   }
 
   // Thêm các component 3D vào danh sách
-  const threeDComponents = ["Cloud3D", "Wind3D", "Ocean3D", "Island3D"];
+  const threeDComponents = ["Cloud3D", "Wind3D", "Ocean3D", "Island3D", "Rock3D"];
   components = [...components, ...threeDComponents];
 
   function renderPreview(name: string) {
@@ -155,6 +156,8 @@ export default function ComponentsPage() {
         return <Ocean3DPreview />;
       case "Island3D":
         return <Island3DPreview />;
+      case "Rock3D":
+        return <Rock3DPreview />;
       default:
         return (
           <div className="text-sm text-neutral-600 dark:text-neutral-300">
