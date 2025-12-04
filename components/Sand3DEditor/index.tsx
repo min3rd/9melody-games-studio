@@ -6,6 +6,7 @@ import SandSurface from "../Sand3D/SandSurface";
 import { HeightMap } from "../Sand3D";
 import EditorControls from "./EditorControls";
 import InteractiveGrid from "./InteractiveGrid";
+import AxisGizmo from "./AxisGizmo";
 
 export interface Sand3DEditorProps {
   initialHeightMap?: HeightMap;
@@ -43,6 +44,7 @@ export default function Sand3DEditor({
   const [color, setColor] = useState<string>(initialColor);
   const [selectedPoint, setSelectedPoint] = useState<{ row: number; col: number } | null>(null);
   const [editMode, setEditMode] = useState<"edit" | "add" | "delete">("edit");
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleHeightMapChange = useCallback(
     (newHeightMap: HeightMap) => {
@@ -124,7 +126,7 @@ export default function Sand3DEditor({
               <directionalLight position={[5, 10, 5]} intensity={0.8} />
               <directionalLight position={[-5, 5, -5]} intensity={0.3} />
               <PerspectiveCamera makeDefault position={[0, size * 0.8, size * 1.2]} />
-              <OrbitControls enableZoom={true} enablePan={true} />
+              <OrbitControls enableZoom={true} enablePan={true} enabled={!isDragging} />
 
               <SandSurface
                 heightMap={heightMap}
@@ -145,6 +147,32 @@ export default function Sand3DEditor({
                 selectedPoint={selectedPoint}
                 onPointClick={handlePointClick}
               />
+
+              {/* Hiển thị trục X, Y, Z tại điểm được chọn */}
+              {selectedPoint && (() => {
+                const rows = heightMap.length;
+                const cols = heightMap[0].length;
+                const stepX = size / (cols - 1);
+                const stepZ = size / (rows - 1);
+                const halfSize = size / 2;
+                const x = selectedPoint.col * stepX - halfSize;
+                const z = selectedPoint.row * stepZ - halfSize;
+                const y = heightMap[selectedPoint.row][selectedPoint.col] * heightScale;
+                
+                return (
+                  <AxisGizmo
+                    position={[x, y, z]}
+                    heightMap={heightMap}
+                    row={selectedPoint.row}
+                    col={selectedPoint.col}
+                    size={size}
+                    heightScale={heightScale}
+                    onHeightChange={handleHeightChange}
+                    onDragStart={() => setIsDragging(true)}
+                    onDragEnd={() => setIsDragging(false)}
+                  />
+                );
+              })()}
             </Canvas>
           </div>
         </div>
