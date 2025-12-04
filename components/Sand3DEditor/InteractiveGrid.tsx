@@ -7,7 +7,7 @@ interface InteractiveGridProps {
   heightMap: HeightMap;
   size: number;
   heightScale: number;
-  selectedPoint: { row: number; col: number };
+  selectedPoint: { row: number; col: number } | null;
   onPointClick: (row: number, col: number) => void;
 }
 
@@ -38,17 +38,20 @@ export default function InteractiveGrid({
           position: [x, y, z] as [number, number, number],
           row: rowIdx,
           col: colIdx,
-          isSelected: selectedPoint.row === rowIdx && selectedPoint.col === colIdx,
+          isSelected: selectedPoint !== null && selectedPoint.row === rowIdx && selectedPoint.col === colIdx,
         };
       })
     );
   }, [heightMap, size, heightScale, rows, cols, selectedPoint]);
 
+  // Tính toán kích thước điểm dựa trên size của mặt cát
+  const pointSize = Math.max(size * 0.015, 0.1);
+
   return (
     <group>
       {points.map((point, index) => (
         <mesh
-          key={index}
+          key={`${point.row}-${point.col}`}
           position={point.position}
           onClick={(e) => {
             e.stopPropagation();
@@ -56,17 +59,23 @@ export default function InteractiveGrid({
           }}
           onPointerOver={(e) => {
             e.stopPropagation();
+            if (e.object) {
+              (e.object as THREE.Mesh).scale.set(1.5, 1.5, 1.5);
+            }
             document.body.style.cursor = "pointer";
           }}
-          onPointerOut={() => {
+          onPointerOut={(e) => {
+            if (e.object) {
+              (e.object as THREE.Mesh).scale.set(1, 1, 1);
+            }
             document.body.style.cursor = "default";
           }}
         >
-          <sphereGeometry args={[size * 0.02, 8, 8]} />
+          <sphereGeometry args={[pointSize, 8, 8]} />
           <meshStandardMaterial
             color={point.isSelected ? "#ff0000" : "#00ff00"}
             emissive={point.isSelected ? "#ff0000" : "#00ff00"}
-            emissiveIntensity={0.5}
+            emissiveIntensity={point.isSelected ? 0.8 : 0.3}
           />
         </mesh>
       ))}

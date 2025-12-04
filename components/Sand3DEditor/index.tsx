@@ -114,11 +114,11 @@ export default function Sand3DEditor({
   }, [heightMap, size, heightScale, color, onExport]);
 
   return (
-    <div className={`flex flex-col h-full ${className}`}>
-      <div className="flex-1 grid grid-cols-2 gap-4 p-4">
+    <div className={`flex flex-col h-full min-h-[600px] ${className}`}>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 min-h-0 overflow-hidden">
         {/* Preview 3D */}
-        <div className="border rounded bg-gradient-to-b from-amber-50 to-amber-100 dark:from-amber-900 dark:to-amber-800">
-          <div className="h-full">
+        <div className="border rounded bg-gradient-to-b from-amber-50 to-amber-100 dark:from-amber-900 dark:to-amber-800 min-h-[400px] lg:min-h-0">
+          <div className="h-full w-full">
             <Canvas camera={{ position: [0, size * 0.8, size * 1.2], fov: 50 }}>
               <ambientLight intensity={0.6} />
               <directionalLight position={[5, 10, 5]} intensity={0.8} />
@@ -137,16 +137,14 @@ export default function Sand3DEditor({
                 wireframe={false}
               />
 
-              {/* Hiển thị điểm được chọn */}
-              {selectedPoint && (
-                <InteractiveGrid
-                  heightMap={heightMap}
-                  size={size}
-                  heightScale={heightScale}
-                  selectedPoint={selectedPoint}
-                  onPointClick={handlePointClick}
-                />
-              )}
+              {/* Hiển thị điểm tương tác */}
+              <InteractiveGrid
+                heightMap={heightMap}
+                size={size}
+                heightScale={heightScale}
+                selectedPoint={selectedPoint}
+                onPointClick={handlePointClick}
+              />
             </Canvas>
           </div>
         </div>

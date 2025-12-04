@@ -46,7 +46,7 @@ export default function Sand3DEditorPreview(): React.ReactElement {
           <p className="text-sm text-neutral-600 dark:text-neutral-300">
             Component editor 3D để chỉnh sửa tham số đầu vào cho Sand3D. Cho phép chỉnh sửa kích thước, tọa độ các điểm, thêm/xóa điểm từ một mặt phẳng để tạo hình dạng cho mặt cát.
           </p>
-          <div className="h-[500px] border rounded bg-gradient-to-b from-amber-50 to-amber-100 dark:from-amber-900 dark:to-amber-800">
+          <div className="h-[600px] border rounded bg-gradient-to-b from-amber-50 to-amber-100 dark:from-amber-900 dark:to-amber-800">
             <Sand3DEditor
               initialHeightMap={[
                 [0, 0, 0, 0, 0],

@@ -45,8 +45,8 @@ export default function EditorControls({
   const cols = heightMap[0].length;
 
   return (
-    <div className="border rounded bg-white dark:bg-neutral-800 p-4 space-y-4 overflow-y-auto">
-      <h3 className="text-lg font-semibold">Sand3D Editor</h3>
+    <div className="border rounded bg-white dark:bg-neutral-800 p-4 space-y-4 overflow-y-auto max-h-full">
+      <h3 className="text-lg font-semibold mb-4">Sand3D Editor</h3>
 
       {/* Edit Mode */}
       <div>
@@ -163,31 +163,41 @@ export default function EditorControls({
       <div>
         <label className="text-sm font-medium mb-2 block">Height Map</label>
         <div className="border rounded p-2 bg-neutral-50 dark:bg-neutral-900 max-h-64 overflow-auto">
-          <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-            {heightMap.map((row, rowIdx) =>
-              row.map((height, colIdx) => {
-                const isSelected = selectedPoint?.row === rowIdx && selectedPoint?.col === colIdx;
-                return (
-                  <input
-                    key={`${rowIdx}-${colIdx}`}
-                    type="number"
-                    step="0.1"
-                    className={`w-full px-1 py-1 text-xs rounded border ${
-                      isSelected
-                        ? "bg-blue-200 dark:bg-blue-800 border-blue-500"
-                        : "bg-white dark:bg-neutral-800"
-                    }`}
-                    value={height.toFixed(1)}
-                    onChange={(e) =>
-                      onHeightChange(rowIdx, colIdx, parseFloat(e.target.value) || 0)
-                    }
-                    onClick={() => onPointSelect({ row: rowIdx, col: colIdx })}
-                  />
-                );
-              })
-            )}
+          <div className="inline-block min-w-full">
+            <div 
+              className="grid gap-1" 
+              style={{ 
+                gridTemplateColumns: `repeat(${cols}, minmax(50px, auto))`,
+              }}
+            >
+              {heightMap.map((row, rowIdx) =>
+                row.map((height, colIdx) => {
+                  const isSelected = selectedPoint?.row === rowIdx && selectedPoint?.col === colIdx;
+                  return (
+                    <input
+                      key={`${rowIdx}-${colIdx}`}
+                      type="number"
+                      step="0.1"
+                      className={`w-full min-w-[50px] px-1 py-1 text-xs rounded border text-center ${
+                        isSelected
+                          ? "bg-blue-200 dark:bg-blue-800 border-blue-500 ring-2 ring-blue-400"
+                          : "bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                      }`}
+                      value={height.toFixed(1)}
+                      onChange={(e) =>
+                        onHeightChange(rowIdx, colIdx, parseFloat(e.target.value) || 0)
+                      }
+                      onClick={() => onPointSelect({ row: rowIdx, col: colIdx })}
+                    />
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
+        <p className="text-xs text-neutral-500 mt-1">
+          Click on cells to select, or use the grid above
+        </p>
       </div>
 
       {/* Selected Point Editor */}
