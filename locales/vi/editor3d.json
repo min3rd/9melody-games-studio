@@ -52,9 +52,9 @@
   "viewport": {
     "title": "Khung nhìn 3D",
     "controls": {
-      "rotate": "Xoay: Click trái + kéo",
-      "pan": "Di chuyển: Click phải + kéo",
-      "zoom": "Phóng to: Cuộn chuột"
+      "rotate": "Xoay: Click phải + kéo",
+      "pan": "Di chuyển: Click giữa + kéo",
+      "zoom": "Phóng to/thu nhỏ: Cuộn chuột"
     },
     "camera": {
       "perspective": "Phối cảnh",

@@ -52,8 +52,8 @@
   "viewport": {
     "title": "3D Viewport",
     "controls": {
-      "rotate": "Rotate: Left click + drag",
-      "pan": "Pan: Right click + drag",
+      "rotate": "Rotate: Right click + drag",
+      "pan": "Pan: Middle click + drag",
       "zoom": "Zoom: Scroll wheel"
     },
     "camera": {
