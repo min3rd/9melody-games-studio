@@ -73,14 +73,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* Desktop layout */}
       <div className="flex h-screen overflow-hidden">
         <aside className="hidden md:flex flex-col w-64 p-4 bg-white dark:bg-neutral-800 border-r dark:border-neutral-700">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-bold">Admin</h2>
-          </div>
-          <nav className="flex-1 overflow-auto">
-            <Menu items={menuItems} className="w-full" />
-          </nav>
-          {/* Controls moved from header to sidebar footer */}
-          <div className="flex flex-col gap-3 pt-4 border-t dark:border-neutral-700">
+          {/* Header with title and controls */}
+          <div className="flex flex-col gap-3 mb-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold">Admin</h2>
+            </div>
+            {/* Controls row */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <ThemeToggle />
@@ -89,6 +87,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <UserMenu />
             </div>
           </div>
+          <nav className="flex-1 overflow-auto">
+            <Menu items={menuItems} className="w-full" />
+          </nav>
         </aside>
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Mobile header for hamburger menu only */}
