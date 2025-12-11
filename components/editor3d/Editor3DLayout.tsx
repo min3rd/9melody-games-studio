@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid } from '@react-three/drei';
+import * as THREE from 'three';
 import HierarchyPanel, { SceneObject } from './HierarchyPanel';
 import PropertiesPanel from './PropertiesPanel';
 import AssetLibraryPanel, { AssetItem } from './AssetLibraryPanel';
@@ -347,7 +348,15 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
                   <ambientLight intensity={0.5} />
                   <directionalLight position={[10, 10, 5]} intensity={0.8} />
                   <PerspectiveCamera makeDefault position={[5, 5, 5]} />
-                  <OrbitControls enableZoom enablePan />
+                  <OrbitControls 
+                    enableZoom 
+                    enablePan 
+                    mouseButtons={{
+                      LEFT: undefined,
+                      MIDDLE: THREE.MOUSE.PAN,
+                      RIGHT: THREE.MOUSE.ROTATE
+                    }}
+                  />
                   
                   {/* Grid helper */}
                   <Grid
