@@ -1,6 +1,7 @@
 "use client";
-import React, { createContext, useContext } from 'react';
-import { PRESET_MAP, type Preset, ROUND_CLASSES, CARD_PADDING_MAP, type UICardSize } from '../presets';
+import React, { createContext, useContext, useRef } from 'react';
+import { PRESET_MAP, type Preset, ROUND_CLASSES, CARD_PADDING_MAP, type UICardSize, type Pattern } from '../presets';
+import PatternOverlay from '../patterns';
 
 const CardContext = createContext<{ size: UICardSize } | undefined>(undefined);
 
@@ -11,6 +12,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLElement> {
   rounded?: boolean;
   elevation?: 'none' | 'sm' | 'md' | 'lg';
   size?: UICardSize;
+  pattern?: Pattern;
 }
 
 export interface CardHeaderProps extends React.HTMLAttributes<HTMLElement> {
@@ -50,22 +52,52 @@ export function Card({
   rounded = true,
   elevation = 'sm',
   size = 'md',
+  pattern,
   className = '',
   children,
   ...rest
 }: Readonly<CardProps>) {
-  const bg = color ?? undefined; // we avoid setting background color on card by default
-  const presetAccent = preset ? { borderTop: `4px solid ${PRESET_MAP[preset]}` } : {};
+  const wrapperRef = useRef<HTMLElement | null>(null);
+  const activeColor = color ?? PRESET_MAP[preset];
+  const presetAccent = preset && !pattern ? { borderTop: `4px solid ${PRESET_MAP[preset]}` } : {};
   const roundClass = rounded ? ROUND_CLASSES.sm : ROUND_CLASSES.none;
-  const effects = withEffects ? 'transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-0.5' : '';
+  const effects = withEffects && !pattern ? 'transition-transform duration-150 ease-[cubic-bezier(.2,.9,.2,1)] hover:-translate-y-0.5' : '';
+  
+  const patternClass = pattern ? `card-pattern-${pattern}` : '';
+  const baseClasses = pattern 
+    ? 'border border-neutral-200 dark:border-neutral-800 overflow-hidden relative'
+    : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800';
+
+  const patternStyle = pattern === 'pixel' 
+    ? { backgroundColor: '#071028', color: '#fff' }
+    : pattern === 'neon'
+    ? { backgroundColor: '#05060a', color: '#fff' }
+    : pattern === 'pixel3d'
+    ? { backgroundColor: '#1a1a2e', color: '#fff' }
+    : pattern === 'bubble'
+    ? { backgroundColor: 'transparent' }
+    : {};
 
   return (
     <CardContext.Provider value={{ size }}>
     <article
+      ref={wrapperRef}
       {...rest}
-      className={`bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 ${roundClass} ${elevationClasses(elevation)} ${effects} ${className}`.trim()}
-      style={{ ...(bg ? { backgroundColor: bg } : {}), ...presetAccent, ...(rest.style ?? {}) }}
+      className={`${baseClasses} ${roundClass} ${elevationClasses(elevation)} ${effects} ${patternClass} ${className}`.trim()}
+      style={{ 
+        ...(pattern ? patternStyle : {}),
+        ...presetAccent, 
+        ...(rest.style ?? {}) 
+      }}
     >
+      {pattern && (
+        <PatternOverlay 
+          pattern={pattern} 
+          wrapperRef={wrapperRef} 
+          activeColor={activeColor}
+          classPrefix="card" 
+        />
+      )}
       {children}
     </article>
     </CardContext.Provider>
