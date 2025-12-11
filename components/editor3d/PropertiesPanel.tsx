@@ -126,7 +126,10 @@ export default function PropertiesPanel({
                     step={0.1}
                     min={0.1}
                     className="px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
-                    onChange={(e) => onPropertyChange?.(`scale${axis}`, parseFloat(e.target.value) || 0.1)}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      onPropertyChange?.(`scale${axis}`, !isNaN(val) && val >= 0.1 ? val : 0.1);
+                    }}
                   />
                 </div>
               ))}
