@@ -37,6 +37,8 @@ export interface Editor3DLayoutProps {
       appearance: string;
       color: string;
       wireframe: string;
+      lightSettings: string;
+      intensity: string;
     };
     assets: {
       title: string;
