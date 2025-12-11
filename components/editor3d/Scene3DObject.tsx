@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -20,6 +20,7 @@ export interface Scene3DObjectProps {
   selected: boolean;
   onSelect: () => void;
   onTransform?: (property: string, value: any) => void;
+  orbitControlsRef?: React.RefObject<any>;
 }
 
 /**
@@ -31,8 +32,28 @@ export default function Scene3DObject({
   selected,
   onSelect,
   onTransform,
+  orbitControlsRef,
 }: Scene3DObjectProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const transformControlsRef = useRef<any>(null);
+
+  // Handle TransformControls events to disable/enable OrbitControls
+  useEffect(() => {
+    const controls = transformControlsRef.current;
+    if (!controls || !orbitControlsRef?.current) return;
+
+    const handleDraggingChanged = (event: any) => {
+      if (orbitControlsRef.current) {
+        orbitControlsRef.current.enabled = !event.value;
+      }
+    };
+
+    controls.addEventListener('dragging-changed', handleDraggingChanged);
+
+    return () => {
+      controls.removeEventListener('dragging-changed', handleDraggingChanged);
+    };
+  }, [orbitControlsRef]);
 
   const renderGeometry = () => {
     const color = data.color || '#3b82f6';
@@ -132,8 +153,13 @@ export default function Scene3DObject({
       {renderGeometry()}
       {selected && meshRef.current && (
         <TransformControls
+          ref={transformControlsRef}
           object={meshRef.current}
           mode="translate"
+          size={0.8}
+          showX
+          showY
+          showZ
           onObjectChange={(e) => {
             if (meshRef.current) {
               const pos = meshRef.current.position;
