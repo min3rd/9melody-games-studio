@@ -44,6 +44,64 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 Following these rules helps keep styles consistent, maintainable, and themeable across the project.
 
+## Component Library
+
+This project includes a standardized component library in `components/ui/` with a consistent API and pixel-art aesthetic. See [`COMPONENTS.md`](./COMPONENTS.md) for detailed documentation.
+
+### Key Features
+
+- **Consistent Props API**: All components support standard props: `size`, `preset`, `color`, `rounded`, `withEffects`
+- **Pattern Backgrounds**: Interactive components support 4 pattern backgrounds:
+  - `pixel`: Classic pixel grid with animated wave
+  - `pixel3d`: 3D falling pixel blocks effect  
+  - `neon`: Neon glow particles with flicker
+  - `bubble`: Floating bubble particles
+- **Dark Mode**: All components support light and dark themes
+- **TypeScript**: Fully typed with exported prop interfaces
+- **Accessible**: ARIA attributes and keyboard navigation
+
+### Quick Example
+
+```tsx
+import { Button, Card, Alert } from '@/components/ui';
+
+export default function Page() {
+  return (
+    <div className="p-4">
+      {/* Button with pixel pattern background */}
+      <Button pattern="pixel" preset="primary" size="lg">
+        Click Me
+      </Button>
+
+      {/* Card with neon pattern */}
+      <Card pattern="neon" preset="info">
+        <CardBody>
+          Card content goes here
+        </CardBody>
+      </Card>
+
+      {/* Alert with bubble pattern */}
+      <Alert 
+        pattern="bubble" 
+        preset="success"
+        title="Success!"
+        description="Your action completed successfully."
+      />
+    </div>
+  );
+}
+```
+
+### Available Components
+
+**Form Inputs**: TextInput, TextArea, Select, Checkbox, Radio, Toggle, Range, Rating, FileInput  
+**Display**: Badge, Avatar, Indicator, Loading, Progress, RadialProgress  
+**Layout**: Card, Modal, Drawer, Accordion, Tabs, Timeline  
+**Navigation**: Button, Dropdown, Menu, Navbar, Breadcrumbs, Pagination, Dock  
+**Feedback**: Alert, Loading, Progress
+
+For complete documentation, see [`COMPONENTS.md`](./COMPONENTS.md).
+
 ### Using Prisma with Postgres
 
 If you'd like to use Postgres as the datasource for Prisma, add a Postgres-style `DATABASE_URL` to your `.env` (example provided in `.env.example`). This repo includes a `prisma.config.ts` which Prisma v7 uses to read the `DATABASE_URL` from the environment.
