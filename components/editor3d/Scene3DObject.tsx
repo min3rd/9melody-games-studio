@@ -156,6 +156,7 @@ export default function Scene3DObject({
           ref={transformControlsRef}
           object={meshRef.current}
           mode="translate"
+          space="world"
           size={0.8}
           showX
           showY
