@@ -8,7 +8,8 @@ import React, {
   useContext,
 } from "react";
 import ReactDOM from "react-dom";
-import { PRESET_MAP, type Preset } from "../presets";
+import { PRESET_MAP, type Preset, type Pattern } from "../presets";
+import PatternOverlay from "../patterns";
 
 export interface DrawerProps extends React.HTMLAttributes<HTMLDivElement> {
   open: boolean;
@@ -21,6 +22,7 @@ export interface DrawerProps extends React.HTMLAttributes<HTMLDivElement> {
   animationDuration?: number; // ms
   preset?: Preset;
   color?: string;
+  pattern?: Pattern;
 }
 
 // Very small helper to normalize width/height
@@ -42,6 +44,7 @@ interface DrawerContextValue {
   animationDuration?: number;
   preset?: Preset;
   color?: string;
+  pattern?: Pattern;
   overlayElement?: HTMLElement | null;
 }
 
@@ -59,6 +62,7 @@ export function DrawerContainer({
   animationDuration = 220,
   preset,
   color,
+  pattern,
   className,
 }: React.PropsWithChildren<
   Partial<DrawerContextValue> & { className?: string }
@@ -81,6 +85,7 @@ export function DrawerContainer({
     animationDuration,
     preset,
     color,
+    pattern,
     overlayElement: overlayPanelRef.current,
   };
 
@@ -198,6 +203,19 @@ export function Drawer({
   }
 
   const panelBaseClass = `relative bg-white dark:bg-neutral-900 box-border ${isSide ? "shadow-none" : "shadow-xl"} ${isHorizontal ? 'h-full' : 'w-full'} ${className ?? ""}`;
+  
+  const patternClass = pattern ? `drawer-pattern-${pattern}` : '';
+  const patternStyle = pattern === 'pixel' 
+    ? { backgroundColor: '#071028', color: '#fff' }
+    : pattern === 'neon'
+    ? { backgroundColor: '#05060a', color: '#fff' }
+    : pattern === 'pixel3d'
+    ? { backgroundColor: '#1a1a2e', color: '#fff' }
+    : pattern === 'bubble'
+    ? { backgroundColor: 'transparent', color: '#fff' }
+    : {};
+  
+  const drawerRef = useRef<HTMLDivElement | null>(null);
 
   // Adjust order to place panel before/after content for side layouts
   const orderStyle: React.CSSProperties = {};
@@ -223,12 +241,20 @@ export function Drawer({
         style={{ ...style, ...orderStyle }}
         aria-hidden={!open}
       >
-        <div className={panelBaseClass}>
-          <div className="flex flex-col h-full">
+        <div ref={drawerRef} className={`${panelBaseClass} ${patternClass} overflow-hidden`} style={pattern ? patternStyle : {}}>
+          {pattern && (
+            <PatternOverlay 
+              pattern={pattern} 
+              wrapperRef={drawerRef} 
+              activeColor={color ?? (preset ? PRESET_MAP[preset] : undefined)}
+              classPrefix="drawer" 
+            />
+          )}
+          <div className={`flex flex-col h-full relative z-10 ${pattern ? 'text-white' : ''}`}>
             {headerChild ? (
               headerChild
             ) : (
-              <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800">
+              <div className={`flex items-center justify-between px-4 py-2 border-b ${pattern ? 'border-white/20' : 'border-neutral-200 dark:border-neutral-800'}`}>
                 <div className="text-sm font-medium">{rest['aria-label'] ?? 'Drawer'}</div>
                 <div className="flex items-center gap-2">
                   <button
@@ -245,7 +271,7 @@ export function Drawer({
 
             <div className="flex-1 overflow-auto">{bodyChildren}</div>
 
-            {footerChild && <div className="border-t border-neutral-200 dark:border-neutral-800">{footerChild}</div>}
+            {footerChild && <div className={`border-t ${pattern ? 'border-white/20' : 'border-neutral-200 dark:border-neutral-800'}`}>{footerChild}</div>}
           </div>
         </div>
       </div>
@@ -259,11 +285,20 @@ export function Drawer({
       style={{ ...style, ...orderStyle }}
       aria-hidden={!open}
     >
-      <div className={panelBaseClass}>
+      <div ref={drawerRef} className={`${panelBaseClass} ${patternClass} overflow-hidden`} style={pattern ? patternStyle : {}}>
+        {pattern && (
+          <PatternOverlay 
+            pattern={pattern} 
+            wrapperRef={drawerRef} 
+            activeColor={color ?? (preset ? PRESET_MAP[preset] : undefined)}
+            classPrefix="drawer" 
+          />
+        )}
+        <div className={`flex flex-col h-full relative z-10 ${pattern ? 'text-white' : ''}`}>
         {headerChild ? (
           headerChild
         ) : (
-          <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800">
+          <div className={`flex items-center justify-between px-4 py-2 border-b ${pattern ? 'border-white/20' : 'border-neutral-200 dark:border-neutral-800'}`}>
             <div className="text-sm font-medium">{rest["aria-label"] ?? "Drawer"}</div>
             <div className="flex items-center gap-2">
               <button
@@ -278,7 +313,8 @@ export function Drawer({
           </div>
         )}
         <div className="flex-1 overflow-auto p-4">{bodyChildren}</div>
-        {footerChild && <div className="border-t border-neutral-200 dark:border-neutral-800">{footerChild}</div>}
+        {footerChild && <div className={`border-t ${pattern ? 'border-white/20' : 'border-neutral-200 dark:border-neutral-800'}`}>{footerChild}</div>}
+        </div>
       </div>
       {/* Backdrop for over mode is handled by DrawerContainer to span the full container */}
     </div>
