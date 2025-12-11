@@ -13,6 +13,15 @@ export const PRESET_MAP = {
 
 export type Preset = keyof typeof PRESET_MAP;
 
+/**
+ * Pattern types for background effects
+ * - pixel: Classic pixel grid with animated wave
+ * - pixel3d: 3D falling pixel blocks
+ * - neon: Neon glow particles with flicker
+ * - bubble: Floating bubble particles
+ */
+export type Pattern = 'pixel' | 'pixel3d' | 'neon' | 'bubble';
+
 export default PRESET_MAP;
 
 /*

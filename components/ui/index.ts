@@ -9,7 +9,7 @@ export { DrawerContainer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter 
 export { default as Toggle } from "./Toggle";
 export { default as Accordion } from "./Accordion";
 export { default as Indicator } from "./Indicator";
-export { PRESET_MAP, type Preset } from "./presets";
+export { PRESET_MAP, type Preset, type Pattern } from "./presets";
 export {
   BUTTON_SIZE_CLASSES,
   INDICATOR_SIZE_CLASSES,
