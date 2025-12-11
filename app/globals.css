@@ -1018,3 +1018,53 @@ html.dark body {
 .alert-pixel3d-block.settled { opacity: 1; transform: translate(0px, 0px) scale(1) translateZ(0px); }
 .alert-pixel3d-block.settled::after { opacity: 0.6; }
 .alert-pixel3d-block.fading { animation: pixel3d-fade 600ms ease-out forwards; }
+
+/* Modal pattern classes */
+.modal-pattern-pixel { --modal-pattern-size: 6px; --modal-pattern-bg: #071028; background-color: var(--modal-pattern-bg); color: #fff; }
+.modal-pattern-neon { background-color: var(--input-pattern-bg-dark, #05060a); color: #fff; }
+.modal-pattern-bubble { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #ffdde1 50%, #ffeaa7 75%, #ff9a9e 100%); background-size: 400% 400%; animation: bubble-gradient 15s ease infinite; color: #fff; }
+.modal-pattern-pixel3d { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; perspective: 1000px; }
+
+/* Modal pattern overlays - reuse existing animations */
+.modal-neon-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.modal-neon-tile { position: absolute; border-radius: 1px; transform-origin: 50% 50%; background: var(--modal-pattern-color, #3b82f6); box-shadow: var(--modal-neon-tile-shadow, 0 0 6px var(--modal-pattern-color, #3b82f6)); opacity: 0; animation: input-neon-tile var(--modal-neon-duration, 1200ms) cubic-bezier(.2,.9,.2,1) forwards, input-neon-flicker var(--modal-neon-flicker-duration, 600ms) cubic-bezier(.2,.9,.2,1) infinite alternate; animation-delay: var(--modal-neon-delay, 0s), var(--modal-neon-delay, 0s); will-change: transform, opacity, box-shadow, filter; }
+.modal-bubble-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.modal-bubble-float { position: absolute; border-radius: 50%; opacity: 0; box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2); animation: bubble-float var(--bubble-duration, 3000ms) ease-out forwards; will-change: transform, opacity; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2) 40%, transparent 70%); background-blend-mode: overlay; }
+.modal-bubble-hover { position: absolute; border-radius: 50%; opacity: 0; transform: translate(-50%, -50%); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.5), 0 0 25px rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.25); animation: bubble-hover-burst var(--bubble-duration, 1500ms) ease-out forwards; will-change: transform, opacity, filter; background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3) 45%, transparent 75%); background-blend-mode: overlay; filter: blur(0); }
+.modal-pattern-overlay { position: absolute; inset: 0; display: grid; gap: 2px; z-index: 1; pointer-events: none; }
+.modal-pattern-tile { width: var(--modal-pattern-size); height: var(--modal-pattern-size); border-radius: 1px; background-color: var(--modal-pattern-tile); opacity: 0; transform-origin: center; animation-name: input-pattern-tile-drop; animation-duration: 1000ms; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1); }
+.modal-pixel3d-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.modal-pixel3d-grid { position: absolute; inset: 0; display: block; gap: 2px; }
+.modal-pixel3d-block { position: absolute; width: auto; height: auto; border-radius: 2px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.3); transform-style: preserve-3d; will-change: transform, opacity; transition: transform 0.18s cubic-bezier(0.2,0.9,0.2,1); }
+.modal-pixel3d-block::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.3) 100%); border-radius: inherit; pointer-events: none; }
+.modal-pixel3d-block::after { content: ""; position: absolute; bottom: -4px; left: 2px; right: -2px; height: 4px; background: rgba(0, 0, 0, 0.4); filter: blur(2px); border-radius: 50%; opacity: 0; transition: opacity 0.3s ease; }
+.modal-pixel3d-inner { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; will-change: transform, filter; transition: transform 120ms cubic-bezier(0.2, 0.9, 0.2, 1), filter 180ms ease; background: inherit; }
+.modal-pixel3d-block.falling { animation: pixel3d-land var(--pixel-duration, 1500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--pixel-delay, 0s); transform: translate(var(--start-x, 0px), var(--start-y, 0px)) scale(var(--start-scale, 1)) translateZ(var(--start-z, 0px)); }
+.modal-pixel3d-block.settled { opacity: 1; transform: translate(0px, 0px) scale(1) translateZ(0px); }
+.modal-pixel3d-block.settled::after { opacity: 0.6; }
+.modal-pixel3d-block.fading { animation: pixel3d-fade 600ms ease-out forwards; }
+
+/* Drawer pattern classes */
+.drawer-pattern-pixel { --drawer-pattern-size: 6px; --drawer-pattern-bg: #071028; background-color: var(--drawer-pattern-bg); color: #fff; }
+.drawer-pattern-neon { background-color: var(--input-pattern-bg-dark, #05060a); color: #fff; }
+.drawer-pattern-bubble { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #ffdde1 50%, #ffeaa7 75%, #ff9a9e 100%); background-size: 400% 400%; animation: bubble-gradient 15s ease infinite; color: #fff; }
+.drawer-pattern-pixel3d { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; perspective: 1000px; }
+
+/* Drawer pattern overlays - reuse existing animations */
+.drawer-neon-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.drawer-neon-tile { position: absolute; border-radius: 1px; transform-origin: 50% 50%; background: var(--drawer-pattern-color, #3b82f6); box-shadow: var(--drawer-neon-tile-shadow, 0 0 6px var(--drawer-pattern-color, #3b82f6)); opacity: 0; animation: input-neon-tile var(--drawer-neon-duration, 1200ms) cubic-bezier(.2,.9,.2,1) forwards, input-neon-flicker var(--drawer-neon-flicker-duration, 600ms) cubic-bezier(.2,.9,.2,1) infinite alternate; animation-delay: var(--drawer-neon-delay, 0s), var(--drawer-neon-delay, 0s); will-change: transform, opacity, box-shadow, filter; }
+.drawer-bubble-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.drawer-bubble-float { position: absolute; border-radius: 50%; opacity: 0; box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2); animation: bubble-float var(--bubble-duration, 3000ms) ease-out forwards; will-change: transform, opacity; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2) 40%, transparent 70%); background-blend-mode: overlay; }
+.drawer-bubble-hover { position: absolute; border-radius: 50%; opacity: 0; transform: translate(-50%, -50%); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.5), 0 0 25px rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.25); animation: bubble-hover-burst var(--bubble-duration, 1500ms) ease-out forwards; will-change: transform, opacity, filter; background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3) 45%, transparent 75%); background-blend-mode: overlay; filter: blur(0); }
+.drawer-pattern-overlay { position: absolute; inset: 0; display: grid; gap: 2px; z-index: 1; pointer-events: none; }
+.drawer-pattern-tile { width: var(--drawer-pattern-size); height: var(--drawer-pattern-size); border-radius: 1px; background-color: var(--drawer-pattern-tile); opacity: 0; transform-origin: center; animation-name: input-pattern-tile-drop; animation-duration: 1000ms; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1); }
+.drawer-pixel3d-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.drawer-pixel3d-grid { position: absolute; inset: 0; display: block; gap: 2px; }
+.drawer-pixel3d-block { position: absolute; width: auto; height: auto; border-radius: 2px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.3); transform-style: preserve-3d; will-change: transform, opacity; transition: transform 0.18s cubic-bezier(0.2,0.9,0.2,1); }
+.drawer-pixel3d-block::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.3) 100%); border-radius: inherit; pointer-events: none; }
+.drawer-pixel3d-block::after { content: ""; position: absolute; bottom: -4px; left: 2px; right: -2px; height: 4px; background: rgba(0, 0, 0, 0.4); filter: blur(2px); border-radius: 50%; opacity: 0; transition: opacity 0.3s ease; }
+.drawer-pixel3d-inner { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; will-change: transform, filter; transition: transform 120ms cubic-bezier(0.2, 0.9, 0.2, 1), filter 180ms ease; background: inherit; }
+.drawer-pixel3d-block.falling { animation: pixel3d-land var(--pixel-duration, 1500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--pixel-delay, 0s); transform: translate(var(--start-x, 0px), var(--start-y, 0px)) scale(var(--start-scale, 1)) translateZ(var(--start-z, 0px)); }
+.drawer-pixel3d-block.settled { opacity: 1; transform: translate(0px, 0px) scale(1) translateZ(0px); }
+.drawer-pixel3d-block.settled::after { opacity: 0.6; }
+.drawer-pixel3d-block.fading { animation: pixel3d-fade 600ms ease-out forwards; }

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { PRESET_MAP, type Preset } from '../presets';
+import { PRESET_MAP, type Preset, type Pattern } from '../presets';
+import PatternOverlay from '../patterns';
 import ReactDOM from 'react-dom';
 
 export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -18,6 +19,7 @@ export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   title?: React.ReactNode;
   preset?: Preset;
   color?: string;
+  pattern?: Pattern;
 }
 
 export default function Modal({
@@ -35,11 +37,13 @@ export default function Modal({
   title,
   preset,
   color,
+  pattern,
   children,
   ...rest
 }: Readonly<ModalProps>) {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const portalRoot = useMemo(() => {
     if (typeof document === 'undefined') return null;
     let root = document.getElementById('modal-root');
@@ -239,6 +243,17 @@ export default function Modal({
   };
 
   const themeColor = color ?? (preset ? PRESET_MAP[preset] : undefined);
+  
+  const patternClass = pattern ? `modal-pattern-${pattern}` : '';
+  const patternStyle = pattern === 'pixel' 
+    ? { backgroundColor: '#071028', color: '#fff' }
+    : pattern === 'neon'
+    ? { backgroundColor: '#05060a', color: '#fff' }
+    : pattern === 'pixel3d'
+    ? { backgroundColor: '#1a1a2e', color: '#fff' }
+    : pattern === 'bubble'
+    ? { backgroundColor: 'transparent', color: '#fff' }
+    : {};
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-start justify-center" role="presentation">
@@ -254,18 +269,26 @@ export default function Modal({
       {/* Modal Window */}
       <div
         ref={modalRef}
-        className="relative bg-white dark:bg-neutral-900 rounded shadow-lg overflow-hidden flex flex-col"
-        style={modalStyle}
+        className={`relative bg-white dark:bg-neutral-900 rounded shadow-lg overflow-hidden flex flex-col ${patternClass}`.trim()}
+        style={{ ...modalStyle, ...(pattern ? patternStyle : {}) }}
         role="dialog"
         aria-modal
         {...rest}
       >
+        {pattern && (
+          <PatternOverlay 
+            pattern={pattern} 
+            wrapperRef={modalRef} 
+            activeColor={themeColor}
+            classPrefix="modal" 
+          />
+        )}
         {/* Header / Title Bar */}
         <div
-          className={`flex items-center justify-between gap-2 px-4 py-2 text-sm border-b border-neutral-200 dark:border-neutral-800 select-none ${allowMove ? 'cursor-grab active:cursor-grabbing' : ''}`}
+          className={`flex items-center justify-between gap-2 px-4 py-2 text-sm border-b ${pattern ? 'border-white/20' : 'border-neutral-200 dark:border-neutral-800'} select-none ${allowMove ? 'cursor-grab active:cursor-grabbing' : ''} relative z-10`}
           onMouseDown={onTitleMouseDown}
         >
-          <div className="font-medium text-sm truncate">{title ?? 'Modal'}</div>
+          <div className={`font-medium text-sm truncate ${pattern ? 'text-white' : ''}`}>{title ?? 'Modal'}</div>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -277,7 +300,7 @@ export default function Modal({
         </div>
 
         {/* Content */}
-            <div className="flex-1 p-4 overflow-auto custom-scrollbar">
+            <div className={`flex-1 p-4 overflow-auto custom-scrollbar relative z-10 ${pattern ? 'text-white' : ''}`}>
           {children}
         </div>
 
