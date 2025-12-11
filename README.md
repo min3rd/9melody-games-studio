@@ -102,6 +102,37 @@ export default function Page() {
 
 For complete documentation, see [`COMPONENTS.md`](./COMPONENTS.md).
 
+## 3D Editor
+
+This project includes a powerful 3D Editor for creating and managing 3D scenes that are displayed on the homepage.
+
+### Quick Access
+
+- **Editor**: `/private/admin/3d-editor` (requires admin authentication)
+- **Homepage Display**: `/` (shows the saved 3D scene)
+
+### Key Features
+
+- **Scene Hierarchy**: Add, delete, rename, and organize 3D objects
+- **Interactive Viewport**: Real-time 3D rendering with camera controls
+- **Properties Panel**: Edit position, rotation, scale, color, and more
+- **Asset Library**: Browse and add primitives and 3D components
+- **Save/Load**: Persist scenes to localStorage (upgradable to API/DB)
+
+### Quick Start
+
+1. Navigate to `/private/admin/3d-editor`
+2. Add objects using the `+ 📦` button or click assets in the library
+3. Select and edit objects using the Properties panel
+4. Click **💾 Save** to save your scene
+5. View the result on the homepage at `/`
+
+### Documentation
+
+- **English Guide**: [`docs/3D_EDITOR_GUIDE.md`](./docs/3D_EDITOR_GUIDE.md)
+- **Vietnamese Guide**: [`docs/3D_EDITOR_GUIDE_VI.md`](./docs/3D_EDITOR_GUIDE_VI.md)
+- **Implementation Details**: [`IMPLEMENTATION_SUMMARY.md`](./IMPLEMENTATION_SUMMARY.md)
+
 ### Using Prisma with Postgres
 
 If you'd like to use Postgres as the datasource for Prisma, add a Postgres-style `DATABASE_URL` to your `.env` (example provided in `.env.example`). This repo includes a `prisma.config.ts` which Prisma v7 uses to read the `DATABASE_URL` from the environment.
