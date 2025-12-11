@@ -122,16 +122,16 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
   const selectedObject = sceneObjects.find((obj) => obj.id === selectedObjectId) || null;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-neutral-50 dark:bg-neutral-900">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Top Toolbar */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border-b border-neutral-300 dark:border-neutral-700 flex-shrink-0">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0">
         <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
           ↶ Undo
         </button>
         <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
           ↷ Redo
         </button>
-        <div className="h-6 w-px bg-neutral-300 dark:bg-neutral-700" />
+        <div className="h-6 w-px bg-neutral-300 dark:border-neutral-600" />
         <button className="px-3 py-1.5 text-xs bg-primary-500 text-white hover:bg-primary-600 rounded-sm transition-colors">
           💾 Save
         </button>
@@ -141,12 +141,12 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 dark:bg-neutral-900">
         {/* Left Sidebar - Scene Hierarchy */}
         <div
           className={`${
             hierarchyCollapsed ? 'w-12' : 'w-64'
-          } transition-all duration-300 border-r border-neutral-300 dark:border-neutral-700 overflow-hidden`}
+          } transition-all duration-300 overflow-hidden`}
         >
           <HierarchyPanel
             objects={sceneObjects}
@@ -160,7 +160,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
         </div>
 
         {/* Center Area - Viewport and Asset Library */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden border-x border-neutral-200 dark:border-neutral-700">
           {/* 3D Viewport */}
           <div className="flex-1 min-h-0">
             <EditorPanel title={translations.viewport.title} className="h-full">
@@ -211,7 +211,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
           <div
             className={`${
               assetsCollapsed ? 'h-12' : 'h-64'
-            } transition-all duration-300 border-t border-neutral-300 dark:border-neutral-700 overflow-hidden`}
+            } transition-all duration-300 border-t border-neutral-200 dark:border-neutral-700 overflow-hidden`}
           >
             <AssetLibraryPanel
               assets={assets}
@@ -229,7 +229,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
         <div
           className={`${
             propertiesCollapsed ? 'w-12' : 'w-80'
-          } transition-all duration-300 border-l border-neutral-300 dark:border-neutral-700 overflow-hidden`}
+          } transition-all duration-300 overflow-hidden`}
         >
           <PropertiesPanel
             selectedObject={selectedObject}
