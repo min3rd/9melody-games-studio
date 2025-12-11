@@ -136,6 +136,7 @@ export function Drawer({
     animationDuration,
     preset,
     color,
+    pattern,
     overlayElement,
   } = ctx as any;
   const w = sizeToCss(width);
