@@ -2,12 +2,10 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid } from '@react-three/drei';
-import { ThemeToggle, UserMenu, LanguageSwitcher } from '@/components/ui';
 import HierarchyPanel, { SceneObject } from './HierarchyPanel';
 import PropertiesPanel from './PropertiesPanel';
 import AssetLibraryPanel, { AssetItem } from './AssetLibraryPanel';
 import EditorPanel from './EditorPanel';
-import { useRouter } from 'next/navigation';
 
 export interface Editor3DLayoutProps {
   translations: {
@@ -65,8 +63,6 @@ export interface Editor3DLayoutProps {
  * 4. Asset Library (bottom panel)
  */
 export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
-  const router = useRouter();
-  
   // Scene state
   const [sceneObjects, setSceneObjects] = useState<SceneObject[]>([
     { id: '1', name: 'Main Camera', type: 'object' },
@@ -83,6 +79,11 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
     { id: 'a4', name: 'sand_01.glb', type: 'file', path: '/models/sand_01.glb' },
     { id: 'a5', name: 'rock_01.glb', type: 'file', path: '/models/rock_01.glb' },
   ]);
+
+  // Panel collapse state
+  const [hierarchyCollapsed, setHierarchyCollapsed] = useState(false);
+  const [propertiesCollapsed, setPropertiesCollapsed] = useState(false);
+  const [assetsCollapsed, setAssetsCollapsed] = useState(false);
 
   // Handlers
   const handleObjectSelect = (id: string) => {
@@ -121,36 +122,32 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
   const selectedObject = sceneObjects.find((obj) => obj.id === selectedObjectId) || null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-900">
-      {/* Left Sidebar - Navigation and Scene Hierarchy */}
-      <div className="flex flex-col w-64 bg-neutral-800 dark:bg-neutral-900 border-r border-neutral-700">
-        {/* Sidebar Header with Admin Title and Controls */}
-        <div className="flex flex-col gap-3 p-4 border-b border-neutral-700">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => router.push('/private/admin')}
-              className="text-sm font-bold text-white hover:text-neutral-300 transition-colors"
-            >
-              ← Admin
-            </button>
-          </div>
-          
-          {/* Controls Row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <LanguageSwitcher />
-            </div>
-            <UserMenu />
-          </div>
-          
-          <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">
-            3D Editor
-          </div>
-        </div>
+    <div className="flex flex-col h-full overflow-hidden bg-neutral-50 dark:bg-neutral-900">
+      {/* Top Toolbar */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border-b border-neutral-300 dark:border-neutral-700 flex-shrink-0">
+        <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
+          ↶ Undo
+        </button>
+        <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
+          ↷ Redo
+        </button>
+        <div className="h-6 w-px bg-neutral-300 dark:bg-neutral-700" />
+        <button className="px-3 py-1.5 text-xs bg-primary-500 text-white hover:bg-primary-600 rounded-sm transition-colors">
+          💾 Save
+        </button>
+        <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
+          📤 Export
+        </button>
+      </div>
 
-        {/* Hierarchy Panel in Sidebar */}
-        <div className="flex-1 overflow-hidden">
+      {/* Main Content Area */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Left Sidebar - Scene Hierarchy */}
+        <div
+          className={`${
+            hierarchyCollapsed ? 'w-12' : 'w-64'
+          } transition-all duration-300 border-r border-neutral-300 dark:border-neutral-700 overflow-hidden`}
+        >
           <HierarchyPanel
             objects={sceneObjects}
             selectedId={selectedObjectId || undefined}
@@ -161,34 +158,13 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
             translations={translations.hierarchy}
           />
         </div>
-      </div>
 
-      {/* Main Content Area - Full Height */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Toolbar */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border-b border-neutral-300 dark:border-neutral-700 flex-shrink-0">
-          <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
-            ↶ Undo
-          </button>
-          <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
-            ↷ Redo
-          </button>
-          <div className="h-6 w-px bg-neutral-300 dark:bg-neutral-700" />
-          <button className="px-3 py-1.5 text-xs bg-primary-500 text-white hover:bg-primary-600 rounded-sm transition-colors">
-            💾 Save
-          </button>
-          <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
-            📤 Export
-          </button>
-        </div>
-
-        {/* Content Area with Viewport and Asset Library */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Center - Viewport and Asset Library */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* 3D Viewport */}
-            <div className="flex-1 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-b from-sky-200 to-sky-100 dark:from-sky-900 dark:to-sky-800">
+        {/* Center Area - Viewport and Asset Library */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* 3D Viewport */}
+          <div className="flex-1 min-h-0">
+            <EditorPanel title={translations.viewport.title} className="h-full">
+              <div className="h-full bg-gradient-to-b from-sky-200 to-sky-100 dark:from-sky-900 dark:to-sky-800 rounded-sm overflow-hidden">
                 <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
                   <ambientLight intensity={0.5} />
                   <directionalLight position={[10, 10, 5]} intensity={0.8} />
@@ -209,7 +185,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
                     followCamera={false}
                   />
 
-                  {/* Example objects */}
+                  {/* Example objects - Replace with actual scene objects */}
                   <mesh position={[0, 0.5, 0]}>
                     <boxGeometry args={[1, 1, 1]} />
                     <meshStandardMaterial color="#3b82f6" />
@@ -228,30 +204,38 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
                 <div>{translations.viewport.controls.pan}</div>
                 <div>{translations.viewport.controls.zoom}</div>
               </div>
-            </div>
-
-            {/* Bottom Panel - Asset Library (Fixed Height) */}
-            <div className="h-56 border-t border-neutral-300 dark:border-neutral-700 flex-shrink-0 overflow-hidden">
-              <AssetLibraryPanel
-                assets={assets}
-                onAssetSelect={(asset) => console.log('Selected asset:', asset)}
-                onAssetDragStart={(asset) => console.log('Drag started:', asset)}
-                onNewFolder={(path) => console.log('New folder in:', path)}
-                onUpload={() => console.log('Upload clicked')}
-                onRefresh={() => console.log('Refresh clicked')}
-                translations={translations.assets}
-              />
-            </div>
+            </EditorPanel>
           </div>
 
-          {/* Right Sidebar - Properties Panel */}
-          <div className="w-80 border-l border-neutral-300 dark:border-neutral-700 flex-shrink-0 overflow-hidden">
-            <PropertiesPanel
-              selectedObject={selectedObject}
-              onPropertyChange={handlePropertyChange}
-              translations={translations.properties}
+          {/* Bottom Panel - Asset Library */}
+          <div
+            className={`${
+              assetsCollapsed ? 'h-12' : 'h-64'
+            } transition-all duration-300 border-t border-neutral-300 dark:border-neutral-700 overflow-hidden`}
+          >
+            <AssetLibraryPanel
+              assets={assets}
+              onAssetSelect={(asset) => console.log('Selected asset:', asset)}
+              onAssetDragStart={(asset) => console.log('Drag started:', asset)}
+              onNewFolder={(path) => console.log('New folder in:', path)}
+              onUpload={() => console.log('Upload clicked')}
+              onRefresh={() => console.log('Refresh clicked')}
+              translations={translations.assets}
             />
           </div>
+        </div>
+
+        {/* Right Sidebar - Properties Panel */}
+        <div
+          className={`${
+            propertiesCollapsed ? 'w-12' : 'w-80'
+          } transition-all duration-300 border-l border-neutral-300 dark:border-neutral-700 overflow-hidden`}
+        >
+          <PropertiesPanel
+            selectedObject={selectedObject}
+            onPropertyChange={handlePropertyChange}
+            translations={translations.properties}
+          />
         </div>
       </div>
     </div>
