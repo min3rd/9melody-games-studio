@@ -6,6 +6,7 @@ import HierarchyPanel, { SceneObject } from './HierarchyPanel';
 import PropertiesPanel from './PropertiesPanel';
 import AssetLibraryPanel, { AssetItem } from './AssetLibraryPanel';
 import EditorPanel from './EditorPanel';
+import Scene3DObject, { Object3DData } from './Scene3DObject';
 
 export interface Editor3DLayoutProps {
   translations: {
@@ -63,21 +64,40 @@ export interface Editor3DLayoutProps {
  * 4. Asset Library (bottom panel)
  */
 export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
-  // Scene state
+  // Scene state - now includes full 3D object data
   const [sceneObjects, setSceneObjects] = useState<SceneObject[]>([
     { id: '1', name: 'Main Camera', type: 'object' },
     { id: '2', name: 'Directional Light', type: 'light' },
-    { id: '3', name: 'Example Sand', type: 'object' },
   ]);
   const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
 
-  // Asset state
+  // 3D object data (position, rotation, scale, etc.)
+  const [objectData, setObjectData] = useState<Record<string, Object3DData>>({
+    '2': {
+      id: '2',
+      name: 'Directional Light',
+      type: 'light',
+      position: [5, 5, 5],
+      rotation: [0, 0, 0],
+      scale: [1, 1, 1],
+      color: '#ffffff',
+      intensity: 0.8,
+    },
+  });
+
+  // Asset state - Include 3D component types
   const [assets] = useState<AssetItem[]>([
-    { id: 'a1', name: 'Sand Textures', type: 'folder', path: '/textures/sand' },
-    { id: 'a2', name: 'Rock Models', type: 'folder', path: '/models/rocks' },
-    { id: 'a3', name: 'Cloud Models', type: 'folder', path: '/models/clouds' },
-    { id: 'a4', name: 'sand_01.glb', type: 'file', path: '/models/sand_01.glb' },
-    { id: 'a5', name: 'rock_01.glb', type: 'file', path: '/models/rock_01.glb' },
+    { id: 'primitives', name: 'Primitives', type: 'folder', path: '/primitives' },
+    { id: 'components', name: '3D Components', type: 'folder', path: '/components' },
+    { id: 'box', name: 'Box', type: 'file', path: '/primitives/box' },
+    { id: 'sphere', name: 'Sphere', type: 'file', path: '/primitives/sphere' },
+    { id: 'cylinder', name: 'Cylinder', type: 'file', path: '/primitives/cylinder' },
+    { id: 'island', name: 'Island 3D', type: 'file', path: '/components/island' },
+    { id: 'sand', name: 'Sand 3D', type: 'file', path: '/components/sand' },
+    { id: 'ocean', name: 'Ocean 3D', type: 'file', path: '/components/ocean' },
+    { id: 'cloud', name: 'Cloud 3D', type: 'file', path: '/components/cloud' },
+    { id: 'rock', name: 'Rock 3D', type: 'file', path: '/components/rock' },
+    { id: 'wind', name: 'Wind 3D', type: 'file', path: '/components/wind' },
   ]);
 
   // Panel collapse state
@@ -92,17 +112,52 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
 
   const handleAddObject = (type: 'object' | 'light' | 'group') => {
     const newId = Date.now().toString();
-    const typeName = type === 'light' ? 'Light' : type === 'group' ? 'Group' : 'Object';
+    const typeName = type === 'light' ? 'Light' : type === 'group' ? 'Group' : 'Cube';
     const newObject: SceneObject = {
       id: newId,
       name: `New ${typeName}`,
       type,
     };
     setSceneObjects([...sceneObjects, newObject]);
+
+    // Add default 3D data for objects and lights
+    if (type === 'object') {
+      setObjectData({
+        ...objectData,
+        [newId]: {
+          id: newId,
+          name: `New ${typeName}`,
+          type: 'box',
+          position: [0, 0.5, 0],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
+          color: '#3b82f6',
+          wireframe: false,
+        },
+      });
+    } else if (type === 'light') {
+      setObjectData({
+        ...objectData,
+        [newId]: {
+          id: newId,
+          name: `New ${typeName}`,
+          type: 'light',
+          position: [5, 5, 5],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
+          color: '#ffffff',
+          intensity: 1,
+        },
+      });
+    }
   };
 
   const handleDeleteObject = (id: string) => {
     setSceneObjects(sceneObjects.filter((obj) => obj.id !== id));
+    // Remove from objectData as well
+    const newObjectData = { ...objectData };
+    delete newObjectData[id];
+    setObjectData(newObjectData);
     if (selectedObjectId === id) {
       setSelectedObjectId(null);
     }
@@ -115,11 +170,125 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
   };
 
   const handlePropertyChange = (property: string, value: any) => {
-    console.log('Property changed:', property, value);
-    // In a real implementation, this would update the selected object's properties
+    if (!selectedObjectId || !objectData[selectedObjectId]) return;
+
+    const updatedData = { ...objectData[selectedObjectId] };
+
+    // Handle different property types
+    if (property === 'name') {
+      updatedData.name = value;
+      handleRenameObject(selectedObjectId, value);
+    } else if (property.startsWith('position')) {
+      const axis = property.replace('position', '').toLowerCase();
+      const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+      const newPosition = [...updatedData.position] as [number, number, number];
+      newPosition[axisIndex] = value;
+      updatedData.position = newPosition;
+    } else if (property.startsWith('rotation')) {
+      const axis = property.replace('rotation', '').toLowerCase();
+      const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+      const newRotation = [...updatedData.rotation] as [number, number, number];
+      newRotation[axisIndex] = value;
+      updatedData.rotation = newRotation;
+    } else if (property.startsWith('scale')) {
+      const axis = property.replace('scale', '').toLowerCase();
+      const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+      const newScale = [...updatedData.scale] as [number, number, number];
+      newScale[axisIndex] = value;
+      updatedData.scale = newScale;
+    } else if (property === 'color') {
+      updatedData.color = value;
+    } else if (property === 'wireframe') {
+      updatedData.wireframe = value;
+    } else if (property === 'intensity') {
+      updatedData.intensity = value;
+    }
+
+    setObjectData({
+      ...objectData,
+      [selectedObjectId]: updatedData,
+    });
   };
 
   const selectedObject = sceneObjects.find((obj) => obj.id === selectedObjectId) || null;
+
+  // Handle asset drag and create new object
+  const handleAssetDragStart = (asset: AssetItem) => {
+    console.log('Asset drag started:', asset);
+  };
+
+  const handleAssetSelect = (asset: AssetItem) => {
+    // When user selects an asset, add it to the scene
+    const assetType = asset.id as Object3DData['type'];
+    if (['box', 'sphere', 'cylinder', 'light', 'island', 'sand', 'ocean', 'cloud', 'rock', 'wind'].includes(assetType)) {
+      const newId = Date.now().toString();
+      const newObject: SceneObject = {
+        id: newId,
+        name: asset.name,
+        type: assetType === 'light' ? 'light' : 'object',
+      };
+      setSceneObjects([...sceneObjects, newObject]);
+
+      // Set default 3D data based on asset type
+      const defaultData: Object3DData = {
+        id: newId,
+        name: asset.name,
+        type: assetType,
+        position: [0, assetType === 'light' ? 5 : 0.5, 0],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+        color: assetType === 'light' ? '#ffffff' : '#3b82f6',
+        wireframe: false,
+        intensity: assetType === 'light' ? 1 : undefined,
+      };
+
+      setObjectData({
+        ...objectData,
+        [newId]: defaultData,
+      });
+
+      // Auto-select the new object
+      setSelectedObjectId(newId);
+    }
+  };
+
+  // Save scene configuration
+  const handleSaveScene = () => {
+    const sceneConfig = {
+      objects: sceneObjects.filter(obj => obj.id !== '1'), // Exclude camera
+      objectData: Object.fromEntries(
+        Object.entries(objectData).filter(([id]) => id !== '1')
+      ),
+      timestamp: new Date().toISOString(),
+    };
+    
+    // Save to localStorage for now (can be replaced with API call)
+    localStorage.setItem('homepage-scene-config', JSON.stringify(sceneConfig));
+    console.log('Scene saved:', sceneConfig);
+    alert('Scene saved successfully!');
+  };
+
+  // Load scene configuration
+  const handleLoadScene = () => {
+    const savedConfig = localStorage.getItem('homepage-scene-config');
+    if (savedConfig) {
+      try {
+        const config = JSON.parse(savedConfig);
+        setSceneObjects([
+          { id: '1', name: 'Main Camera', type: 'object' },
+          ...config.objects,
+        ]);
+        setObjectData(config.objectData);
+        console.log('Scene loaded:', config);
+        alert('Scene loaded successfully!');
+      } catch (error) {
+        console.error('Failed to load scene:', error);
+        alert('Failed to load scene configuration');
+      }
+    } else {
+      alert('No saved scene found');
+    }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -132,8 +301,17 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
           ↷ Redo
         </button>
         <div className="h-6 w-px bg-neutral-300 dark:border-neutral-600" />
-        <button className="px-3 py-1.5 text-xs bg-primary-500 text-white hover:bg-primary-600 rounded-sm transition-colors">
+        <button 
+          onClick={handleSaveScene}
+          className="px-3 py-1.5 text-xs bg-primary-500 text-white hover:bg-primary-600 rounded-sm transition-colors"
+        >
           💾 Save
+        </button>
+        <button 
+          onClick={handleLoadScene}
+          className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors"
+        >
+          📂 Load
         </button>
         <button className="px-3 py-1.5 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors">
           📤 Export
@@ -185,16 +363,18 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
                     followCamera={false}
                   />
 
-                  {/* Example objects - Replace with actual scene objects */}
-                  <mesh position={[0, 0.5, 0]}>
-                    <boxGeometry args={[1, 1, 1]} />
-                    <meshStandardMaterial color="#3b82f6" />
-                  </mesh>
-
-                  <mesh position={[2, 0.5, 0]}>
-                    <sphereGeometry args={[0.5, 32, 32]} />
-                    <meshStandardMaterial color="#ef4444" />
-                  </mesh>
+                  {/* Render scene objects */}
+                  {Object.entries(objectData).map(([id, data]) => (
+                    <Scene3DObject
+                      key={id}
+                      data={data}
+                      selected={selectedObjectId === id}
+                      onSelect={() => handleObjectSelect(id)}
+                      onTransform={(property, value) => {
+                        handlePropertyChange(property, value);
+                      }}
+                    />
+                  ))}
                 </Canvas>
               </div>
 
@@ -215,8 +395,8 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
           >
             <AssetLibraryPanel
               assets={assets}
-              onAssetSelect={(asset) => console.log('Selected asset:', asset)}
-              onAssetDragStart={(asset) => console.log('Drag started:', asset)}
+              onAssetSelect={handleAssetSelect}
+              onAssetDragStart={handleAssetDragStart}
               onNewFolder={(path) => console.log('New folder in:', path)}
               onUpload={() => console.log('Upload clicked')}
               onRefresh={() => console.log('Refresh clicked')}
