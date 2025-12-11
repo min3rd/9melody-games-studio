@@ -57,5 +57,9 @@ export default function Editor3DClient() {
     },
   };
 
-  return <Editor3DLayout translations={translations} />;
+  return (
+    <div className="h-full">
+      <Editor3DLayout translations={translations} />
+    </div>
+  );
 }
