@@ -18,6 +18,8 @@ export interface PropertiesPanelProps {
     appearance: string;
     color: string;
     wireframe: string;
+    lightSettings: string;
+    intensity: string;
   };
 }
 
@@ -164,12 +166,12 @@ export default function PropertiesPanel({
         {selectedObject.type === 'light' && (
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 uppercase tracking-wide">
-              Light Settings
+              {translations.lightSettings}
             </h4>
 
             <div>
               <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-                Intensity
+                {translations.intensity}
               </label>
               <Range
                 min={0}

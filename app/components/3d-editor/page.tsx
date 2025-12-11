@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect } from 'react';
-import i18n from '@/lib/i18n';
 import { setClientLanguage } from '@/lib/i18n';
 import { Editor3DLayout } from '@/components/editor3d';
+import i18n from '@/lib/i18n';
 
-export default function Editor3DClient() {
+export default function Editor3DPreviewPage() {
   useEffect(() => {
     setClientLanguage();
   }, []);
@@ -57,5 +57,15 @@ export default function Editor3DClient() {
     },
   };
 
-  return <Editor3DLayout translations={translations} />;
+  return (
+    <div className="min-h-screen">
+      <div className="bg-neutral-100 dark:bg-neutral-900 p-4">
+        <h1 className="text-2xl font-bold mb-2">3D Editor Layout Preview</h1>
+        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+          This is a preview of the 3D Editor layout with 4 main functional areas.
+        </p>
+      </div>
+      <Editor3DLayout translations={translations} />
+    </div>
+  );
 }

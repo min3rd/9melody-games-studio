@@ -13,17 +13,20 @@ import {
   UserMenu,
   LanguageSwitcher,
 } from "@/components/ui";
+import i18n from "@/lib/i18n";
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
+  const t = (key: string) => i18n.t(key, { ns: 'admin' });
+
   const items = [
-    { label: "Overview", href: "/private/admin" },
-    { label: "Users", href: "/private/admin/users" },
-    { label: "3D Editor", href: "/private/admin/3d-editor" },
-    { label: "Settings", href: "/private/admin/settings" },
+    { label: t("dashboard"), href: "/private/admin" },
+    { label: t("users"), href: "/private/admin/users" },
+    { label: t("3dEditor"), href: "/private/admin/3d-editor" },
+    { label: t("settings"), href: "/private/admin/settings" },
   ];
 
   const menuItems = items.map((it) => ({
