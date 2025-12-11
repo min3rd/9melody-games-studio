@@ -1,0 +1,75 @@
+{
+  "title": "Trình chỉnh sửa 3D",
+  "description": "Tạo và chỉnh sửa khung cảnh 3D",
+  "panels": {
+    "viewport": "Khung nhìn",
+    "hierarchy": "Cấu trúc cảnh",
+    "properties": "Thuộc tính",
+    "assets": "Thư viện vật thể"
+  },
+  "hierarchy": {
+    "title": "Cấu trúc cảnh",
+    "objects": "Vật thể",
+    "lights": "Ánh sáng",
+    "groups": "Nhóm",
+    "addObject": "Thêm vật thể",
+    "addLight": "Thêm ánh sáng",
+    "addGroup": "Thêm nhóm",
+    "delete": "Xóa",
+    "duplicate": "Nhân bản",
+    "rename": "Đổi tên",
+    "noObjects": "Không có vật thể trong cảnh",
+    "selectToView": "Chọn một vật thể để xem thuộc tính"
+  },
+  "properties": {
+    "title": "Thuộc tính",
+    "transform": "Biến đổi",
+    "position": "Vị trí",
+    "rotation": "Xoay",
+    "scale": "Tỉ lệ",
+    "appearance": "Hình thức",
+    "color": "Màu sắc",
+    "material": "Chất liệu",
+    "wireframe": "Khung dây",
+    "noSelection": "Chưa chọn vật thể",
+    "selectObject": "Chọn một vật thể để xem và chỉnh sửa thuộc tính"
+  },
+  "assets": {
+    "title": "Thư viện vật thể",
+    "search": "Tìm kiếm vật thể...",
+    "newFolder": "Tạo thư mục",
+    "upload": "Tải lên",
+    "refresh": "Làm mới",
+    "grid": "Chế độ lưới",
+    "list": "Chế độ danh sách",
+    "noAssets": "Không tìm thấy vật thể",
+    "folders": "Thư mục",
+    "files": "Tệp",
+    "dragDrop": "Kéo thả vật thể vào cảnh"
+  },
+  "viewport": {
+    "title": "Khung nhìn 3D",
+    "controls": {
+      "rotate": "Xoay: Click trái + kéo",
+      "pan": "Di chuyển: Click phải + kéo",
+      "zoom": "Phóng to: Cuộn chuột"
+    },
+    "camera": {
+      "perspective": "Phối cảnh",
+      "orthographic": "Trực giao",
+      "reset": "Đặt lại camera"
+    },
+    "grid": "Lưới",
+    "axis": "Trục"
+  },
+  "toolbar": {
+    "select": "Chọn",
+    "move": "Di chuyển",
+    "rotate": "Xoay",
+    "scale": "Tỉ lệ",
+    "undo": "Hoàn tác",
+    "redo": "Làm lại",
+    "save": "Lưu",
+    "export": "Xuất"
+  }
+}

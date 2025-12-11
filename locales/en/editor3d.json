@@ -1,0 +1,75 @@
+{
+  "title": "3D Editor",
+  "description": "Create and edit 3D scenes",
+  "panels": {
+    "viewport": "Viewport",
+    "hierarchy": "Scene Hierarchy",
+    "properties": "Properties",
+    "assets": "Asset Library"
+  },
+  "hierarchy": {
+    "title": "Scene Hierarchy",
+    "objects": "Objects",
+    "lights": "Lights",
+    "groups": "Groups",
+    "addObject": "Add Object",
+    "addLight": "Add Light",
+    "addGroup": "Add Group",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "rename": "Rename",
+    "noObjects": "No objects in scene",
+    "selectToView": "Select an object to view its properties"
+  },
+  "properties": {
+    "title": "Properties",
+    "transform": "Transform",
+    "position": "Position",
+    "rotation": "Rotation",
+    "scale": "Scale",
+    "appearance": "Appearance",
+    "color": "Color",
+    "material": "Material",
+    "wireframe": "Wireframe",
+    "noSelection": "No object selected",
+    "selectObject": "Select an object to view and edit its properties"
+  },
+  "assets": {
+    "title": "Asset Library",
+    "search": "Search assets...",
+    "newFolder": "New Folder",
+    "upload": "Upload",
+    "refresh": "Refresh",
+    "grid": "Grid View",
+    "list": "List View",
+    "noAssets": "No assets found",
+    "folders": "Folders",
+    "files": "Files",
+    "dragDrop": "Drag and drop assets into the scene"
+  },
+  "viewport": {
+    "title": "3D Viewport",
+    "controls": {
+      "rotate": "Rotate: Left click + drag",
+      "pan": "Pan: Right click + drag",
+      "zoom": "Zoom: Scroll wheel"
+    },
+    "camera": {
+      "perspective": "Perspective",
+      "orthographic": "Orthographic",
+      "reset": "Reset Camera"
+    },
+    "grid": "Grid",
+    "axis": "Axis"
+  },
+  "toolbar": {
+    "select": "Select",
+    "move": "Move",
+    "rotate": "Rotate",
+    "scale": "Scale",
+    "undo": "Undo",
+    "redo": "Redo",
+    "save": "Save",
+    "export": "Export"
+  }
+}
