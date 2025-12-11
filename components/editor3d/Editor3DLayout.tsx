@@ -427,6 +427,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
         >
           <PropertiesPanel
             selectedObject={selectedObject}
+            objectData={selectedObjectId ? objectData[selectedObjectId] : undefined}
             onPropertyChange={handlePropertyChange}
             translations={translations.properties}
           />

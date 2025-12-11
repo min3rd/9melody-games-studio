@@ -4,8 +4,11 @@ import EditorPanel from './EditorPanel';
 import { TextInput, Range, Toggle } from '@/components/ui';
 import { SceneObject } from './HierarchyPanel';
 
+import { Object3DData } from './Scene3DObject';
+
 export interface PropertiesPanelProps {
   selectedObject: SceneObject | null;
+  objectData?: Object3DData;
   onPropertyChange?: (property: string, value: any) => void;
   translations: {
     title: string;
@@ -28,6 +31,7 @@ export interface PropertiesPanelProps {
  */
 export default function PropertiesPanel({
   selectedObject,
+  objectData,
   onPropertyChange,
   translations,
 }: PropertiesPanelProps) {
@@ -70,16 +74,16 @@ export default function PropertiesPanel({
             <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">
               {translations.position}
             </label>
-            <div className="space-y-2">
-              {['X', 'Y', 'Z'].map((axis) => (
-                <div key={axis} className="flex items-center gap-2">
-                  <span className="text-xs font-medium w-4">{axis}</span>
+            <div className="grid grid-cols-3 gap-2">
+              {['X', 'Y', 'Z'].map((axis, index) => (
+                <div key={axis} className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">{axis}</span>
                   <input
                     type="number"
-                    defaultValue={0}
+                    value={objectData?.position?.[index] ?? 0}
                     step={0.1}
-                    className="flex-1 px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
-                    onChange={(e) => onPropertyChange?.(`position${axis}`, parseFloat(e.target.value))}
+                    className="px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
+                    onChange={(e) => onPropertyChange?.(`position${axis}`, parseFloat(e.target.value) || 0)}
                   />
                 </div>
               ))}
@@ -91,16 +95,16 @@ export default function PropertiesPanel({
             <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">
               {translations.rotation}
             </label>
-            <div className="space-y-2">
-              {['X', 'Y', 'Z'].map((axis) => (
-                <div key={axis} className="flex items-center gap-2">
-                  <span className="text-xs font-medium w-4">{axis}</span>
+            <div className="grid grid-cols-3 gap-2">
+              {['X', 'Y', 'Z'].map((axis, index) => (
+                <div key={axis} className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">{axis}</span>
                   <input
                     type="number"
-                    defaultValue={0}
+                    value={objectData?.rotation?.[index] ?? 0}
                     step={1}
-                    className="flex-1 px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
-                    onChange={(e) => onPropertyChange?.(`rotation${axis}`, parseFloat(e.target.value))}
+                    className="px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
+                    onChange={(e) => onPropertyChange?.(`rotation${axis}`, parseFloat(e.target.value) || 0)}
                   />
                 </div>
               ))}
@@ -112,17 +116,17 @@ export default function PropertiesPanel({
             <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">
               {translations.scale}
             </label>
-            <div className="space-y-2">
-              {['X', 'Y', 'Z'].map((axis) => (
-                <div key={axis} className="flex items-center gap-2">
-                  <span className="text-xs font-medium w-4">{axis}</span>
+            <div className="grid grid-cols-3 gap-2">
+              {['X', 'Y', 'Z'].map((axis, index) => (
+                <div key={axis} className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">{axis}</span>
                   <input
                     type="number"
-                    defaultValue={1}
+                    value={objectData?.scale?.[index] ?? 1}
                     step={0.1}
                     min={0.1}
-                    className="flex-1 px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
-                    onChange={(e) => onPropertyChange?.(`scale${axis}`, parseFloat(e.target.value))}
+                    className="px-2 py-1 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-sm"
+                    onChange={(e) => onPropertyChange?.(`scale${axis}`, parseFloat(e.target.value) || 0.1)}
                   />
                 </div>
               ))}
