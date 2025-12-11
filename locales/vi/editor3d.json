@@ -31,6 +31,8 @@
     "color": "Màu sắc",
     "material": "Chất liệu",
     "wireframe": "Khung dây",
+    "lightSettings": "Cài đặt ánh sáng",
+    "intensity": "Cường độ",
     "noSelection": "Chưa chọn vật thể",
     "selectObject": "Chọn một vật thể để xem và chỉnh sửa thuộc tính"
   },

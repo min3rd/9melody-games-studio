@@ -31,6 +31,8 @@
     "color": "Color",
     "material": "Material",
     "wireframe": "Wireframe",
+    "lightSettings": "Light Settings",
+    "intensity": "Intensity",
     "noSelection": "No object selected",
     "selectObject": "Select an object to view and edit its properties"
   },
