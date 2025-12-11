@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid } from '@react-three/drei';
 import * as THREE from 'three';
@@ -105,6 +105,9 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
   const [hierarchyCollapsed, setHierarchyCollapsed] = useState(false);
   const [propertiesCollapsed, setPropertiesCollapsed] = useState(false);
   const [assetsCollapsed, setAssetsCollapsed] = useState(false);
+
+  // Ref for OrbitControls to disable during transform
+  const orbitControlsRef = useRef<any>(null);
 
   // Handlers
   const handleObjectSelect = (id: string) => {
@@ -349,6 +352,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
                   <directionalLight position={[10, 10, 5]} intensity={0.8} />
                   <PerspectiveCamera makeDefault position={[5, 5, 5]} />
                   <OrbitControls 
+                    ref={orbitControlsRef}
                     enableZoom 
                     enablePan 
                     mouseButtons={{
@@ -382,6 +386,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
                       onTransform={(property, value) => {
                         handlePropertyChange(property, value);
                       }}
+                      orbitControlsRef={orbitControlsRef}
                     />
                   ))}
                 </Canvas>
