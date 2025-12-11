@@ -22,6 +22,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const items = [
     { label: "Overview", href: "/private/admin" },
     { label: "Users", href: "/private/admin/users" },
+    { label: "3D Editor", href: "/private/admin/3d-editor" },
     { label: "Settings", href: "/private/admin/settings" },
   ];
 

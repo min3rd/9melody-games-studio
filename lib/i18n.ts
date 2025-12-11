@@ -7,11 +7,13 @@ import enPublic from "@/locales/en/public.json";
 import viPublic from "@/locales/vi/public.json";
 import enErrors from "@/locales/en/errors.json";
 import viErrors from "@/locales/vi/errors.json";
+import enEditor3d from "@/locales/en/editor3d.json";
+import viEditor3d from "@/locales/vi/editor3d.json";
 
 // resources loaded from locales
 const resources = {
-  en: { common: en, admin: enAdmin, errors: enErrors, public: enPublic },
-  vi: { common: vi, admin: viAdmin, errors: viErrors, public: viPublic },
+  en: { common: en, admin: enAdmin, errors: enErrors, public: enPublic, editor3d: enEditor3d },
+  vi: { common: vi, admin: viAdmin, errors: viErrors, public: viPublic, editor3d: viEditor3d },
 };
 
 // init i18next
@@ -22,7 +24,7 @@ if (!i18n.isInitialized) {
     // to harmonize the runtime language with localStorage or user preferences.
     lng: "en",
     fallbackLng: "en",
-    ns: ["common", "admin", "errors", "public"],
+    ns: ["common", "admin", "errors", "public", "editor3d"],
     defaultNS: "common",
     interpolation: { escapeValue: false },
   });

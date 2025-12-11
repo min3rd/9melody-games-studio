@@ -2,6 +2,7 @@
   "dashboard": "Admin Dashboard",
   "users": "Users",
   "settings": "Settings",
+  "3dEditor": "3D Editor",
   "notAuthorized": "Not authorized",
   "loginToAdmin": "Log in as Admin",
   "logout": "Logout",
