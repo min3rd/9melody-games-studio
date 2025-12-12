@@ -65,6 +65,12 @@ Documentation includes:
 - Troubleshooting guide
 - Future enhancement suggestions
 
+### 4. Asset storage APIs
+
+- Added secured REST endpoints under `/api/assets` and `/api/assets/[id]` for listing, uploading (multipart), creating folders, updating metadata, and deleting assets.
+- Assets carry metadata (type, size, mime, preview, timestamps, kind) and support nested folder hierarchies.
+- All operations validate the admin session cookies used by the editor routes.
+
 ## Key Features Delivered
 
 ✅ **Intuitive Interface**

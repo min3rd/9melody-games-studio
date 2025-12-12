@@ -20,5 +20,13 @@
   "00x0010": "Invalid identifier.",
   "INVALID_ID": "Invalid identifier.",
   "00x0011": "An unexpected error occurred. Please try again later.",
-  "INTERNAL_ERROR": "An unexpected error occurred. Please try again later."
+  "INTERNAL_ERROR": "An unexpected error occurred. Please try again later.",
+  "00x0012": "Asset name is required.",
+  "ASSET_NAME_REQUIRED": "Asset name is required.",
+  "00x0013": "Asset not found.",
+  "ASSET_NOT_FOUND": "Asset not found.",
+  "00x0014": "Parent folder is invalid.",
+  "ASSET_PARENT_INVALID": "Parent folder is invalid.",
+  "00x0015": "No asset file provided.",
+  "ASSET_UPLOAD_REQUIRED": "No asset file provided."
 }
