@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import EditorPanel from './EditorPanel';
 import { TextInput } from '@/components/ui';
 import { ErrorCodes } from '@/lib/errorCodes';
@@ -175,6 +175,15 @@ export default function AssetLibraryPanel({
   const [moveCandidate, setMoveCandidate] = useState<AssetItem | null>(null);
   const [moveTarget, setMoveTarget] = useState<FolderNode['id'] | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; target: AssetItem | null } | null>(null);
+  const [modalState, setModalState] = useState<
+    | { type: 'create'; parentId: FolderNode['id'] | null }
+    | { type: 'rename'; target: AssetItem }
+    | { type: 'delete'; target: AssetItem }
+    | null
+  >(null);
+  const [nameInput, setNameInput] = useState('');
+  const assetsAreaRef = useRef<HTMLDivElement | null>(null);
 
   const filteredAssets = useMemo(
     () =>
@@ -190,23 +199,36 @@ export default function AssetLibraryPanel({
     return [{ id: null, name: translations.root }, ...path.map((node) => ({ id: node.id, name: node.name }))];
   }, [currentFolderId, folderTree, translations.root]);
 
-  useEffect(() => {
-    async function bootstrap() {
-      const treeLoaded = await loadTree();
-      await loadAssets(currentFolderId, treeLoaded);
-    }
-    bootstrap();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function loadTree(preferApi = true) {
-    if (!preferApi) {
-      setFolderTree(buildFolderTree(normalizedFallback));
-      return false;
-    }
-    try {
-      const response = await fetch('/api/assets/tree?foldersOnly=true', { cache: 'no-store' });
-      if (!response.ok) {
+  const loadTree = useCallback(
+    async (preferApi = true) => {
+      if (!preferApi) {
+        setFolderTree(buildFolderTree(normalizedFallback));
+        return false;
+      }
+      try {
+        const response = await fetch('/api/assets/tree?foldersOnly=true', { cache: 'no-store' });
+        if (!response.ok) {
+          if (normalizedFallback.length) {
+            setUsingFallback(true);
+            setFolderTree(buildFolderTree(normalizedFallback));
+          } else {
+            setErrorMessage(translations.errorGeneric);
+          }
+          return false;
+        }
+        const json = await response.json();
+        const mapNode = (item: ApiFolderNode): FolderNode => ({
+          id: item.id,
+          name: item.name,
+          parentId: item.parentId ?? null,
+          children: (item.children ?? []).map(mapNode),
+          source: 'api',
+        });
+        const mapped: FolderNode[] = ((json.items ?? []) as ApiFolderNode[]).map(mapNode);
+        setFolderTree(mapped);
+        setUsingFallback(false);
+        return true;
+      } catch (error: unknown) {
         if (normalizedFallback.length) {
           setUsingFallback(true);
           setFolderTree(buildFolderTree(normalizedFallback));
@@ -215,75 +237,86 @@ export default function AssetLibraryPanel({
         }
         return false;
       }
-      const json = await response.json();
-      const mapNode = (item: ApiFolderNode): FolderNode => ({
-        id: item.id,
-        name: item.name,
-        parentId: item.parentId ?? null,
-        children: (item.children ?? []).map(mapNode),
-        source: 'api',
-      });
-      const mapped: FolderNode[] = ((json.items ?? []) as ApiFolderNode[]).map(mapNode);
-      setFolderTree(mapped);
-      setUsingFallback(false);
-      return true;
-    } catch (error: unknown) {
-      if (normalizedFallback.length) {
-        setUsingFallback(true);
-        setFolderTree(buildFolderTree(normalizedFallback));
-      } else {
-        setErrorMessage(translations.errorGeneric);
+    },
+    [normalizedFallback, translations.errorGeneric]
+  );
+
+  const loadAssets = useCallback(
+    async (parentId: FolderNode['id'] | null, preferApi = true) => {
+      setLoading(true);
+      const useApi = preferApi && !usingFallback;
+      if (useApi) {
+        setErrorMessage(null);
       }
-      return false;
-    }
-  }
+      if (!useApi) {
+        setAssets(normalizedFallback.filter((asset) => (asset.parentId ?? null) === (parentId ?? null)));
+        setLoading(false);
+        return;
+      }
 
-  async function loadAssets(parentId: FolderNode['id'] | null, preferApi = true) {
-    setLoading(true);
-    const useApi = preferApi && !usingFallback;
-    if (useApi) {
-      setErrorMessage(null);
-    }
-    if (!useApi) {
-      setAssets(normalizedFallback.filter((asset) => (asset.parentId ?? null) === (parentId ?? null)));
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/assets?parentId=${parentId ?? ''}`, { cache: 'no-store' });
-      if (!response.ok) {
+      try {
+        const search = parentId === null || parentId === undefined ? '' : String(parentId);
+        const response = await fetch(`/api/assets?parentId=${encodeURIComponent(search)}`, { cache: 'no-store' });
+        if (!response.ok) {
+          if (normalizedFallback.length) {
+            setUsingFallback(true);
+            setAssets(normalizedFallback.filter((asset) => (asset.parentId ?? null) === (parentId ?? null)));
+          } else {
+            setErrorMessage(translations.errorGeneric);
+          }
+          setLoading(false);
+          return;
+        }
+        const json = await response.json();
+        const mapped: AssetItem[] = ((json.items ?? []) as ApiAsset[]).map((item) => ({
+          id: item.id,
+          name: item.name,
+          type: item.type === 'FOLDER' ? 'folder' : 'file',
+          parentId: item.parentId ?? null,
+          thumbnail: item.previewUrl,
+          source: 'api',
+        }));
+        setAssets(mapped);
+        setUsingFallback(false);
+      } catch (error: unknown) {
         if (normalizedFallback.length) {
           setUsingFallback(true);
           setAssets(normalizedFallback.filter((asset) => (asset.parentId ?? null) === (parentId ?? null)));
         } else {
           setErrorMessage(translations.errorGeneric);
         }
+      } finally {
         setLoading(false);
-        return;
       }
-      const json = await response.json();
-      const mapped: AssetItem[] = ((json.items ?? []) as ApiAsset[]).map((item) => ({
-        id: item.id,
-        name: item.name,
-        type: item.type === 'FOLDER' ? 'folder' : 'file',
-        parentId: item.parentId ?? null,
-        thumbnail: item.previewUrl,
-        source: 'api',
-      }));
-      setAssets(mapped);
-      setUsingFallback(false);
-    } catch (error: unknown) {
-      if (normalizedFallback.length) {
-        setUsingFallback(true);
-        setAssets(normalizedFallback.filter((asset) => (asset.parentId ?? null) === (parentId ?? null)));
-      } else {
-        setErrorMessage(translations.errorGeneric);
-      }
-    } finally {
-      setLoading(false);
+    },
+    [normalizedFallback, translations.errorGeneric, usingFallback]
+  );
+
+  useEffect(() => {
+    async function bootstrap() {
+      const treeLoaded = await loadTree();
+      await loadAssets(currentFolderId, treeLoaded);
     }
-  }
+    void bootstrap();
+  }, [currentFolderId, loadAssets, loadTree]);
+
+  useEffect(() => {
+    function handleGlobalClick() {
+      setContextMenu(null);
+    }
+    function handleEsc(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setContextMenu(null);
+        setModalState(null);
+      }
+    }
+    window.addEventListener('click', handleGlobalClick);
+    window.addEventListener('keyup', handleEsc);
+    return () => {
+      window.removeEventListener('click', handleGlobalClick);
+      window.removeEventListener('keyup', handleEsc);
+    };
+  }, []);
 
   function handleFolderNavigate(folderId: FolderNode['id'] | null) {
     setCurrentFolderId(folderId);
@@ -297,27 +330,27 @@ export default function AssetLibraryPanel({
     return translations.errorGeneric;
   }
 
-  async function handleNewFolder() {
+  function openCreateModal(parentId?: FolderNode['id'] | null) {
     if (usingFallback) return;
-    const name = window.prompt(translations.namePlaceholder);
-    if (!name) return;
-    setLoading(true);
-    try {
-      const response = await fetch('/api/assets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, type: 'FOLDER', parentId: currentFolderId }),
-      });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        alert(getActionError(payload?.code));
-        return;
-      }
-      await loadTree();
-      await loadAssets(currentFolderId);
-    } finally {
-      setLoading(false);
-    }
+    setErrorMessage(null);
+    setModalState({ type: 'create', parentId: parentId ?? currentFolderId });
+    setNameInput('');
+    setContextMenu(null);
+  }
+
+  function openRenameModal(asset: AssetItem) {
+    if (usingFallback || asset.type !== 'folder') return;
+    setErrorMessage(null);
+    setModalState({ type: 'rename', target: asset });
+    setNameInput(asset.name);
+    setContextMenu(null);
+  }
+
+  function openDeleteModal(asset: AssetItem) {
+    if (usingFallback || asset.type !== 'folder') return;
+    setErrorMessage(null);
+    setModalState({ type: 'delete', target: asset });
+    setContextMenu(null);
   }
 
   async function handleRefresh() {
@@ -325,41 +358,67 @@ export default function AssetLibraryPanel({
     await loadAssets(currentFolderId, treeLoaded);
   }
 
-  async function handleRename(asset: AssetItem) {
-    if (usingFallback || typeof asset.id !== 'number') return;
-    const name = window.prompt(translations.rename, asset.name);
-    if (!name || name === asset.name) return;
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/assets/${asset.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        alert(getActionError(payload?.code));
-        return;
-      }
-      await loadTree();
-      await loadAssets(currentFolderId);
-    } finally {
-      setLoading(false);
-    }
+  function handleContextMenu(event: React.MouseEvent, asset: AssetItem | null = null) {
+    event.preventDefault();
+    const bounds = assetsAreaRef.current?.getBoundingClientRect();
+    const x = bounds ? event.clientX - bounds.left : event.clientX;
+    const y = bounds ? event.clientY - bounds.top : event.clientY;
+    setContextMenu({ x, y, target: asset });
   }
 
-  async function handleDelete(asset: AssetItem) {
-    if (usingFallback || typeof asset.id !== 'number') return;
-    const confirmed = window.confirm(translations.confirmDelete.replace('{name}', asset.name));
-    if (!confirmed) return;
+  function openMove(asset: AssetItem) {
+    if (usingFallback || asset.type !== 'folder') return;
+    setErrorMessage(null);
+    setMoveCandidate(asset);
+    setMoveTarget(asset.parentId ?? null);
+    setContextMenu(null);
+  }
+
+  async function submitModal(event?: React.FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    if (!modalState || usingFallback) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/assets/${asset.id}`, { method: 'DELETE' });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        alert(getActionError(payload?.code));
-        return;
+      if (modalState.type === 'create') {
+        const trimmed = nameInput.trim();
+        if (!trimmed) return;
+        const response = await fetch('/api/assets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: trimmed, type: 'FOLDER', parentId: modalState.parentId }),
+        });
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null);
+          setErrorMessage(getActionError(payload?.code));
+          return;
+        }
+      } else if (modalState.type === 'rename') {
+        const trimmed = nameInput.trim();
+        if (!trimmed || trimmed === modalState.target.name || typeof modalState.target.id !== 'number') return;
+        const response = await fetch(`/api/assets/${modalState.target.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: trimmed }),
+        });
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null);
+          setErrorMessage(getActionError(payload?.code));
+          return;
+        }
+      } else if (modalState.type === 'delete') {
+        if (typeof modalState.target.id !== 'number') return;
+        const response = await fetch(`/api/assets/${modalState.target.id}`, { method: 'DELETE' });
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null);
+          setErrorMessage(getActionError(payload?.code));
+          return;
+        }
+        if (moveCandidate?.id === modalState.target.id) {
+          setMoveCandidate(null);
+        }
       }
+
+      setModalState(null);
       await loadTree();
       await loadAssets(currentFolderId);
     } finally {
@@ -379,7 +438,7 @@ export default function AssetLibraryPanel({
       });
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        alert(getActionError(payload?.code));
+        setErrorMessage(getActionError(payload?.code));
         return;
       }
       setMoveCandidate(null);
@@ -413,7 +472,7 @@ export default function AssetLibraryPanel({
         {viewMode === 'grid' ? '☰' : '⊞'}
       </button>
       <button
-        onClick={() => handleNewFolder()}
+        onClick={() => openCreateModal()}
         disabled={loading || usingFallback}
         className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         title={translations.newFolder}
@@ -434,11 +493,11 @@ export default function AssetLibraryPanel({
     const isFolder = asset.type === 'folder';
     const icon = isFolder ? '📁' : '🎨';
     const actionButtons = isFolder ? (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
         <button
           onClick={(event) => {
             event.stopPropagation();
-            handleRename(asset);
+            openRenameModal(asset);
           }}
           disabled={loading || usingFallback || typeof asset.id !== 'number'}
           className="px-1 py-0.5 text-[10px] bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm disabled:opacity-60"
@@ -449,8 +508,7 @@ export default function AssetLibraryPanel({
         <button
           onClick={(event) => {
             event.stopPropagation();
-            setMoveCandidate(asset);
-            setMoveTarget(asset.parentId ?? null);
+            openMove(asset);
           }}
           disabled={loading || usingFallback || typeof asset.id !== 'number'}
           className="px-1 py-0.5 text-[10px] bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm disabled:opacity-60"
@@ -461,7 +519,7 @@ export default function AssetLibraryPanel({
         <button
           onClick={(event) => {
             event.stopPropagation();
-            handleDelete(asset);
+            openDeleteModal(asset);
           }}
           disabled={loading || usingFallback || typeof asset.id !== 'number'}
           className="px-1 py-0.5 text-[10px] bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm disabled:opacity-60"
@@ -485,7 +543,8 @@ export default function AssetLibraryPanel({
               onAssetSelect?.(asset);
             }
           }}
-          className="flex flex-col items-center p-3 border border-neutral-300 dark:border-neutral-700 rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors"
+          onContextMenu={(event) => handleContextMenu(event, asset)}
+          className="group relative flex flex-col items-center p-3 border border-neutral-300 dark:border-neutral-700 rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors"
         >
           {asset.thumbnail ? (
             <img
@@ -518,7 +577,8 @@ export default function AssetLibraryPanel({
             onAssetSelect?.(asset);
           }
         }}
-        className="flex items-center gap-3 px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors"
+        onContextMenu={(event) => handleContextMenu(event, asset)}
+        className="group relative flex items-center gap-3 px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors"
       >
         <span className="text-xl">{icon}</span>
         <span className="flex-1 text-sm truncate">{asset.name}</span>
@@ -573,7 +633,12 @@ export default function AssetLibraryPanel({
             </div>
           </div>
 
-          <div className="flex-1">
+          <div
+            className="flex-1 relative"
+            ref={assetsAreaRef}
+            data-testid="asset-area"
+            onContextMenu={(event) => handleContextMenu(event, null)}
+          >
             {errorMessage && (
               <div className="mb-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-700 rounded-sm px-3 py-2">
                 {errorMessage}
@@ -599,8 +664,120 @@ export default function AssetLibraryPanel({
             <div className="text-xs text-center text-neutral-500 dark:text-neutral-400 italic py-4 border-t border-neutral-200 dark:border-neutral-700">
               {translations.dragDrop}
             </div>
+
+            {contextMenu && (
+              <div
+                className="absolute z-20 min-w-[180px] rounded-sm border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-lg py-1 text-sm"
+                style={{ top: contextMenu.y, left: contextMenu.x }}
+                onClick={(event) => event.stopPropagation()}
+                onContextMenu={(event) => event.preventDefault()}
+              >
+                <ContextMenuButton
+                  label={translations.newFolder}
+                  disabled={usingFallback}
+                  onClick={() => openCreateModal(
+                    contextMenu.target?.type === 'folder' ? contextMenu.target.id : currentFolderId
+                  )}
+                />
+                <ContextMenuButton
+                  label={translations.refresh}
+                  onClick={() => {
+                    handleRefresh();
+                    setContextMenu(null);
+                  }}
+                />
+                {contextMenu.target?.type === 'folder' && (
+                  <>
+                    <ContextMenuButton
+                      label={translations.rename}
+                      disabled={usingFallback || typeof contextMenu.target.id !== 'number'}
+                      onClick={() => openRenameModal(contextMenu.target as AssetItem)}
+                    />
+                    <ContextMenuButton
+                      label={translations.move}
+                      disabled={usingFallback || typeof contextMenu.target.id !== 'number'}
+                      onClick={() => openMove(contextMenu.target as AssetItem)}
+                    />
+                    <ContextMenuButton
+                      label={translations.delete}
+                      disabled={usingFallback || typeof contextMenu.target.id !== 'number'}
+                      onClick={() => openDeleteModal(contextMenu.target as AssetItem)}
+                    />
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
+
+        {modalState && (
+          <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4" onClick={() => setModalState(null)}>
+            <div
+              className="w-full max-w-sm rounded-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-4 space-y-3"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                {modalState.type === 'create' && translations.newFolder}
+                {modalState.type === 'rename' && translations.rename}
+                {modalState.type === 'delete' && translations.delete}
+              </div>
+
+              {modalState.type === 'delete' ? (
+                <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                  {translations.confirmDelete.replace('{name}', modalState.target.name)}
+                </p>
+              ) : (
+                <form className="space-y-2" onSubmit={submitModal}>
+                  <label className="text-xs text-neutral-700 dark:text-neutral-300 flex flex-col gap-1">
+                    {translations.namePlaceholder}
+                    <input
+                      value={nameInput}
+                      onChange={(event) => setNameInput(event.target.value)}
+                      className="w-full rounded-sm border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
+                      autoFocus
+                    />
+                  </label>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setModalState(null)}
+                      className="px-3 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 rounded-sm"
+                    >
+                      {translations.cancel}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-3 py-1 text-xs bg-primary-500 text-white rounded-sm disabled:opacity-60"
+                    >
+                      {translations.save}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {modalState.type === 'delete' && (
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setModalState(null)}
+                    className="px-3 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 rounded-sm"
+                  >
+                    {translations.cancel}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => submitModal()}
+                    className="px-3 py-1 text-xs bg-red-500 text-white rounded-sm disabled:opacity-60"
+                  >
+                    {translations.delete}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {moveCandidate && moveCandidate.type === 'folder' && (
           <div className="border border-neutral-200 dark:border-neutral-700 rounded-sm p-3 bg-white dark:bg-neutral-900 space-y-2">
@@ -674,5 +851,26 @@ function FolderTreeNode({
         </div>
       )}
     </div>
+  );
+}
+
+function ContextMenuButton({
+  label,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`w-full text-left px-3 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+    >
+      {label}
+    </button>
   );
 }
