@@ -163,7 +163,7 @@ export default function Scene3DObject({
           onObjectChange={(e) => {
             if (meshRef.current) {
               const pos = meshRef.current.position;
-              // Only update position when in translate mode
+              // Update position values individually for proper state sync
               onTransform?.('positionX', pos.x);
               onTransform?.('positionY', pos.y);
               onTransform?.('positionZ', pos.z);
