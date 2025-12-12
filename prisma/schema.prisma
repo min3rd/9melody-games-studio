@@ -40,3 +40,28 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+enum AssetType {
+  FOLDER
+  FILE
+}
+
+model Asset {
+  id         Int        @id @default(autoincrement())
+  name       String
+  type       AssetType
+  mimeType   String?
+  size       Int?
+  extension  String?
+  url        String?
+  previewUrl String?
+  kind       String?
+  metadata   Json?
+  parentId   Int?
+  parent     Asset?     @relation("AssetChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Asset[]    @relation("AssetChildren")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([parentId])
+}

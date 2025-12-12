@@ -12,6 +12,10 @@ export const ErrorCodes = {
   USERNAME_EXISTS: '00x0009',
   INVALID_ID: '00x0010',
   INTERNAL_ERROR: '00x0011',
+  ASSET_NAME_REQUIRED: '00x0012',
+  ASSET_NOT_FOUND: '00x0013',
+  ASSET_PARENT_INVALID: '00x0014',
+  ASSET_UPLOAD_REQUIRED: '00x0015',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

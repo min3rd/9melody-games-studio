@@ -20,5 +20,13 @@
   "00x0010": "Định danh không hợp lệ.",
   "INVALID_ID": "Định danh không hợp lệ.",
   "00x0011": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
-  "INTERNAL_ERROR": "Đã xảy ra lỗi. Vui lòng thử lại sau."
+  "INTERNAL_ERROR": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+  "00x0012": "Cần tên asset.",
+  "ASSET_NAME_REQUIRED": "Cần tên asset.",
+  "00x0013": "Không tìm thấy asset.",
+  "ASSET_NOT_FOUND": "Không tìm thấy asset.",
+  "00x0014": "Thư mục cha không hợp lệ.",
+  "ASSET_PARENT_INVALID": "Thư mục cha không hợp lệ.",
+  "00x0015": "Chưa cung cấp file asset.",
+  "ASSET_UPLOAD_REQUIRED": "Chưa cung cấp file asset."
 }
