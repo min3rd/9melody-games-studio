@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { ErrorCodes, formatError } from "@/lib/errorCodes";
 import { requireAdminFromRequest } from "@/lib/apiAuth";
-import { parseNumericParam } from "./utils";
+import { hasNameConflict, parseNumericParam } from "./utils";
 import { NextRequest, NextResponse } from "next/server";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
@@ -200,6 +200,11 @@ export async function POST(request: NextRequest) {
   const inferredKind = kind ?? inferKind(inferredExtension, mimeType);
   const payloadMetadata =
     metadata && typeof metadata === "object" ? metadata : undefined;
+
+  const hasConflict = await hasNameConflict(name, parentId, normalizedType, undefined);
+  if (hasConflict) {
+    return NextResponse.json(formatError(ErrorCodes.ASSET_NAME_CONFLICT), { status: 409 });
+  }
 
   const asset = await prisma.asset.create({
     data: {

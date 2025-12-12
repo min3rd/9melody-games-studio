@@ -16,6 +16,7 @@ export const ErrorCodes = {
   ASSET_NOT_FOUND: '00x0013',
   ASSET_PARENT_INVALID: '00x0014',
   ASSET_UPLOAD_REQUIRED: '00x0015',
+  ASSET_NAME_CONFLICT: '00x0016',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

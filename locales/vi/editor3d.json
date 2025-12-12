@@ -47,7 +47,19 @@
     "noAssets": "Không tìm thấy vật thể",
     "folders": "Thư mục",
     "files": "Tệp",
-    "dragDrop": "Kéo thả vật thể vào cảnh"
+    "dragDrop": "Kéo thả vật thể vào cảnh",
+    "rename": "Đổi tên",
+    "delete": "Xóa",
+    "move": "Di chuyển",
+    "root": "Gốc",
+    "confirmDelete": "Xóa \"{name}\"? Thao tác này sẽ xóa cả nội dung bên trong.",
+    "destination": "Thư mục đích",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "namePlaceholder": "Tên thư mục",
+    "moveTitle": "Di chuyển thư mục",
+    "errorConflict": "Đã có mục với tên này trong thư mục.",
+    "errorGeneric": "Không thể thực hiện thao tác, vui lòng thử lại."
   },
   "viewport": {
     "title": "Khung nhìn 3D",

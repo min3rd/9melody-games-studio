@@ -28,5 +28,7 @@
   "00x0014": "Thư mục cha không hợp lệ.",
   "ASSET_PARENT_INVALID": "Thư mục cha không hợp lệ.",
   "00x0015": "Chưa cung cấp file asset.",
-  "ASSET_UPLOAD_REQUIRED": "Chưa cung cấp file asset."
+  "ASSET_UPLOAD_REQUIRED": "Chưa cung cấp file asset.",
+  "00x0016": "Đã có asset với tên này trong thư mục đích.",
+  "ASSET_NAME_CONFLICT": "Đã có asset với tên này trong thư mục đích."
 }

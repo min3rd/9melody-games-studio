@@ -47,7 +47,19 @@
     "noAssets": "No assets found",
     "folders": "Folders",
     "files": "Files",
-    "dragDrop": "Drag and drop assets into the scene"
+    "dragDrop": "Drag and drop assets into the scene",
+    "rename": "Rename",
+    "delete": "Delete",
+    "move": "Move",
+    "root": "Root",
+    "confirmDelete": "Delete \"{name}\"? This will also remove its children.",
+    "destination": "Destination folder",
+    "save": "Save",
+    "cancel": "Cancel",
+    "namePlaceholder": "Folder name",
+    "moveTitle": "Move folder",
+    "errorConflict": "An asset with this name already exists in this folder.",
+    "errorGeneric": "Unable to complete this action right now."
   },
   "viewport": {
     "title": "3D Viewport",

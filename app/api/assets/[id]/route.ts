@@ -3,7 +3,7 @@ import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { ErrorCodes, formatError } from "@/lib/errorCodes";
 import { requireAdminFromRequest } from "@/lib/apiAuth";
-import { parseIdParam, parseNumericParam } from "../utils";
+import { hasNameConflict, parseIdParam, parseNumericParam } from "../utils";
 import { NextRequest, NextResponse } from "next/server";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
@@ -154,6 +154,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   if (typeof size === "number") data.size = size;
   if (typeof extension === "string") data.extension = extension;
   if (typeof kind === "string") data.kind = kind;
+
+  const targetName = data.name ?? existing.name;
+  const targetParentId = data.parentId !== undefined ? data.parentId : existing.parentId ?? null;
+  if (await hasNameConflict(targetName, targetParentId, existing.type, existing.id)) {
+    return NextResponse.json(formatError(ErrorCodes.ASSET_NAME_CONFLICT), { status: 409 });
+  }
 
   const updated = await prisma.asset.update({ where: { id }, data });
   return NextResponse.json(updated);

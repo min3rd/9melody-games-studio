@@ -28,5 +28,7 @@
   "00x0014": "Parent folder is invalid.",
   "ASSET_PARENT_INVALID": "Parent folder is invalid.",
   "00x0015": "No asset file provided.",
-  "ASSET_UPLOAD_REQUIRED": "No asset file provided."
+  "ASSET_UPLOAD_REQUIRED": "No asset file provided.",
+  "00x0016": "An asset with this name already exists in the destination folder.",
+  "ASSET_NAME_CONFLICT": "An asset with this name already exists in the destination folder."
 }
