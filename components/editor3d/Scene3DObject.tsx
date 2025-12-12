@@ -37,6 +37,7 @@ export default function Scene3DObject({
   const meshRef = useRef<THREE.Mesh | THREE.Group>(null);
   const transformControlsRef = useRef<any>(null);
   const isDraggingRef = useRef(false);
+  const justFinishedDraggingRef = useRef(false);
 
   // Handle TransformControls events to disable/enable OrbitControls
   useEffect(() => {
@@ -47,6 +48,11 @@ export default function Scene3DObject({
       isDraggingRef.current = event.value;
       if (orbitControlsRef.current) {
         orbitControlsRef.current.enabled = !event.value;
+      }
+      
+      // When dragging ends, set flag to skip next sync
+      if (!event.value) {
+        justFinishedDraggingRef.current = true;
       }
     };
 
@@ -60,6 +66,12 @@ export default function Scene3DObject({
   // Sync mesh position/rotation/scale with data when NOT dragging
   useEffect(() => {
     if (!meshRef.current || isDraggingRef.current) return;
+    
+    // Skip sync immediately after dragging to avoid race condition
+    if (justFinishedDraggingRef.current) {
+      justFinishedDraggingRef.current = false;
+      return;
+    }
     
     meshRef.current.position.set(data.position[0], data.position[1], data.position[2]);
     meshRef.current.rotation.set(data.rotation[0], data.rotation[1], data.rotation[2]);
