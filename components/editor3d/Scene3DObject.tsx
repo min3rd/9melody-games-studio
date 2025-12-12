@@ -37,7 +37,9 @@ export default function Scene3DObject({
   const meshRef = useRef<THREE.Mesh | THREE.Group>(null);
   const transformControlsRef = useRef<any>(null);
   const isDraggingRef = useRef(false);
-  const justFinishedDraggingRef = useRef(false);
+  const lastMeshPositionRef = useRef<[number, number, number]>([0, 0, 0]);
+  const lastMeshRotationRef = useRef<[number, number, number]>([0, 0, 0]);
+  const lastMeshScaleRef = useRef<[number, number, number]>([1, 1, 1]);
 
   // Handle TransformControls events to disable/enable OrbitControls
   useEffect(() => {
@@ -48,11 +50,6 @@ export default function Scene3DObject({
       isDraggingRef.current = event.value;
       if (orbitControlsRef.current) {
         orbitControlsRef.current.enabled = !event.value;
-      }
-      
-      // When dragging ends, set flag to skip next sync
-      if (!event.value) {
-        justFinishedDraggingRef.current = true;
       }
     };
 
@@ -67,15 +64,35 @@ export default function Scene3DObject({
   useEffect(() => {
     if (!meshRef.current || isDraggingRef.current) return;
     
-    // Skip sync immediately after dragging to avoid race condition
-    if (justFinishedDraggingRef.current) {
-      justFinishedDraggingRef.current = false;
-      return;
-    }
+    const mesh = meshRef.current;
+    const currentMeshPos: [number, number, number] = [mesh.position.x, mesh.position.y, mesh.position.z];
+    const currentMeshRot: [number, number, number] = [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z];
+    const currentMeshScale: [number, number, number] = [mesh.scale.x, mesh.scale.y, mesh.scale.z];
     
-    meshRef.current.position.set(data.position[0], data.position[1], data.position[2]);
-    meshRef.current.rotation.set(data.rotation[0], data.rotation[1], data.rotation[2]);
-    meshRef.current.scale.set(data.scale[0], data.scale[1], data.scale[2]);
+    // Only sync if data differs from current mesh state
+    // This means the change came from input fields, not from dragging
+    const posChanged = data.position[0] !== currentMeshPos[0] || 
+                       data.position[1] !== currentMeshPos[1] || 
+                       data.position[2] !== currentMeshPos[2];
+    const rotChanged = data.rotation[0] !== currentMeshRot[0] || 
+                       data.rotation[1] !== currentMeshRot[1] || 
+                       data.rotation[2] !== currentMeshRot[2];
+    const scaleChanged = data.scale[0] !== currentMeshScale[0] || 
+                         data.scale[1] !== currentMeshScale[1] || 
+                         data.scale[2] !== currentMeshScale[2];
+    
+    if (posChanged) {
+      mesh.position.set(data.position[0], data.position[1], data.position[2]);
+      lastMeshPositionRef.current = [...data.position];
+    }
+    if (rotChanged) {
+      mesh.rotation.set(data.rotation[0], data.rotation[1], data.rotation[2]);
+      lastMeshRotationRef.current = [...data.rotation];
+    }
+    if (scaleChanged) {
+      mesh.scale.set(data.scale[0], data.scale[1], data.scale[2]);
+      lastMeshScaleRef.current = [...data.scale];
+    }
   }, [data.position, data.rotation, data.scale]);
 
   const renderGeometry = () => {
