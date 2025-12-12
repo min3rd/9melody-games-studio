@@ -34,7 +34,7 @@ export default function Scene3DObject({
   onTransform,
   orbitControlsRef,
 }: Scene3DObjectProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<THREE.Mesh | THREE.Group>(null);
   const transformControlsRef = useRef<any>(null);
   const isDraggingRef = useRef(false);
 
@@ -115,7 +115,7 @@ export default function Scene3DObject({
 
       case 'light':
         return (
-          <group ref={meshRef as any}>
+          <group ref={meshRef}>
             <pointLight intensity={data.intensity || 1} color={color} />
             {/* Helper to visualize the light */}
             <mesh
