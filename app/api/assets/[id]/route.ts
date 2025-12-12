@@ -3,23 +3,11 @@ import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { ErrorCodes, formatError } from "@/lib/errorCodes";
 import { requireAdminFromRequest } from "@/lib/apiAuth";
+import { parseIdParam, parseNumericParam } from "../utils";
 import { NextRequest, NextResponse } from "next/server";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-
-function parseId(idParam: string | string[]) {
-  const value = Array.isArray(idParam) ? idParam[0] : idParam;
-  const parsed = Number(value);
-  if (Number.isNaN(parsed)) return null;
-  return parsed;
-}
-
-function parseParentId(value: unknown) {
-  if (value === null || value === undefined) return null;
-  const parsed = Number(value);
-  if (Number.isNaN(parsed)) return undefined;
-  return parsed;
-}
+const MAX_FOLDER_DEPTH = 50;
 
 async function ensureParentFolder(parentId: number | null, assetId: number) {
   if (parentId === null) return { ok: true as const };
@@ -33,12 +21,14 @@ async function ensureParentFolder(parentId: number | null, assetId: number) {
 
   // prevent circular parenting by walking ancestors
   let currentParent: number | null = parent.parentId;
-  while (currentParent !== null) {
+  let depth = 0;
+  while (currentParent !== null && depth < MAX_FOLDER_DEPTH) {
     if (currentParent === assetId) {
       return { ok: false as const, status: 400, body: formatError(ErrorCodes.ASSET_PARENT_INVALID) };
     }
     const ancestor = await prisma.asset.findUnique({ where: { id: currentParent }, select: { parentId: true } });
     currentParent = ancestor?.parentId ?? null;
+    depth += 1;
   }
 
   return { ok: true as const, parentId };
@@ -51,10 +41,9 @@ async function deleteLocalFile(url: string | null | undefined) {
   try {
     await fs.unlink(filePath);
   } catch (error: unknown) {
-    if (!(error instanceof Error) || "code" in error) {
-      if ((error as { code?: string }).code === "ENOENT") return;
-    }
-    // swallow other errors to avoid blocking API responses
+    const err = error as NodeJS.ErrnoException;
+    if (err?.code === "ENOENT") return;
+    console.error("Failed to delete asset file", error);
   }
 }
 
@@ -66,7 +55,8 @@ async function collectLocalFiles(rootId: number, rootUrl: string | null) {
 
   const queue: number[] = [rootId];
   while (queue.length) {
-    const current = queue.pop() as number;
+    const current = queue.pop();
+    if (!current) continue;
     const children = await prisma.asset.findMany({
       where: { parentId: current },
       select: { id: true, url: true, type: true },
@@ -89,7 +79,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json(formatError(ErrorCodes.NOT_AUTHORIZED), { status: 403 });
   }
 
-  const id = parseId(params.id);
+  const id = parseIdParam(params.id);
   if (id === null) {
     return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
   }
@@ -113,7 +103,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     return NextResponse.json(formatError(ErrorCodes.NOT_AUTHORIZED), { status: 403 });
   }
 
-  const id = parseId(params.id);
+  const id = parseIdParam(params.id);
   if (id === null) {
     return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
   }
@@ -145,10 +135,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     data.previewUrl = previewUrl;
   }
   if (rawParentId !== undefined) {
-    const parentId = parseParentId(rawParentId);
-    if (parentId === undefined) {
+    const parentResult = parseNumericParam(rawParentId);
+    if (!parentResult.ok) {
       return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
     }
+    const parentId = parentResult.value;
     const parentCheck = await ensureParentFolder(parentId, id);
     if (!parentCheck.ok) {
       return NextResponse.json(parentCheck.body, { status: parentCheck.status });
@@ -174,7 +165,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     return NextResponse.json(formatError(ErrorCodes.NOT_AUTHORIZED), { status: 403 });
   }
 
-  const id = parseId(params.id);
+  const id = parseIdParam(params.id);
   if (id === null) {
     return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
   }
