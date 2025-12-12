@@ -43,17 +43,30 @@ export interface Editor3DLayoutProps {
       intensity: string;
     };
     assets: {
-      title: string;
-      search: string;
-      newFolder: string;
-      upload: string;
-      refresh: string;
-      grid: string;
-      list: string;
-      noAssets: string;
-      dragDrop: string;
-    };
+    title: string;
+    search: string;
+    newFolder: string;
+    upload: string;
+    refresh: string;
+    grid: string;
+    list: string;
+    noAssets: string;
+    dragDrop: string;
+    folders: string;
+    rename: string;
+    delete: string;
+    move: string;
+    root: string;
+    confirmDelete: string;
+    destination: string;
+    save: string;
+    cancel: string;
+    namePlaceholder: string;
+    moveTitle: string;
+    errorConflict: string;
+    errorGeneric: string;
   };
+};
 }
 
 /**
@@ -86,20 +99,20 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
     },
   });
 
-  // Asset state - Include 3D component types
-  const [assets] = useState<AssetItem[]>([
-    { id: 'primitives', name: 'Primitives', type: 'folder', path: '/primitives' },
-    { id: 'components', name: '3D Components', type: 'folder', path: '/components' },
-    { id: 'box', name: 'Box', type: 'file', path: '/primitives/box' },
-    { id: 'sphere', name: 'Sphere', type: 'file', path: '/primitives/sphere' },
-    { id: 'cylinder', name: 'Cylinder', type: 'file', path: '/primitives/cylinder' },
-    { id: 'island', name: 'Island 3D', type: 'file', path: '/components/island' },
-    { id: 'sand', name: 'Sand 3D', type: 'file', path: '/components/sand' },
-    { id: 'ocean', name: 'Ocean 3D', type: 'file', path: '/components/ocean' },
-    { id: 'cloud', name: 'Cloud 3D', type: 'file', path: '/components/cloud' },
-    { id: 'rock', name: 'Rock 3D', type: 'file', path: '/components/rock' },
-    { id: 'wind', name: 'Wind 3D', type: 'file', path: '/components/wind' },
-  ]);
+  // Asset fallback data (for unauthenticated previews) - Include 3D component types
+  const fallbackAssets: AssetItem[] = [
+    { id: 'primitives', name: 'Primitives', type: 'folder', path: '/primitives', parentId: null, source: 'fallback' },
+    { id: 'components', name: '3D Components', type: 'folder', path: '/components', parentId: null, source: 'fallback' },
+    { id: 'box', name: 'Box', type: 'file', path: '/primitives/box', parentId: 'primitives', source: 'fallback' },
+    { id: 'sphere', name: 'Sphere', type: 'file', path: '/primitives/sphere', parentId: 'primitives', source: 'fallback' },
+    { id: 'cylinder', name: 'Cylinder', type: 'file', path: '/primitives/cylinder', parentId: 'primitives', source: 'fallback' },
+    { id: 'island', name: 'Island 3D', type: 'file', path: '/components/island', parentId: 'components', source: 'fallback' },
+    { id: 'sand', name: 'Sand 3D', type: 'file', path: '/components/sand', parentId: 'components', source: 'fallback' },
+    { id: 'ocean', name: 'Ocean 3D', type: 'file', path: '/components/ocean', parentId: 'components', source: 'fallback' },
+    { id: 'cloud', name: 'Cloud 3D', type: 'file', path: '/components/cloud', parentId: 'components', source: 'fallback' },
+    { id: 'rock', name: 'Rock 3D', type: 'file', path: '/components/rock', parentId: 'components', source: 'fallback' },
+    { id: 'wind', name: 'Wind 3D', type: 'file', path: '/components/wind', parentId: 'components', source: 'fallback' },
+  ];
 
   // Panel collapse state
   const [hierarchyCollapsed, setHierarchyCollapsed] = useState(false);
@@ -428,12 +441,9 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
             } transition-all duration-300 border-t border-neutral-200 dark:border-neutral-700 overflow-hidden`}
           >
             <AssetLibraryPanel
-              assets={assets}
               onAssetSelect={handleAssetSelect}
               onAssetDragStart={handleAssetDragStart}
-              onNewFolder={(path) => console.log('New folder in:', path)}
-              onUpload={() => console.log('Upload clicked')}
-              onRefresh={() => console.log('Refresh clicked')}
+              fallbackAssets={fallbackAssets}
               translations={translations.assets}
             />
           </div>
