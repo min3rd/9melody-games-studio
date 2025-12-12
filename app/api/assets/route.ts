@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { ErrorCodes, formatError } from "@/lib/errorCodes";
 import { requireAdminFromRequest } from "@/lib/apiAuth";
+import { parseNumericParam } from "./utils";
 import { NextRequest, NextResponse } from "next/server";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
@@ -48,19 +49,13 @@ function normalizeExtension(name: string, mimeType?: string | null) {
   return undefined;
 }
 
-function parseParentId(value: string | null): number | null | undefined {
-  if (value === null) return null;
-  const parsed = Number(value);
-  if (Number.isNaN(parsed)) return undefined;
-  return parsed;
-}
-
 function parseMetadata(value: FormDataEntryValue | null | undefined) {
   if (typeof value !== "string") return undefined;
   try {
     const parsed = JSON.parse(value);
     return typeof parsed === "object" && parsed !== null ? parsed : undefined;
-  } catch {
+  } catch (error: unknown) {
+    console.error("Failed to parse asset metadata", error);
     return undefined;
   }
 }
@@ -69,7 +64,7 @@ async function saveFileToDisk(file: File) {
   const buffer = Buffer.from(await file.arrayBuffer());
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
   const extension = normalizeExtension(file.name, file.type);
-  const fileName = `${randomUUID()}.${extension ?? "bin"}`;
+  const fileName = `${randomUUID()}.${extension ?? "dat"}`;
   const destination = path.join(UPLOAD_DIR, fileName);
   await fs.writeFile(destination, buffer);
 
@@ -93,10 +88,11 @@ export async function GET(request: NextRequest) {
   const kind = searchParams.get("kind");
   const query = searchParams.get("q");
 
-  const parentId = parseParentId(parentIdParam);
-  if (parentId === undefined) {
+  const parentIdResult = parseNumericParam(parentIdParam);
+  if (!parentIdResult.ok) {
     return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
   }
+  const parentId = parentIdResult.value;
 
   const where: {
     parentId?: number | null;
@@ -107,6 +103,7 @@ export async function GET(request: NextRequest) {
   where.parentId = parentId;
   if (kind) where.kind = kind;
   if (query) {
+    // Case-insensitive filtering relies on database support (e.g., PostgreSQL) via mode: "insensitive"
     where.name = { contains: query, mode: "insensitive" };
   }
 
@@ -130,10 +127,11 @@ export async function POST(request: NextRequest) {
   const contentType = request.headers.get("content-type") ?? "";
   if (contentType.includes("multipart/form-data")) {
     const formData = await request.formData();
-    const parentId = parseParentId(formData.get("parentId") as string | null);
-    if (parentId === undefined) {
+    const parentIdResult = parseNumericParam(formData.get("parentId"));
+    if (!parentIdResult.ok) {
       return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
     }
+    const parentId = parentIdResult.value;
 
     const parentCheck = await ensureParentFolder(parentId);
     if (!parentCheck.ok) {
@@ -186,10 +184,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(formatError(ErrorCodes.ASSET_NAME_REQUIRED), { status: 400 });
   }
 
-  const parentId = parseParentId(rawParentId === undefined || rawParentId === null ? null : String(rawParentId));
-  if (parentId === undefined) {
+  const parentIdResult = parseNumericParam(rawParentId ?? null);
+  if (!parentIdResult.ok) {
     return NextResponse.json(formatError(ErrorCodes.INVALID_ID), { status: 400 });
   }
+  const parentId = parentIdResult.value;
 
   const parentCheck = await ensureParentFolder(parentId);
   if (!parentCheck.ok) {

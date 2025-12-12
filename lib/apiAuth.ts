@@ -4,9 +4,8 @@ import type { NextRequest } from "next/server";
 export async function requireAdminFromRequest(request: NextRequest) {
   const email = request.cookies.get("userEmail")?.value ?? null;
   const sessionVersion = request.cookies.get("sv")?.value ?? null;
-  const isAdminCookie = request.cookies.get("isAdmin")?.value === "true";
 
-  if (!email || !isAdminCookie) {
+  if (!email) {
     return null;
   }
 
