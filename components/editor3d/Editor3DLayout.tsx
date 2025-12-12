@@ -174,43 +174,51 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
   };
 
   const handlePropertyChange = (property: string, value: any) => {
-    if (!selectedObjectId || !objectData[selectedObjectId]) return;
+    if (!selectedObjectId) return;
 
-    const updatedData = { ...objectData[selectedObjectId] };
-
-    // Handle different property types
     if (property === 'name') {
-      updatedData.name = value;
       handleRenameObject(selectedObjectId, value);
-    } else if (property.startsWith('position')) {
-      const axis = property.replace('position', '').toLowerCase();
-      const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
-      const newPosition = [...updatedData.position] as [number, number, number];
-      newPosition[axisIndex] = value;
-      updatedData.position = newPosition;
-    } else if (property.startsWith('rotation')) {
-      const axis = property.replace('rotation', '').toLowerCase();
-      const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
-      const newRotation = [...updatedData.rotation] as [number, number, number];
-      newRotation[axisIndex] = value;
-      updatedData.rotation = newRotation;
-    } else if (property.startsWith('scale')) {
-      const axis = property.replace('scale', '').toLowerCase();
-      const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
-      const newScale = [...updatedData.scale] as [number, number, number];
-      newScale[axisIndex] = value;
-      updatedData.scale = newScale;
-    } else if (property === 'color') {
-      updatedData.color = value;
-    } else if (property === 'wireframe') {
-      updatedData.wireframe = value;
-    } else if (property === 'intensity') {
-      updatedData.intensity = value;
     }
 
-    setObjectData({
-      ...objectData,
-      [selectedObjectId]: updatedData,
+    setObjectData((prev) => {
+      const current = prev[selectedObjectId];
+      if (!current) return prev;
+
+      const updatedData = { ...current };
+
+      // Handle different property types
+      if (property === 'name') {
+        updatedData.name = value;
+      } else if (property.startsWith('position')) {
+        const axis = property.replace('position', '').toLowerCase();
+        const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+        const newPosition = [...updatedData.position] as [number, number, number];
+        newPosition[axisIndex] = value;
+        updatedData.position = newPosition;
+      } else if (property.startsWith('rotation')) {
+        const axis = property.replace('rotation', '').toLowerCase();
+        const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+        const newRotation = [...updatedData.rotation] as [number, number, number];
+        newRotation[axisIndex] = value;
+        updatedData.rotation = newRotation;
+      } else if (property.startsWith('scale')) {
+        const axis = property.replace('scale', '').toLowerCase();
+        const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+        const newScale = [...updatedData.scale] as [number, number, number];
+        newScale[axisIndex] = value;
+        updatedData.scale = newScale;
+      } else if (property === 'color') {
+        updatedData.color = value;
+      } else if (property === 'wireframe') {
+        updatedData.wireframe = value;
+      } else if (property === 'intensity') {
+        updatedData.intensity = value;
+      }
+
+      return {
+        ...prev,
+        [selectedObjectId]: updatedData,
+      };
     });
   };
 
