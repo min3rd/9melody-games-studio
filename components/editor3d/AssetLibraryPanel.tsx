@@ -155,7 +155,7 @@ export default function AssetLibraryPanel({
 }: AssetLibraryPanelProps) {
   const normalizedFallback = useMemo(() => normalizeFallbackAssets(fallbackAssets), [fallbackAssets]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<FolderNode['id'] | null>(null);
   const [assets, setAssets] = useState<AssetItem[]>(normalizedFallback);
   const [folderTree, setFolderTree] = useState<FolderNode[]>(() => buildFolderTree(normalizedFallback));
@@ -580,8 +580,8 @@ export default function AssetLibraryPanel({
   return (
     <EditorPanel title={translations.title} headerActions={headerActions} className="h-full">
       <div className="space-y-3">
-        <div className="flex gap-4">
-          <div className="w-48 border border-neutral-200 dark:border-neutral-700 rounded-sm p-2 space-y-1 bg-white dark:bg-neutral-900 overflow-y-auto max-h-64 md:max-h-96 lg:max-h-full pr-1">
+        <div className="flex gap-4 h-full">
+          <div className="w-52 border border-neutral-200 dark:border-neutral-700 rounded-sm p-2 space-y-1 bg-white dark:bg-neutral-900 overflow-y-auto max-h-[320px] sm:max-h-full pr-1">
             <div className="text-xs font-semibold text-neutral-700 dark:text-neutral-200">{translations.folders}</div>
             <button
               onClick={() => handleFolderNavigate(null)}
