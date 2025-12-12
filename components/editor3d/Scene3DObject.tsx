@@ -36,6 +36,7 @@ export default function Scene3DObject({
 }: Scene3DObjectProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const transformControlsRef = useRef<any>(null);
+  const isDraggingRef = useRef(false);
 
   // Handle TransformControls events to disable/enable OrbitControls
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function Scene3DObject({
     if (!controls || !orbitControlsRef?.current) return;
 
     const handleDraggingChanged = (event: any) => {
+      isDraggingRef.current = event.value;
       if (orbitControlsRef.current) {
         orbitControlsRef.current.enabled = !event.value;
       }
@@ -55,6 +57,15 @@ export default function Scene3DObject({
     };
   }, [orbitControlsRef]);
 
+  // Sync mesh position/rotation/scale with data when NOT dragging
+  useEffect(() => {
+    if (!meshRef.current || isDraggingRef.current) return;
+    
+    meshRef.current.position.set(data.position[0], data.position[1], data.position[2]);
+    meshRef.current.rotation.set(data.rotation[0], data.rotation[1], data.rotation[2]);
+    meshRef.current.scale.set(data.scale[0], data.scale[1], data.scale[2]);
+  }, [data.position, data.rotation, data.scale]);
+
   const renderGeometry = () => {
     const color = data.color || '#3b82f6';
     const wireframe = data.wireframe || false;
@@ -64,9 +75,6 @@ export default function Scene3DObject({
         return (
           <mesh
             ref={meshRef}
-            position={data.position}
-            rotation={data.rotation}
-            scale={data.scale}
             onClick={(e) => {
               e.stopPropagation();
               onSelect();
@@ -81,9 +89,6 @@ export default function Scene3DObject({
         return (
           <mesh
             ref={meshRef}
-            position={data.position}
-            rotation={data.rotation}
-            scale={data.scale}
             onClick={(e) => {
               e.stopPropagation();
               onSelect();
@@ -98,9 +103,6 @@ export default function Scene3DObject({
         return (
           <mesh
             ref={meshRef}
-            position={data.position}
-            rotation={data.rotation}
-            scale={data.scale}
             onClick={(e) => {
               e.stopPropagation();
               onSelect();
@@ -113,7 +115,7 @@ export default function Scene3DObject({
 
       case 'light':
         return (
-          <group position={data.position} rotation={data.rotation} scale={data.scale}>
+          <group ref={meshRef as any}>
             <pointLight intensity={data.intensity || 1} color={color} />
             {/* Helper to visualize the light */}
             <mesh
@@ -133,9 +135,6 @@ export default function Scene3DObject({
         return (
           <mesh
             ref={meshRef}
-            position={data.position}
-            rotation={data.rotation}
-            scale={data.scale}
             onClick={(e) => {
               e.stopPropagation();
               onSelect();
