@@ -177,7 +177,21 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
     if (!selectedObjectId) return;
 
     if (property === 'name') {
+      setObjectData((prev) => {
+        const current = prev[selectedObjectId];
+        if (!current) return prev;
+
+        return {
+          ...prev,
+          [selectedObjectId]: {
+            ...current,
+            name: value,
+          },
+        };
+      });
+
       handleRenameObject(selectedObjectId, value);
+      return;
     }
 
     setObjectData((prev) => {
@@ -187,9 +201,7 @@ export default function Editor3DLayout({ translations }: Editor3DLayoutProps) {
       const updatedData = { ...current };
 
       // Handle different property types
-      if (property === 'name') {
-        updatedData.name = value;
-      } else if (property.startsWith('position')) {
+      if (property.startsWith('position')) {
         const axis = property.replace('position', '').toLowerCase();
         const axisIndex = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
         const newPosition = [...updatedData.position] as [number, number, number];
