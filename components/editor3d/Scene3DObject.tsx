@@ -156,7 +156,6 @@ export default function Scene3DObject({
           ref={transformControlsRef}
           object={meshRef.current}
           mode="translate"
-          space="world"
           size={0.8}
           showX
           showY
@@ -164,11 +163,10 @@ export default function Scene3DObject({
           onObjectChange={(e) => {
             if (meshRef.current) {
               const pos = meshRef.current.position;
-              const rot = meshRef.current.rotation;
-              const scl = meshRef.current.scale;
-              onTransform?.('position', [pos.x, pos.y, pos.z]);
-              onTransform?.('rotation', [rot.x, rot.y, rot.z]);
-              onTransform?.('scale', [scl.x, scl.y, scl.z]);
+              // Only update position when in translate mode
+              onTransform?.('positionX', pos.x);
+              onTransform?.('positionY', pos.y);
+              onTransform?.('positionZ', pos.z);
             }
           }}
         />
