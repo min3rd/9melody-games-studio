@@ -101,17 +101,6 @@ function buildFolderTree(items: AssetItem[]): FolderNode[] {
   return roots;
 }
 
-function findPath(tree: FolderNode[], targetId: FolderNode['id'], trail: FolderNode[] = []): FolderNode[] | null {
-  for (const node of tree) {
-    if (node.id === targetId) {
-      return [...trail, node];
-    }
-    const childTrail = findPath(node.children, targetId, [...trail, node]);
-    if (childTrail) return childTrail;
-  }
-  return null;
-}
-
 function flattenFolderNodes(
   nodes: FolderNode[],
   exclude?: Set<FolderNode['id']>,
@@ -190,14 +179,6 @@ export default function AssetLibraryPanel({
       assets.filter((asset) => asset.name.toLowerCase().includes(searchTerm.toLowerCase())),
     [assets, searchTerm]
   );
-
-  const breadcrumbs = useMemo(() => {
-    if (currentFolderId === null) {
-      return [{ id: null, name: translations.root }];
-    }
-    const path = findPath(folderTree, currentFolderId) ?? [];
-    return [{ id: null, name: translations.root }, ...path.map((node) => ({ id: node.id, name: node.name }))];
-  }, [currentFolderId, folderTree, translations.root]);
 
   const loadTree = useCallback(
     async (preferApi = true) => {
@@ -463,29 +444,38 @@ export default function AssetLibraryPanel({
   }, [folderTree, moveCandidate, translations.root]);
 
   const headerActions = (
-    <div className="flex items-center gap-1">
-      <button
-        onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-        className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors"
-        title={viewMode === 'grid' ? translations.list : translations.grid}
-      >
-        {viewMode === 'grid' ? '☰' : '⊞'}
-      </button>
-      <button
-        onClick={() => openCreateModal()}
-        disabled={loading || usingFallback}
-        className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-        title={translations.newFolder}
-      >
-        📁+
-      </button>
-      <button
-        onClick={() => handleRefresh()}
-        className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors"
-        title={translations.refresh}
-      >
-        🔄
-      </button>
+    <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+          className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors"
+          title={viewMode === 'grid' ? translations.list : translations.grid}
+        >
+          {viewMode === 'grid' ? '☰' : '⊞'}
+        </button>
+        <button
+          onClick={() => openCreateModal()}
+          disabled={loading || usingFallback}
+          className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          title={translations.newFolder}
+        >
+          📁+
+        </button>
+        <button
+          onClick={() => handleRefresh()}
+          className="px-2 py-1 text-xs bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-sm transition-colors"
+          title={translations.refresh}
+        >
+          🔄
+        </button>
+      </div>
+      <TextInput
+        placeholder={translations.search}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        size="sm"
+        className="w-48"
+      />
     </div>
   );
 
@@ -590,30 +580,8 @@ export default function AssetLibraryPanel({
   return (
     <EditorPanel title={translations.title} headerActions={headerActions} className="h-full">
       <div className="space-y-3">
-        <TextInput
-          placeholder={translations.search}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          size="sm"
-          className="w-full"
-        />
-
-        <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
-          {breadcrumbs.map((crumb, idx) => (
-            <React.Fragment key={String(crumb.id ?? idx)}>
-              <button
-                onClick={() => handleFolderNavigate(crumb.id)}
-                className="hover:text-primary-500 transition-colors"
-              >
-                {crumb.name}
-              </button>
-              {idx < breadcrumbs.length - 1 && <span>/</span>}
-            </React.Fragment>
-          ))}
-        </div>
-
         <div className="flex gap-4">
-          <div className="w-48 border border-neutral-200 dark:border-neutral-700 rounded-sm p-2 space-y-1 bg-white dark:bg-neutral-900">
+          <div className="w-48 border border-neutral-200 dark:border-neutral-700 rounded-sm p-2 space-y-1 bg-white dark:bg-neutral-900 overflow-y-auto max-h-64 md:max-h-96 lg:max-h-full pr-1">
             <div className="text-xs font-semibold text-neutral-700 dark:text-neutral-200">{translations.folders}</div>
             <button
               onClick={() => handleFolderNavigate(null)}
