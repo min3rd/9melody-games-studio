@@ -37,9 +37,6 @@ export default function Scene3DObject({
   const meshRef = useRef<THREE.Mesh | THREE.Group>(null);
   const transformControlsRef = useRef<any>(null);
   const isDraggingRef = useRef(false);
-  const lastMeshPositionRef = useRef<[number, number, number]>([0, 0, 0]);
-  const lastMeshRotationRef = useRef<[number, number, number]>([0, 0, 0]);
-  const lastMeshScaleRef = useRef<[number, number, number]>([1, 1, 1]);
 
   // Handle TransformControls events to disable/enable OrbitControls
   useEffect(() => {
@@ -83,15 +80,12 @@ export default function Scene3DObject({
     
     if (posChanged) {
       mesh.position.set(data.position[0], data.position[1], data.position[2]);
-      lastMeshPositionRef.current = [...data.position];
     }
     if (rotChanged) {
       mesh.rotation.set(data.rotation[0], data.rotation[1], data.rotation[2]);
-      lastMeshRotationRef.current = [...data.rotation];
     }
     if (scaleChanged) {
       mesh.scale.set(data.scale[0], data.scale[1], data.scale[2]);
-      lastMeshScaleRef.current = [...data.scale];
     }
   }, [data.position, data.rotation, data.scale]);
 
